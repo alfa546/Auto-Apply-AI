@@ -41,6 +41,12 @@ class Settings(BaseSettings):
     PLAYWRIGHT_HEADLESS: bool = True
     PLAYWRIGHT_TIMEOUT: int = 30000
     
+    # Email Agent Configurations
+    EMAIL_IMAP_SERVER: Optional[str] = None
+    EMAIL_ADDRESS: Optional[str] = None
+    EMAIL_PASSWORD: Optional[str] = None
+    EMAIL_CHECK_INTERVAL_MINUTES: int = 15
+    
     # Security Setup
     SECRET_KEY: str = "supersecretdevelopmentkeychangeinprod"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7 # 1 week

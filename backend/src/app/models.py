@@ -118,6 +118,7 @@ class EmailInteraction(Base):
     received_at = Column(DateTime(timezone=True), server_default=func.now())
     classification = Column(String, nullable=True) # e.g. "Interview Invite", "Rejection", "Confirmation"
     response_draft = Column(String, nullable=True)
+    status = Column(String, default="Pending Review") # e.g. "Pending Review", "Approved", "Sent", "Dismissed"
 
     user = relationship("User", back_populates="email_interactions")
     application = relationship("Application", back_populates="email_interactions")

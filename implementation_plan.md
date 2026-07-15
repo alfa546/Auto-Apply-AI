@@ -430,10 +430,105 @@ Implement the core automation that fills out forms and uploads candidate materia
 
 
 ### Step 8: Email Agent (Inbox Monitoring & Automatic Drafting)
+
 Automate check-ins on applicant mailboxes to capture interviewer responses or requests.
-*   **Gmail Integration**: IMAP / Gmail API listener to watch for replies from applied domains.
-*   **Classification Engine**: LLM classification of incoming emails (e.g., Interview Invite, Rejection, Action Required: Transcript/References).
-*   **Draft Writer**: Automatically draft responses (e.g. providing references, confirming time slots) and notify the user via DB/Dashboard.
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Authentication Credentials Security**: Email inbox reading requires credentials (IMAP server, email address, app-specific password). We will configure settings to load `EMAIL_IMAP_SERVER`, `EMAIL_ADDRESS`, and `EMAIL_PASSWORD` (e.g. Gmail App Password) from `.env`.
+>
+> **Interactive Drafting**: Auto-drafts of email replies will be saved to a database table `email_drafts` with a status of `"Pending Review"`. The user must explicitly approve or edit drafts before they are sent, preventing any unauthorized replies from going out.
+
+---
+
+## Open Questions
+
+> [!NOTE]
+> **Q1: Applied Domains Filtering**
+> To prevent reading unrelated personal emails, we should scan the inbox for emails coming from domains associated with applications stored in the user's `applications` table, or keywords containing company names (e.g., "Google", "Stripe").
+> We will implement a smart filtering strategy: only process emails where the sender's domain or email content matches the company names of active user applications.
+
+---
+
+## Proposed Changes
+
+### Configuration Updates
+
+#### [MODIFY] [config.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/config.py)
+* Add `EMAIL_IMAP_SERVER: Optional[str] = None`
+* Add `EMAIL_ADDRESS: Optional[str] = None`
+* Add `EMAIL_PASSWORD: Optional[str] = None` (app-specific password)
+* Add `EMAIL_CHECK_INTERVAL_MINUTES: int = 15`
+
+---
+
+### Database Schema Updates
+
+#### [NEW] Database Table `email_drafts`
+* Create a table/model `EmailDraft`:
+  * `id` (int, primary key)
+  * `user_id` (str, foreign key to users)
+  * `application_id` (int, foreign key to applications, optional)
+  * `sender` (str)
+  * `subject` (str)
+  * `received_body` (str)
+  * `classification` (str, e.g. "Interview Invite", "Rejection", "Inquiry")
+  * `draft_reply` (str)
+  * `status` (str, e.g. "Pending Review", "Approved", "Sent", "Dismissed")
+  * `created_at` (datetime)
+
+---
+
+### Email Agent Services
+
+#### [NEW] [watcher.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/email/watcher.py)
+* Implement `EmailInboxWatcher`:
+  * `async def check_inbox(self, db_session, user_id: str)`:
+    * Connects to IMAP server using python `imaplib` over SSL.
+    * Fetches unread emails.
+    * Filters emails matching active companies from the user's `applications` list.
+    * Extracts plain text bodies.
+
+#### [NEW] [classifier.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/email/classifier.py)
+* Implement `classify_email(subject: str, body: str) -> str`:
+  * Uses keyword matching/regex classification first, falling back to OpenAI LLM prompt classification.
+  * Categories: `"Interview Invite"`, `"Rejection"`, `"Status Inquiry"`, `"Action Required"` (e.g. transcript request), or `"Unrelated"`.
+
+#### [NEW] [draft_writer.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/email/draft_writer.py)
+* Implement `generate_draft_reply(received_email: dict, candidate_profile: dict) -> str`:
+  * Creates professional, tailored draft responses.
+  * For *Interview Invite*: Draft replies with thanks, expressing enthusiasm, and proposing available calendar time slots.
+  * For *Action Required*: Draft replies acknowledging the request and requesting the candidate to attach documents.
+  * Saves generated draft to the `email_drafts` database table.
+
+---
+
+### Pipeline Orchestration & Endpoints
+
+#### [NEW] [emails.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/api/emails.py)
+* Add endpoints:
+  * `GET /api/v1/emails/drafts` to list all drafts.
+  * `POST /api/v1/emails/drafts/{draft_id}/approve` to approve/send the email.
+  * `DELETE /api/v1/emails/drafts/{draft_id}` to reject/discard a draft.
+  * `POST /api/v1/emails/check` to manually trigger an inbox check.
+
+#### [MODIFY] [main.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/main.py)
+* Register `/api/v1/emails` router.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+* Create `backend/tests/test_email_agent.py` verifying:
+  1. IMAP watcher parses MIME messages correctly (using a mock `imaplib` context).
+  2. The email classifier correctly labels invite texts vs. rejections.
+  3. The draft writer successfully inserts responses into `email_drafts`.
+* Run tests with: `poetry run python -m unittest tests/test_email_agent.py`.
+
 
 ### Step 9: User Dashboard (Next.js Frontend)
 Construct a premium, dark-themed responsive dashboard for checking stats and logs.
