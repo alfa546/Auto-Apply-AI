@@ -65,10 +65,99 @@ Implement secure authentication and user asset uploads.
 *   **Storage**: Firebase Storage (or local S3-compatible service for development) to upload and retrieve resume PDFs and certificates.
 
 ### Step 4: Resume Agent (PDF Parsing, Embeddings & ATS Analysis)
+
 Build the ingestion pipeline that parses uploaded PDFs and translates them into structured JSON profiles and embeddings.
-*   **PDF Parser**: Integration with `PyPDF2` / `pdfplumber` / LLM parsing to extract structured sections (Education, Skills, Experience, Projects).
-*   **ATS Checker**: LLM prompt engine to score resumes against standard industries and identify missing skills.
-*   **Embedding Pipeline**: Generate embeddings of resume parts using SentenceTransformers / OpenAI Embeddings and index them in the Vector DB.
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **LLM API Requirements**: This step introduces LLM integration for structuring resumes and grading them for ATS. We will configure it to use OpenAI's API. If no `OPENAI_API_KEY` is provided in `.env`, the system will automatically fall back to a rule-based parser and grading system so that the backend remains fully functional and testable without keys.
+
+> [!NOTE]
+> **Embeddings Storage**: We will generate embeddings using the local `SentenceTransformer` model `"all-MiniLM-L6-v2"` (from the `sentence-transformers` package already in `pyproject.toml`) and store them in ChromaDB.
+
+---
+
+## Open Questions
+
+> [!NOTE]
+> **Q1: Which LLM provider is preferred?**
+> We propose OpenAI (`gpt-4o-mini` or `gpt-4o`) as it has robust support for structured output via Pydantic schemas. If you prefer Gemini or another provider, please let us know.
+>
+> **Q2: Resume Parsing Automation Trigger**
+> Should uploading a resume automatically trigger parsing, ATS checks, and indexing in one synchronous step, or should the upload just save the file, leaving the client to trigger parsing explicitly? We propose automatically parsing on upload so the user profile is instantly populated.
+
+---
+
+## Proposed Changes
+
+### Configuration Updates
+
+#### [MODIFY] [config.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/config.py)
+* Add `OPENAI_API_KEY`, `OPENAI_MODEL` (default: `"gpt-4o-mini"`), and `EMBEDDING_MODEL` (default: `"all-MiniLM-L6-v2"`) configuration settings.
+
+---
+
+### Resume Agent Services
+
+#### [NEW] [pdf_parser.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/pdf_parser.py)
+* Implement `extract_text_from_pdf(pdf_bytes: bytes) -> str` using `pdfplumber` with a robust fallback to `PyPDF2` in case of decoding errors.
+
+#### [NEW] [resume_parser.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/resume_parser.py)
+* Implement `parse_resume_text(text: str) -> dict` returning:
+  * `skills` (list of strings)
+  * `experience` (list of dicts containing `title`, `company`, `duration`, `description`)
+  * `education` (list of dicts containing `degree`, `institution`, `year`)
+  * `projects` (list of dicts containing `title`, `description`)
+  * `languages` (list of strings)
+* Integrate with OpenAI's structured outputs (`beta.chat.completions.parse`) using Pydantic schemas if `OPENAI_API_KEY` is set.
+* Implement a robust rule-based regex fallback parser if `OPENAI_API_KEY` is not provided.
+
+#### [NEW] [ats_checker.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/ats_checker.py)
+* Implement `evaluate_resume_ats(profile_data: dict, target_role: str = None) -> dict` returning:
+  * `ats_score` (integer 0-100)
+  * `ats_suggestions` (dict with lists of `missing_skills`, `formatting_suggestions`, `experience_improvements`)
+* Use LLM matching if `OPENAI_API_KEY` is set, otherwise run a fallback rule-based similarity and keyword density check.
+
+#### [NEW] [embeddings.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/embeddings.py)
+* Implement `generate_and_store_resume_embeddings(user_id: str, profile_data: dict)`:
+  * Use local `SentenceTransformer` to encode resume components (skills, work history descriptions, projects).
+  * Store and index the vectors in ChromaDB linked to the `user_id`.
+
+---
+
+### API Endpoint Integration
+
+#### [MODIFY] [users.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/api/users.py)
+* Update `upload_resume` endpoint to automatically trigger the parsing, ATS scoring, and embedding generation pipeline upon successful upload, updating the user's `Profile` table record.
+
+#### [NEW] [resumes.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/api/resumes.py)
+* Add endpoints:
+  * `GET /api/v1/resumes/profile` to retrieve parsed resume profile data, ATS score, and suggestions.
+  * `POST /api/v1/resumes/ats-check` to re-score the parsed resume against a user-specified job description or title.
+
+#### [MODIFY] [main.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/main.py)
+* Register the new `resumes` router.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+* Create `backend/tests/test_resume_agent.py` to verify:
+  1. PDF text extraction from a sample PDF bytes structure.
+  2. Rule-based resume parser fallback correctness.
+  3. ATS scoring logic and response structure.
+  4. Embedding generation and storage in ChromaDB client.
+* Run tests with: `poetry run pytest backend/tests/test_resume_agent.py` or `pytest backend/tests/test_resume_agent.py`.
+
+### Manual Verification
+* Upload a sample resume PDF using Postman / Swagger UI.
+* Retrieve the parsed profile details via `/api/v1/resumes/profile` and verify JSON keys contain structured data.
+* Run an ATS check against a specific job role (e.g. "Python Developer") and verify the suggestions and score output.
+
 
 ### Step 5: Search Agent (APIs, Scraping & Aggregator Pipeline)
 Create a scheduled engine that regularly queries open APIs and scrapes job/scholarship listings.

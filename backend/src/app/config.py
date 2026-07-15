@@ -25,6 +25,11 @@ class Settings(BaseSettings):
     FIREBASE_PROJECT_ID: Optional[str] = None
     FIREBASE_STORAGE_BUCKET: Optional[str] = None
     
+    # OpenAI & Embeddings Configurations
+    OPENAI_API_KEY: Optional[str] = None
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
+    
     # Security Setup
     SECRET_KEY: str = "supersecretdevelopmentkeychangeinprod"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7 # 1 week

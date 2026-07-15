@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 import os
 
 from src.app.api.users import router as users_router
+from src.app.api.resumes import router as resumes_router
 
 app = FastAPI(
     title="Auto Apply AI API",
@@ -26,6 +27,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Include Routers
 app.include_router(users_router, prefix="/api/v1")
+app.include_router(resumes_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():

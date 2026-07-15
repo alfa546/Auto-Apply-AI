@@ -1,13 +1,33 @@
 import chromadb
+import logging
 from src.app.config import settings
+
+logger = logging.getLogger(__name__)
 
 class VectorDBClient:
     def __init__(self):
-        # Initialize HTTP client to connect to the docker service
-        self.client = chromadb.HttpClient(
-            host=settings.CHROMADB_HOST,
-            port=int(settings.CHROMADB_PORT)
-        )
+        self._client = None
+
+    @property
+    def client(self):
+        if self._client is None:
+            try:
+                # Try connecting to the HTTP service
+                logger.info(f"Connecting to ChromaDB at {settings.CHROMADB_HOST}:{settings.CHROMADB_PORT}...")
+                self._client = chromadb.HttpClient(
+                    host=settings.CHROMADB_HOST,
+                    port=int(settings.CHROMADB_PORT)
+                )
+                # Verify connection
+                self._client.heartbeat()
+                logger.info("ChromaDB connection successful.")
+            except Exception as e:
+                logger.warning(
+                    f"Could not connect to ChromaDB at {settings.CHROMADB_HOST}:{settings.CHROMADB_PORT}. "
+                    f"Falling back to EphemeralClient (in-memory). Error: {e}"
+                )
+                self._client = chromadb.EphemeralClient()
+        return self._client
 
     def get_or_create_collection(self, name: str):
         """

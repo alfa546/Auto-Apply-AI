@@ -1,9 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
 from sqlalchemy.orm import Session
+import logging
 from src.app.database import get_db
 from src.app.auth import get_current_user
 from src.app.storage import storage_service
 from src.app.models import User, Profile
+
+from src.app.services.pdf_parser import extract_text_from_pdf
+from src.app.services.resume_parser import parse_resume_text
+from src.app.services.ats_checker import evaluate_resume_ats
+from src.app.services.embeddings import generate_and_store_resume_embeddings
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -77,7 +85,30 @@ async def upload_resume(
     db.commit()
     db.refresh(profile)
 
+    # Run the parsing and indexing pipeline
+    try:
+        raw_text = extract_text_from_pdf(content)
+        profile_data = parse_resume_text(raw_text)
+        ats_results = evaluate_resume_ats(profile_data)
+        
+        # Save parsed data to DB profile
+        profile.skills = profile_data.get("skills", [])
+        profile.experience = profile_data.get("experience", [])
+        profile.education = profile_data.get("education", [])
+        profile.projects = profile_data.get("projects", [])
+        profile.languages = profile_data.get("languages", [])
+        profile.ats_score = ats_results.get("ats_score")
+        profile.ats_suggestions = ats_results.get("ats_suggestions")
+        
+        db.commit()
+        db.refresh(profile)
+        
+        # Generate embeddings and store in ChromaDB
+        generate_and_store_resume_embeddings(uid, profile_data)
+    except Exception as parse_error:
+        logger.error(f"Failed to parse or index resume for user {uid}: {parse_error}", exc_info=True)
+
     return {
-        "message": "Resume uploaded successfully.",
+        "message": "Resume uploaded and parsed successfully.",
         "resume_url": file_url
     }
