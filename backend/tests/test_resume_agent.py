@@ -28,16 +28,16 @@ def override_get_db():
     finally:
         db.close()
 
-app.dependency_overrides[get_db] = override_get_db
-
 class TestResumeAgent(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        app.dependency_overrides[get_db] = override_get_db
         Base.metadata.create_all(bind=engine)
         cls.client = TestClient(app)
 
     @classmethod
     def tearDownClass(cls):
+        app.dependency_overrides.pop(get_db, None)
         Base.metadata.drop_all(bind=engine)
         engine.dispose()
         if os.path.exists("./test_resume.db"):

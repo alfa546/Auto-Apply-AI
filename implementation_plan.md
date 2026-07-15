@@ -160,10 +160,106 @@ Build the ingestion pipeline that parses uploaded PDFs and translates them into 
 
 
 ### Step 5: Search Agent (APIs, Scraping & Aggregator Pipeline)
+
 Create a scheduled engine that regularly queries open APIs and scrapes job/scholarship listings.
-*   **APIs**: Integrations with Adzuna, Jooble, and scraping scripts for Google Careers, Greenhouse, Lever, Ashby.
-*   **Scholarship/Hackathons Crawlers**: RSS feeds and web scraper modules targeting top scholarship and hackathon lists.
-*   **Scheduler**: APScheduler or Celery Beat worker executing hourly.
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **API Keys Requirement**: Integrations with Adzuna and Jooble require credentials. We will add configuration placeholders in `config.py` and `.env`. If no API keys are provided, the search providers will return verified mock opportunities (e.g. standard developer openings) to ensure local tests and system runs remain fully functional and unblocked.
+
+> [!NOTE]
+> **Scraping Framework**: For Lever, Greenhouse, and Ashby boards, we will query their public JSON endpoints (APIs) instead of raw HTML scraping. This is much faster, more robust, and doesn't break due to layout changes.
+> For Google Careers and standard RSS boards, we will use a resilient HTTP client parsing RSS XML feed structures.
+
+---
+
+## Open Questions
+
+> [!NOTE]
+> **Q1: What companies should we index by default?**
+> We propose seeding default tracked companies for Greenhouse/Lever/Ashby (e.g., Stripe, Vercel, OpenAI, Cloudflare). If you want specific companies, they can be configured via settings.
+>
+> **Q2: Background Scheduler Implementation**
+> Instead of bringing in a heavy Celery setup, we propose using a Python `asyncio` background loop triggered on FastAPI startup (resilient background task). Alternatively, we can integrate `APScheduler` or write an admin trigger endpoint. We propose providing *both* a startup loop (running hourly) and an admin trigger API endpoint `/api/v1/search/trigger` for manual executions.
+
+---
+
+## Proposed Changes
+
+### Configuration Updates
+
+#### [MODIFY] [config.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/config.py)
+* Add settings for `ADZUNA_APP_ID`, `ADZUNA_APP_KEY`, `JOOBLE_API_KEY`.
+* Add list of default seed companies for board scraping (`TRACKED_COMPANIES_GREENHOUSE`, `TRACKED_COMPANIES_LEVER`).
+* Add search schedule intervals.
+
+---
+
+### Search Agent Providers
+
+#### [NEW] [base.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/search/base.py)
+* Define `BaseSearchProvider` abstract class with:
+  * `async def search(self, query: str, country: str = "us") -> List[dict]`
+
+#### [NEW] [adzuna.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/search/adzuna.py)
+* Implement `AdzunaProvider`: Query Adzuna API for jobs. Return mock jobs if credentials are empty.
+
+#### [NEW] [jooble.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/search/jooble.py)
+* Implement `JoobleProvider`: Query Jooble API for jobs. Return mock jobs if credentials are empty.
+
+#### [NEW] [boards.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/search/boards.py)
+* Implement `GreenhouseProvider` and `LeverProvider` to fetch open listings for our default tracked companies via public endpoints.
+
+#### [NEW] [rss.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/search/rss.py)
+* Implement `RSSProvider` to parse opportunities from hackathon and scholarship feeds (e.g. Devpost RSS or similar public boards).
+
+---
+
+### Aggregator & Database Integration
+
+#### [NEW] [aggregator.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/search/aggregator.py)
+* Implement `SearchAggregator`:
+  * Runs all active providers concurrently.
+  * Filters and cleans results (formatting fields, standardizing types).
+  * Performs duplicate checks against the `jobs_found` database table (using URL matching).
+  * Saves new, unique job opportunities to PostgreSQL.
+
+#### [NEW] [scheduler.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/search/scheduler.py)
+* Setup a background daemon loop running on FastAPI startup to execute the search aggregation every 6 hours.
+
+---
+
+### API Router Integration
+
+#### [NEW] [search.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/api/search.py)
+* Add endpoints:
+  * `POST /api/v1/search/trigger` to manually execute a crawl & aggregate cycle (accepts custom query e.g. "React Developer").
+  * `GET /api/v1/search/opportunities` to fetch the list of discovered jobs from the `jobs_found` database (supporting pagination and filtering).
+
+#### [MODIFY] [main.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/main.py)
+* Register the new `/api/v1/search` routes.
+* Wire up the startup/shutdown events to trigger/close the background scheduler loop.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+* Create `backend/tests/test_search_agent.py` verifying:
+  1. Adzuna & Jooble fallback mocks return standard structured schemas.
+  2. RSS feed parser successfully parses sample XML content.
+  3. Greenhouse/Lever URL crawlers fetch and format correctly.
+  4. SearchAggregator deduplicates and inserts new entries into DB.
+* Run tests with: `poetry run python -m unittest tests/test_search_agent.py`.
+
+### Manual Verification
+* Trigger aggregation using Swagger UI endpoint `/api/v1/search/trigger` with a query like "Python".
+* Inspect the database table `jobs_found` to confirm records are added.
+* Fetch opportunities via `/api/v1/search/opportunities` and verify pagination and query parameters.
+
 
 ### Step 6: Matching Agent (Semantic Matching & Score Thresholding)
 Build the decision-making engine that compares extracted candidate profiles against incoming jobs/opportunities.

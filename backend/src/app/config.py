@@ -30,6 +30,14 @@ class Settings(BaseSettings):
     OPENAI_MODEL: str = "gpt-4o-mini"
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
     
+    # Search Agent Configurations
+    ADZUNA_APP_ID: Optional[str] = None
+    ADZUNA_APP_KEY: Optional[str] = None
+    JOOBLE_API_KEY: Optional[str] = None
+    TRACKED_COMPANIES_GREENHOUSE: list[str] = ["stripe", "vercel", "openai", "cloudflare"]
+    TRACKED_COMPANIES_LEVER: list[str] = ["figma", "vercel", "openai", "palantir"]
+    SEARCH_INTERVAL_HOURS: int = 6
+    
     # Security Setup
     SECRET_KEY: str = "supersecretdevelopmentkeychangeinprod"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7 # 1 week
