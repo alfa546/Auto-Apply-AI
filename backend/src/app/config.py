@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     TRACKED_COMPANIES_GREENHOUSE: list[str] = ["stripe", "vercel", "openai", "cloudflare"]
     TRACKED_COMPANIES_LEVER: list[str] = ["figma", "vercel", "openai", "palantir"]
     SEARCH_INTERVAL_HOURS: int = 6
+    MATCHING_THRESHOLD: float = 0.8
     
     # Security Setup
     SECRET_KEY: str = "supersecretdevelopmentkeychangeinprod"

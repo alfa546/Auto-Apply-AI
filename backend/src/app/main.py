@@ -6,6 +6,7 @@ import os
 from src.app.api.users import router as users_router
 from src.app.api.resumes import router as resumes_router
 from src.app.api.search import router as search_router
+from src.app.api.matching import router as matching_router
 from src.app.services.search.scheduler import start_search_scheduler, stop_search_scheduler
 
 app = FastAPI(
@@ -40,6 +41,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.include_router(users_router, prefix="/api/v1")
 app.include_router(resumes_router, prefix="/api/v1")
 app.include_router(search_router, prefix="/api/v1")
+app.include_router(matching_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():

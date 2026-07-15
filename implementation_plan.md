@@ -262,10 +262,85 @@ Create a scheduled engine that regularly queries open APIs and scrapes job/schol
 
 
 ### Step 6: Matching Agent (Semantic Matching & Score Thresholding)
+
 Build the decision-making engine that compares extracted candidate profiles against incoming jobs/opportunities.
-*   **Vector Search**: Semantic similarity queries between job descriptions and resume profiles.
-*   **Constraint Checking**: Hard filtering on preferred countries, salary range, remote vs. onsite, visa sponsorship, and daily apply limits.
-*   **Ranking logic**: Output matching percentage (e.g. 92%) and queue for auto-applying if above a threshold (e.g., >80%).
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Matching Algorithm & Weights**: We propose a composite matching score combining:
+> * **Vector Search Similarity (60% weight)**: Compares job description embeddings against the candidate's resume embeddings stored in ChromaDB.
+> * **Heuristic Keyword Density (40% weight)**: Compares required job keywords directly against user's skills.
+> If the combined score is above the user-defined threshold (default: 80%), the opportunity is queued in the `applications` table with a state of `"Matched / Ready to Apply"` (or `"Resume Required"` if custom files are needed).
+
+> [!NOTE]
+> **Hard Constraints Rules**: If any of the user's hard constraints (e.g. Visa sponsorship required but not offered, salary maximum below `min_salary`, or disallowed country) are violated, the match is discarded immediately (score set to 0) to avoid applying to unqualified positions.
+
+---
+
+## Open Questions
+
+> [!NOTE]
+> **Q1: Do we auto-populate applications?**
+> When a match is found and is above the threshold (e.g., >80%), should we automatically create an entry in the `applications` table as `"Matched"` so it shows up in the user's pipeline to be processed by the Playwright Apply agent? We propose automatically queueing it so the flow is seamless.
+
+---
+
+## Proposed Changes
+
+### Configuration Updates
+
+#### [MODIFY] [config.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/config.py)
+* Add `MATCHING_THRESHOLD: float = 0.8` configuration parameter.
+
+---
+
+### Matching Agent Services
+
+#### [NEW] [matcher.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/matching/matcher.py)
+* Implement `MatchingEngine`:
+  * `async def evaluate_job_match(self, db_session, user_id: str, job_id: int) -> dict` returning:
+    * `is_match` (boolean)
+    * `score` (float from 0.0 to 1.0)
+    * `reasons` (list of strings explaining match strength or constraint failure reasons)
+  * Vector search component: Generate embedding for job title + description, query ChromaDB filtered by user's `user_id`, and convert distance metrics into a normalized similarity score.
+  * Constraint checking component: Query `user_settings` and cross-reference preferred country, salary ranges, remote preference, and visa sponsorship requirements.
+
+#### [NEW] [matching_pipeline.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/matching/pipeline.py)
+* Implement `run_matching_pipeline(db: Session, user_id: str)`:
+  * Fetch all opportunities from `jobs_found` not yet processed for this user.
+  * Evaluate each job using the `MatchingEngine`.
+  * For opportunities exceeding the threshold, insert/update an `Application` record with status `"Matched"` or `"Ready to Apply"`, and log recommendations.
+
+---
+
+### API Router Integration
+
+#### [NEW] [matching.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/api/matching.py)
+* Add endpoints:
+  * `POST /api/v1/matching/run` to trigger the matching pipeline for the current authenticated user (analyzes new jobs and queues applications).
+  * `GET /api/v1/matching/results` to query matching status/logs for specific jobs.
+
+#### [MODIFY] [main.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/main.py)
+* Register the new `/api/v1/matching` routes.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+* Create `backend/tests/test_matching_agent.py` to verify:
+  1. Semantic vector search similarity computes correct scores.
+  2. Hard constraint checker correctly rejects jobs exceeding salary constraints, country preferences, or visa restrictions.
+  3. The pipeline correctly creates `Application` records with `"Matched"` status only when matches exceed thresholds.
+* Run tests with: `poetry run python -m unittest tests/test_matching_agent.py`.
+
+### Manual Verification
+* Trigger matching using Swagger UI `/api/v1/matching/run`.
+* Verify that new `Application` records are visible in database tracking tables with correct match scores.
+
 
 ### Step 7: Application Agent (Playwright Browser Automation & Cover Letter Generator)
 Implement the core automation that fills out forms and uploads candidate materials.
