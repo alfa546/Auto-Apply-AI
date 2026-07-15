@@ -38,6 +38,8 @@ class Settings(BaseSettings):
     TRACKED_COMPANIES_LEVER: list[str] = ["figma", "vercel", "openai", "palantir"]
     SEARCH_INTERVAL_HOURS: int = 6
     MATCHING_THRESHOLD: float = 0.8
+    PLAYWRIGHT_HEADLESS: bool = True
+    PLAYWRIGHT_TIMEOUT: int = 30000
     
     # Security Setup
     SECRET_KEY: str = "supersecretdevelopmentkeychangeinprod"

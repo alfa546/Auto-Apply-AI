@@ -343,10 +343,91 @@ Build the decision-making engine that compares extracted candidate profiles agai
 
 
 ### Step 7: Application Agent (Playwright Browser Automation & Cover Letter Generator)
+
 Implement the core automation that fills out forms and uploads candidate materials.
-*   **Playwright Engine**: Scripts to log in, navigate, and dynamically fill out standard application forms (Name, Email, Phone, LinkedIn, GitHub, Resume upload, Custom questions).
-*   **Cover Letter Generator**: Dynamic prompt engine to generate context-aware, hyper-tailored cover letters for the specific job description and company.
-*   **Status Reporter**: Save screenshot artifacts and update application state in DB.
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Browser Automation Modes (Headless vs. Headed)**: For production execution, Playwright will run in `"headless"` mode (runs in the background without opening a browser window). For testing or auditing, we will add a configuration parameter `PLAYWRIGHT_HEADLESS` (default: `True`) which can be set to `False` in `.env` to visually watch the agent fill forms.
+>
+> **Screenshots Retention**: On completion (success or failure), the agent will capture a page screenshot and save it to `uploads/screenshots/` (exposed via API `/uploads/screenshots/{filename}`). The database `Application` record will be updated with the screenshot URL.
+
+---
+
+## Open Questions
+
+> [!NOTE]
+> **Q1: Resume Path Resolution**
+> Resumes may be stored in remote Firebase Storage or locally. If Firebase is active, the agent must download the PDF resume to a temporary local path before uploading it in the Playwright file input. We will implement automatic resolution that downloads remote file links to a temporary path on the fly.
+>
+> **Q2: Playwright Binaries Installation**
+> Playwright requires running `playwright install` to download browser binaries. We will add instructions to run `poetry run playwright install` as part of the setup, and gracefully handle missing browser binary exceptions in the service.
+
+---
+
+## Proposed Changes
+
+### Configuration Updates
+
+#### [MODIFY] [config.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/config.py)
+* Add `PLAYWRIGHT_HEADLESS: bool = True` and `PLAYWRIGHT_TIMEOUT: int = 30000` configuration settings.
+
+---
+
+### Application Agent Services
+
+#### [NEW] [cover_letter.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/application/cover_letter.py)
+* Implement `generate_cover_letter(profile_data: dict, job_title: str, company: str, job_description: str) -> str`:
+  * If `OPENAI_API_KEY` is present, prompt OpenAI to write a highly targeted, 3-paragraph professional cover letter matching the candidate's experience to the job parameters.
+  * If no API key is present, fallback to a robust template generator that inserts matching skills, latest degree, and company name.
+
+#### [NEW] [form_filler.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/application/form_filler.py)
+* Implement `FormFillerService`:
+  * `async def auto_fill_application(self, application_url: str, candidate_info: dict, resume_path: str, cover_letter_content: str) -> dict` returning:
+    * `success` (bool)
+    * `screenshot_path` (str)
+    * `error_message` (str)
+  * Implements smart locator matching: detects standard fields like Name (first/last), Email, Phone, LinkedIn URL, GitHub URL, Resume (file upload), and Cover Letter (text area or file upload) using regex patterns on labels/attributes.
+
+---
+
+### Pipeline Orchestration & Endpoints
+
+#### [NEW] [apply_pipeline.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/services/application/pipeline.py)
+* Implement `run_apply_pipeline(db: Session, user_id: str, application_id: int)`:
+  * Transitions Application status to `"Applying"`.
+  * Generates cover letter using `cover_letter.py`.
+  * Fetches the candidate profile and retrieves/downloads their resume.
+  * Triggers `FormFillerService` to execute.
+  * Captures success/failure screenshot, updates Application status to `"Applied"` or `"Failed"`, and saves logs.
+
+#### [NEW] [applications.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/api/applications.py)
+* Add endpoints:
+  * `POST /api/v1/applications/{application_id}/apply` to trigger application submission. Runs asynchronously via FastAPI `BackgroundTasks` to prevent HTTP request timeouts.
+  * `GET /api/v1/applications/{application_id}/status` to fetch execution status, logs, and screenshot URLs.
+
+#### [MODIFY] [main.py](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/backend/src/app/main.py)
+* Register `/api/v1/applications` router.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+* Create `backend/tests/test_application_agent.py` verifying:
+  1. Cover letter generation templates and LLM prompt layouts.
+  2. Playwright Form Filler against a local Mock HTML server (we will launch a lightweight local HTTP server inside the test using python's `http.server` running an application form with name, email, resume upload, and submit button).
+  3. Verify Playwright successfully targets, fills out, uploads, and clicks submit on the mock form in headless mode.
+* Run tests with: `poetry run python -m unittest tests/test_application_agent.py`.
+
+### Manual Verification
+* Upload a resume and run matching.
+* Trigger `/api/v1/applications/{id}/apply` for a mock job form or test Greenhouse board.
+* Confirm the database status updates to `"Applied"` and inspect the generated screenshot in the uploads directory.
+
 
 ### Step 8: Email Agent (Inbox Monitoring & Automatic Drafting)
 Automate check-ins on applicant mailboxes to capture interviewer responses or requests.
