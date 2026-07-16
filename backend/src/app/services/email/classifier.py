@@ -1,6 +1,7 @@
 import logging
 import httpx
 from src.app.config import settings
+from src.app.services.llm_client import get_llm_headers_and_url, is_llm_configured
 
 logger = logging.getLogger(__name__)
 
@@ -51,23 +52,20 @@ def classify_email(subject: str, body: str) -> str:
     if any(k in combined for k in confirmation_keywords):
         return "Status Update"
 
-    # Fallback to OpenAI if API key exists for complex cases
-    if settings.OPENAI_API_KEY:
+    # Fallback to LLM if configured for complex cases
+    if is_llm_configured():
         try:
             return classify_with_openai(subject, body)
         except Exception as e:
-            logger.error(f"Failed to classify email with OpenAI: {e}")
+            logger.error(f"Failed to classify email with LLM: {e}")
 
     return "Status Update"  # Default fallback classification
 
 def classify_with_openai(subject: str, body: str) -> str:
     """
-    Asks OpenAI to classify the email content.
+    Asks configured LLM to classify the email content.
     """
-    headers = {
-        "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    headers, url, model = get_llm_headers_and_url()
     
     prompt = f"""
     Classify the following email from a company regarding a job application.
@@ -86,7 +84,7 @@ def classify_with_openai(subject: str, body: str) -> str:
     """
     
     payload = {
-        "model": settings.OPENAI_MODEL,
+        "model": model,
         "messages": [
             {"role": "system", "content": "You are an assistant that classifies recruitment emails."},
             {"role": "user", "content": prompt}
@@ -96,7 +94,7 @@ def classify_with_openai(subject: str, body: str) -> str:
     
     with httpx.Client(timeout=10.0) as client:
         response = client.post(
-            "https://api.openai.com/v1/chat/completions",
+            url,
             json=payload,
             headers=headers
         )

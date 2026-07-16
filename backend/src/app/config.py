@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     OPENAI_MODEL: str = "gpt-4o-mini"
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
     
+    # Gemini Configurations
+    GEMINI_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "gemini-1.5-flash"
+    
     # Search Agent Configurations
     ADZUNA_APP_ID: Optional[str] = None
     ADZUNA_APP_KEY: Optional[str] = None
@@ -46,6 +50,11 @@ class Settings(BaseSettings):
     EMAIL_ADDRESS: Optional[str] = None
     EMAIL_PASSWORD: Optional[str] = None
     EMAIL_CHECK_INTERVAL_MINUTES: int = 15
+    
+    # Notification Agent Configurations
+    DISCORD_WEBHOOK_URL: Optional[str] = None
+    TELEGRAM_BOT_TOKEN: Optional[str] = None
+    TELEGRAM_CHAT_ID: Optional[str] = None
     
     # Security Setup
     SECRET_KEY: str = "supersecretdevelopmentkeychangeinprod"

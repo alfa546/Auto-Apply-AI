@@ -3,8 +3,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from src.app.config import settings
 
-# Construct the SQLAlchemy database URL from configurations
-postgres_url = f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_SERVER}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
+import os
+
+# Construct the SQLAlchemy database URL from configurations, supporting Heroku DATABASE_URL environment variable
+database_url = os.getenv("DATABASE_URL")
+if database_url:
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    postgres_url = database_url
+else:
+    postgres_url = f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_SERVER}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
+
 sqlite_url = "sqlite:///./auto_apply_local.db"
 
 # Try connecting to PostgreSQL, fallback to SQLite if connection fails

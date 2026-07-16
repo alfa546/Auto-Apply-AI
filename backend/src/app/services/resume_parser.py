@@ -3,36 +3,34 @@ import json
 import logging
 import httpx
 from src.app.config import settings
+from src.app.services.llm_client import get_llm_headers_and_url, is_llm_configured
 
 logger = logging.getLogger(__name__)
 
 def parse_resume_text(text: str) -> dict:
     """
     Parses raw resume text into structured sections.
-    If OPENAI_API_KEY is present, uses OpenAI API with structured JSON outputs.
+    If an LLM is configured (Gemini or OpenAI), uses the API with structured JSON outputs.
     Otherwise, falls back to a rule-based parser.
     """
-    if settings.OPENAI_API_KEY:
+    if is_llm_configured():
         try:
             parsed_data = parse_resume_with_openai(text)
             if parsed_data:
                 return parsed_data
         except Exception as e:
-            logger.error(f"Failed to parse resume with OpenAI: {e}. Falling back to rule-based parser.")
+            logger.error(f"Failed to parse resume with LLM: {e}. Falling back to rule-based parser.")
             
     return rule_based_parse(text)
 
 def parse_resume_with_openai(text: str) -> dict:
     """
-    Calls OpenAI Chat Completions API with a defined JSON Schema.
+    Calls configured LLM API (Gemini or OpenAI) with a defined JSON Schema.
     """
-    headers = {
-        "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    headers, url, model = get_llm_headers_and_url()
     
     payload = {
-        "model": settings.OPENAI_MODEL,
+        "model": model,
         "messages": [
             {
                 "role": "system",
@@ -113,7 +111,7 @@ def parse_resume_with_openai(text: str) -> dict:
     
     with httpx.Client(timeout=30.0) as client:
         response = client.post(
-            "https://api.openai.com/v1/chat/completions",
+            url,
             json=payload,
             headers=headers
         )
@@ -122,8 +120,8 @@ def parse_resume_with_openai(text: str) -> dict:
             content = result["choices"][0]["message"]["content"]
             return json.loads(content)
         else:
-            logger.error(f"OpenAI API call failed with status code {response.status_code}: {response.text}")
-            raise Exception("OpenAI API error")
+            logger.error(f"LLM API call failed with status code {response.status_code}: {response.text}")
+            raise Exception("LLM API error")
 
 def rule_based_parse(text: str) -> dict:
     """

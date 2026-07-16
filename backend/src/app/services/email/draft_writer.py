@@ -1,6 +1,7 @@
 import logging
 import httpx
 from src.app.config import settings
+from src.app.services.llm_client import get_llm_headers_and_url, is_llm_configured
 
 logger = logging.getLogger(__name__)
 
@@ -13,13 +14,13 @@ def generate_draft_reply(
 ) -> str:
     """
     Generates a professional email response draft based on classification.
-    Uses OpenAI GPT if available, otherwise compiles from robust templates.
+    Uses LLM if configured, otherwise compiles from robust templates.
     """
-    if settings.OPENAI_API_KEY:
+    if is_llm_configured():
         try:
             return generate_with_openai(classification, sender, subject, body, candidate_profile)
         except Exception as e:
-            logger.error(f"Failed to generate draft reply with OpenAI: {e}. Falling back to templates.")
+            logger.error(f"Failed to generate draft reply with LLM: {e}. Falling back to templates.")
             
     return generate_from_template(classification, sender, candidate_profile)
 
@@ -31,12 +32,9 @@ def generate_with_openai(
     candidate_profile: dict
 ) -> str:
     """
-    Calls OpenAI Chat Completions to generate a professional email response draft.
+    Calls configured LLM Chat Completions to generate a professional email response draft.
     """
-    headers = {
-        "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    headers, url, model = get_llm_headers_and_url()
     
     prompt = f"""
     You are a professional email assistant. Write a professional reply to an email received from a recruiter.
@@ -62,7 +60,7 @@ def generate_with_openai(
     """
     
     payload = {
-        "model": settings.OPENAI_MODEL,
+        "model": model,
         "messages": [
             {"role": "system", "content": "You are a professional email drafting assistant."},
             {"role": "user", "content": prompt}
@@ -72,7 +70,7 @@ def generate_with_openai(
     
     with httpx.Client(timeout=15.0) as client:
         response = client.post(
-            "https://api.openai.com/v1/chat/completions",
+            url,
             json=payload,
             headers=headers
         )
@@ -80,7 +78,7 @@ def generate_with_openai(
             result = response.json()
             return result["choices"][0]["message"]["content"].strip()
         else:
-            raise Exception("OpenAI API email drafting error")
+            raise Exception("LLM API email drafting error")
 
 def generate_from_template(classification: str, sender: str, candidate_profile: dict) -> str:
     """

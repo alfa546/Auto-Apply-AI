@@ -9,6 +9,7 @@ from src.app.models import Application, User, Profile, JobFound
 from src.app.services.application.cover_letter import generate_cover_letter
 from src.app.services.application.form_filler import FormFillerService
 from src.app.services.pdf_parser import extract_text_from_pdf
+from src.app.services.notification import NotificationService
 
 logger = logging.getLogger(__name__)
 
@@ -162,10 +163,16 @@ async def run_apply_pipeline(db: Session, user_id: str, application_id: int) -> 
             app_record.status = "Applied"
             app_record.notes = f"Successfully applied. Screenshot: {fill_result.get('screenshot_path')}"
             logger.info(f"Successfully applied to {app_record.title} at {app_record.company}")
+            
+            msg = f"<b>Auto Apply AI Alert</b>\n\nSuccessfully applied to: <b>{app_record.title}</b> at <b>{app_record.company}</b>\nURL: {app_record.url}\nScreenshot: {fill_result.get('screenshot_path')}"
+            await NotificationService.send_notification(msg)
         else:
             app_record.status = "Failed"
             app_record.notes = f"Failed to apply: {fill_result.get('error_message')}. Screenshot: {fill_result.get('screenshot_path')}"
             logger.error(f"Application submission failed for {app_record.title}: {fill_result.get('error_message')}")
+            
+            msg = f"<b>Auto Apply AI Alert</b>\n\nFailed to apply to: <b>{app_record.title}</b> at <b>{app_record.company}</b>\nError: {fill_result.get('error_message')}"
+            await NotificationService.send_notification(msg)
 
         db.commit()
         return fill_result
@@ -175,4 +182,7 @@ async def run_apply_pipeline(db: Session, user_id: str, application_id: int) -> 
         app_record.status = "Failed"
         app_record.notes = f"Pipeline execution error: {error_msg}"
         db.commit()
+        
+        msg = f"<b>Auto Apply AI Alert</b>\n\nPipeline execution failed for: <b>{app_record.title}</b> at <b>{app_record.company}</b>\nPipeline Error: {error_msg}"
+        await NotificationService.send_notification(msg)
         return {"success": False, "screenshot_path": None, "error_message": error_msg}

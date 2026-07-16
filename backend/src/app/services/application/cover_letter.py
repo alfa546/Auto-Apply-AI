@@ -1,31 +1,29 @@
 import logging
 import httpx
 from src.app.config import settings
+from src.app.services.llm_client import get_llm_headers_and_url, is_llm_configured
 
 logger = logging.getLogger(__name__)
 
 def generate_cover_letter(profile_data: dict, job_title: str, company: str, job_description: str) -> str:
     """
     Generates a tailored cover letter for a candidate and target job opportunity.
-    If OPENAI_API_KEY is present, uses OpenAI API.
+    If an LLM is configured (Gemini or OpenAI), uses the API.
     Otherwise, falls back to a template-based generator.
     """
-    if settings.OPENAI_API_KEY:
+    if is_llm_configured():
         try:
             return generate_with_openai(profile_data, job_title, company, job_description)
         except Exception as e:
-            logger.error(f"Failed to generate cover letter with OpenAI: {e}. Falling back to template-based generator.")
+            logger.error(f"Failed to generate cover letter with LLM: {e}. Falling back to template-based generator.")
             
     return generate_from_template(profile_data, job_title, company)
 
 def generate_with_openai(profile_data: dict, job_title: str, company: str, job_description: str) -> str:
     """
-    Calls OpenAI Chat Completions to generate a professional cover letter.
+    Calls configured LLM Chat Completions to generate a professional cover letter.
     """
-    headers = {
-        "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    headers, url, model = get_llm_headers_and_url()
     
     prompt = f"""
     You are a professional cover letter writer. Write a tailored, 3-paragraph cover letter for a candidate applying to the role of '{job_title}' at '{company}'.
@@ -47,7 +45,7 @@ def generate_with_openai(profile_data: dict, job_title: str, company: str, job_d
     """
     
     payload = {
-        "model": settings.OPENAI_MODEL,
+        "model": model,
         "messages": [
             {
                 "role": "system",
@@ -63,7 +61,7 @@ def generate_with_openai(profile_data: dict, job_title: str, company: str, job_d
     
     with httpx.Client(timeout=30.0) as client:
         response = client.post(
-            "https://api.openai.com/v1/chat/completions",
+            url,
             json=payload,
             headers=headers
         )
@@ -72,8 +70,8 @@ def generate_with_openai(profile_data: dict, job_title: str, company: str, job_d
             content = result["choices"][0]["message"]["content"]
             return content.strip()
         else:
-            logger.error(f"OpenAI cover letter call failed with status code {response.status_code}: {response.text}")
-            raise Exception("OpenAI API error")
+            logger.error(f"LLM cover letter call failed with status code {response.status_code}: {response.text}")
+            raise Exception("LLM API error")
 
 def generate_from_template(profile_data: dict, job_title: str, company: str) -> str:
     """
