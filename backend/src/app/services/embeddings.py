@@ -1,6 +1,9 @@
 import logging
 from typing import List
-from sentence_transformers import SentenceTransformer
+try:
+    from sentence_transformers import SentenceTransformer
+except ImportError:
+    SentenceTransformer = None
 from src.app.vector_db import vector_db
 from src.app.config import settings
 
@@ -12,6 +15,10 @@ _model_instance = None
 def get_embedding_model():
     global _model_instance
     if _model_instance is None:
+        if SentenceTransformer is None:
+            logger.warning("SentenceTransformer is not installed (ImportError). Using fallback mock embeddings.")
+            _model_instance = "fallback"
+            return _model_instance
         try:
             logger.info(f"Loading SentenceTransformer model: {settings.EMBEDDING_MODEL}")
             _model_instance = SentenceTransformer(settings.EMBEDDING_MODEL)
@@ -20,6 +27,7 @@ def get_embedding_model():
             # We will use None to signify fallback mode
             _model_instance = "fallback"
     return _model_instance
+
 
 def generate_embeddings(texts: List[str]) -> List[List[float]]:
     """
