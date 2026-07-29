@@ -843,21 +843,6 @@ export default function Dashboard() {
             <UserIcon />
             <span>User Profile & RAG Resume Hub</span>
           </button>
-
-          <button
-            onClick={() => setActiveTab("settings")}
-            className={`pb-4 px-6 font-medium text-sm border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
-              activeTab === "settings"
-                ? "border-amber-500 text-amber-400"
-                : "border-transparent text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <KeyIcon />
-            <span>API Keys & Integration Settings</span>
-            <span className="ml-1 bg-amber-950/80 text-amber-300 border border-amber-500/30 text-[10px] px-2 py-0.5 rounded-full font-mono">
-              Vault
-            </span>
-          </button>
         </div>
 
         {/* Tab 1: Daily Jobs & Opportunities Feed */}
