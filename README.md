@@ -363,5 +363,5 @@ pytest -v
 Distributed under the MIT License. See `LICENSE` for more information.
 
 <p align="center">
-  Crafted with ❤️ by <b>Antigravity Agent</b> for <b>Auto Apply AI</b>
+  Crafted with ❤️ by <b>Nouman Sajid</b> for <b>Auto Apply AI</b>
 </p>
