@@ -15,12 +15,18 @@ class SmtpSetupRequest(BaseModel):
     email: str
     app_password: str
 
+def get_uid(user_context) -> str:
+    if isinstance(user_context, dict):
+        return user_context.get("uid", "dev-mock-matcher_test_uid")
+    return getattr(user_context, "id", "dev-mock-matcher_test_uid")
+
 @router.get("/url")
-def get_gmail_auth_url(current_user: User = Depends(get_current_user)):
+def get_gmail_auth_url(current_user: dict = Depends(get_current_user)):
     """
     Returns Google OAuth authorization URL for connecting user's Gmail.
     """
-    url = gmail_client.get_authorization_url(current_user.id)
+    uid = get_uid(current_user)
+    url = gmail_client.get_authorization_url(uid)
     return {"auth_url": url}
 
 @router.get("/callback")
@@ -62,14 +68,15 @@ def gmail_oauth_callback(
 def connect_mock_gmail(
     email: str = Query("user@gmail.com"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Directly connects user's Gmail in dev/demo mode.
     """
-    settings = db.query(UserSettings).filter(UserSettings.user_id == current_user.id).first()
+    uid = get_uid(current_user)
+    settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
     if not settings:
-        settings = UserSettings(user_id=current_user.id)
+        settings = UserSettings(user_id=uid)
         db.add(settings)
         
     settings.is_gmail_connected = True
@@ -82,14 +89,15 @@ def connect_mock_gmail(
 def setup_gmail_smtp(
     payload: SmtpSetupRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Configures Gmail App Password for direct SMTP email applications.
     """
-    settings = db.query(UserSettings).filter(UserSettings.user_id == current_user.id).first()
+    uid = get_uid(current_user)
+    settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
     if not settings:
-        settings = UserSettings(user_id=current_user.id)
+        settings = UserSettings(user_id=uid)
         db.add(settings)
         
     settings.is_gmail_connected = True
@@ -101,12 +109,13 @@ def setup_gmail_smtp(
 @router.get("/status")
 def get_gmail_status(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Check Gmail connection status for logged-in user.
     """
-    settings = db.query(UserSettings).filter(UserSettings.user_id == current_user.id).first()
+    uid = get_uid(current_user)
+    settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
     if not settings or not settings.is_gmail_connected:
         return {
             "is_connected": False,
@@ -121,12 +130,13 @@ def get_gmail_status(
 @router.post("/disconnect")
 def disconnect_gmail(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Disconnect Gmail integration.
     """
-    settings = db.query(UserSettings).filter(UserSettings.user_id == current_user.id).first()
+    uid = get_uid(current_user)
+    settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
     if settings:
         settings.is_gmail_connected = False
         settings.gmail_access_token = None

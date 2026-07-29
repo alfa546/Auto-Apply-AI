@@ -19,16 +19,27 @@ class ApplyRequest(BaseModel):
     job_id: int
     custom_cover_letter: Optional[str] = None
 
+def get_uid_and_email(user_context):
+    if isinstance(user_context, dict):
+        uid = user_context.get("uid", "dev-mock-matcher_test_uid")
+        email = user_context.get("email", "dev-user@example.com")
+    else:
+        uid = getattr(user_context, "id", "dev-mock-matcher_test_uid")
+        email = getattr(user_context, "email", "dev-user@example.com")
+    return uid, email
+
 @router.post("/send-email")
 def auto_apply_via_email(
     payload: ApplyRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Auto-applies to a specific job by generating a tailored cover letter,
     attaching user's CV PDF, and sending directly from user's connected Gmail.
     """
+    uid, user_email = get_uid_and_email(current_user)
+
     # 1. Check Job Details
     job = db.query(JobFound).filter(JobFound.id == payload.job_id).first()
     if not job:
@@ -39,42 +50,40 @@ def auto_apply_via_email(
         recipient_email = f"careers@{job.company.lower().replace(' ', '')}.com"
 
     # 2. Check User Gmail Connection
-    user_settings = db.query(UserSettings).filter(UserSettings.user_id == current_user.id).first()
+    user_settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
     if not user_settings or not user_settings.is_gmail_connected:
-        # Fallback to dev demo mode email address if not connected
-        sender_email = current_user.email
+        sender_email = user_email
     else:
-        sender_email = user_settings.gmail_email_address or current_user.email
+        sender_email = user_settings.gmail_email_address or user_email
 
     # 3. Fetch User Profile and Resume
-    profile = db.query(Profile).filter(Profile.user_id == current_user.id).first()
+    profile = db.query(Profile).filter(Profile.user_id == uid).first()
     cv_path = profile.resume_url if profile and profile.resume_url else None
     
-    # Check physical CV file path on disk
     if cv_path and not os.path.isabs(cv_path):
         cv_path = os.path.abspath(cv_path)
 
     # 4. Generate AI Tailored Cover Letter
-    subject = f"Application for {job.title} - {profile.user.email if profile else current_user.email}"
+    subject = f"Application for {job.title} - {user_email}"
     
     if payload.custom_cover_letter:
         cover_letter = payload.custom_cover_letter
     else:
         try:
             cover_letter = generate_custom_cover_letter(
-                resume_data={
-                    "skills": profile.skills if profile else [],
-                    "summary": profile.summary if profile else "Software Developer"
-                },
-                job_description=job.description or job.title,
-                company_name=job.company
+                candidate_name=user_email.split("@")[0],
+                job_title=job.title,
+                company=job.company,
+                skills=profile.skills if profile else [],
+                job_description=job.description or job.title
             )
         except Exception as e:
             logger.warning(f"Fallback cover letter generation: {e}")
+            skills_str = ', '.join(profile.skills[:5]) if profile and profile.skills else 'software development'
             cover_letter = (
                 f"Dear Hiring Manager at {job.company},\n\n"
                 f"I am writing to express my strong interest in the {job.title} position.\n"
-                f"With my background in software development and skills in {', '.join(profile.skills[:5] if profile and profile.skills else ['programming'])}, "
+                f"With my background in software development and skills in {skills_str}, "
                 f"I am confident in my ability to add immediate value to your team.\n\n"
                 f"Please find my attached resume for your consideration. I look forward to hearing from you.\n\n"
                 f"Best regards,\n{sender_email}"
@@ -111,17 +120,14 @@ def auto_apply_via_email(
 
     # 6. Record Application in DB
     app_record = Application(
-        user_id=current_user.id,
+        user_id=uid,
         title=job.title,
         company=job.company,
         company_email=recipient_email,
-        opportunity_type=job.opportunity_type,
+        opportunity_type=job.opportunity_type or "job",
         status="Sent via Gmail" if send_result.get("success") else "Failed",
         url=job.url,
         cover_letter=cover_letter,
-        sent_via_gmail=True,
-        gmail_message_id=send_result.get("message_id"),
-        cv_attached_path=cv_path,
         notes=f"Sent to {recipient_email} via {send_result.get('method')}"
     )
     db.add(app_record)
