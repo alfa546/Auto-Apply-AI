@@ -261,30 +261,16 @@ const WORK_MODE_OPTIONS = [
   "On-site"
 ];
 
-const TARGET_COUNTRY_OPTIONS = [
-  "United States 🇺🇸",
-  "Canada 🇨🇦",
-  "United Kingdom 🇬🇧",
-  "Germany 🇩🇪",
-  "Netherlands 🇳🇱",
-  "Switzerland 🇨🇭",
-  "Sweden 🇸🇪",
-  "Australia 🇦🇺",
-  "Singapore 🇸🇬",
-  "United Arab Emirates 🇦🇪",
-  "Saudi Arabia 🇸🇦",
-  "Japan 🇯🇵",
-  "Ireland 🇮🇪",
-  "France 🇫🇷",
-  "New Zealand 🇳🇿"
-];
-
-const REGION_OPTIONS = [
-  "North America (USA, Canada)",
-  "Western Europe (UK, Germany, Netherlands)",
-  "Asia-Pacific & Australia (Singapore, Japan)",
-  "Middle East & Gulf (UAE, Saudi Arabia)",
-  "Global Remote (Worldwide)"
+// Complete World Countries List for Autocomplete Box
+const ALL_WORLD_COUNTRIES = [
+  "United States 🇺🇸", "Canada 🇨🇦", "United Kingdom 🇬🇧", "Germany 🇩🇪", "Netherlands 🇳🇱",
+  "Switzerland 🇨🇭", "Sweden 🇸🇪", "Australia 🇦🇺", "Singapore 🇸🇬", "United Arab Emirates 🇦🇪",
+  "Saudi Arabia 🇸🇦", "Japan 🇯🇵", "Ireland 🇮🇪", "France 🇫🇷", "New Zealand 🇳🇿",
+  "Denmark 🇩🇰", "Norway 🇳🇴", "Finland 🇫🇮", "Austria 🇦🇹", "Belgium 🇧🇪",
+  "Spain 🇪🇸", "Italy 🇮🇹", "Portugal 🇵🇹", "Poland 🇵🇱", "Estonia 🇪🇪",
+  "Qatar 🇶🇦", "Kuwait 🇰🇼", "Oman 🇴🇲", "Bahrain 🇧🇭", "Turkey 🇹🇷",
+  "South Korea 🇰🇷", "Malaysia 🇲🇾", "China 🇨🇳", "India 🇮🇳", "Pakistan 🇵🇰",
+  "Brazil 🇧🇷", "Mexico 🇲🇽", "Argentina 🇦🇷", "Chile 🇨🇱", "South Africa 🇿🇦"
 ];
 
 const EMPLOYMENT_TYPE_OPTIONS = [
@@ -339,8 +325,9 @@ export default function Dashboard() {
   const [otherUrl, setOtherUrl] = useState("https://linkedin.com/in/noumansajid");
   const [targetRoles, setTargetRoles] = useState(["Full Stack Developer", "Python AI Engineer", "FastAPI / Next.js Specialist"]);
 
-  // 🌐 International Career Preferences State & Target Countries (1 to 10 max)
-  const [workModePref, setWorkModePref] = useState<string>("Fully Remote (Worldwide)");
+  // 🌐 Country Search Box & Selected Target Countries State
+  const [countryQuery, setCountryQuery] = useState("");
+  const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([
     "United States 🇺🇸",
     "Canada 🇨🇦",
@@ -348,7 +335,9 @@ export default function Dashboard() {
     "United Kingdom 🇬🇧",
     "United Arab Emirates 🇦🇪"
   ]);
-  const [selectedRegions, setSelectedRegions] = useState<string[]>(["North America (USA, Canada)", "Western Europe (UK, Germany, Netherlands)", "Global Remote (Worldwide)"]);
+
+  // 🌐 International Career Preferences State
+  const [workModePref, setWorkModePref] = useState<string>("Fully Remote (Worldwide)");
   const [selectedEmpTypes, setSelectedEmpTypes] = useState<string[]>(["Full-Time Jobs", "Internships & Traineeships"]);
   const [salaryPref, setSalaryPref] = useState<string>("$90,000 - $130,000 / year");
   const [experiencePref, setExperiencePref] = useState<string>("Mid-Level (2 - 5 Yrs)");
@@ -435,30 +424,26 @@ export default function Dashboard() {
     setTimeout(() => setNotification(null), 4000);
   };
 
-  // Toggle helper for Country selection with 10 max validation
-  const toggleCountry = (countryName: string) => {
-    setSelectedCountries(prev => {
-      if (prev.includes(countryName)) {
-        if (prev.length === 1) {
-          showToast("Please select at least 1 target country.", "error");
-          return prev;
-        }
-        return prev.filter(c => c !== countryName);
-      } else {
-        if (prev.length >= 10) {
-          showToast("Maximum limit of 10 target countries reached!", "error");
-          return prev;
-        }
-        return [...prev, countryName];
-      }
-    });
+  // Country Selection from Autocomplete Box (1 to 10 countries max)
+  const handleSelectCountryFromDropdown = (countryName: string) => {
+    if (selectedCountries.includes(countryName)) {
+      showToast("Country already added to your target list.", "error");
+    } else if (selectedCountries.length >= 10) {
+      showToast("Maximum limit of 10 target countries reached!", "error");
+    } else {
+      setSelectedCountries(prev => [...prev, countryName]);
+      showToast(`Added ${countryName} to target countries!`);
+    }
+    setCountryQuery("");
+    setIsCountryDropdownOpen(false);
   };
 
-  // Toggle helpers for multi-select pill preferences
-  const toggleRegion = (region: string) => {
-    setSelectedRegions(prev => 
-      prev.includes(region) ? prev.filter(r => r !== region) : [...prev, region]
-    );
+  const handleRemoveCountry = (countryName: string) => {
+    if (selectedCountries.length === 1) {
+      showToast("Please keep at least 1 target country.", "error");
+      return;
+    }
+    setSelectedCountries(prev => prev.filter(c => c !== countryName));
   };
 
   const toggleEmpType = (empType: string) => {
@@ -532,7 +517,6 @@ export default function Dashboard() {
           target_roles: targetRoles,
           target_countries: selectedCountries,
           work_mode_preference: workModePref,
-          target_regions: selectedRegions,
           employment_types: selectedEmpTypes,
           salary_preference: salaryPref,
           experience_level: experiencePref,
@@ -802,7 +786,7 @@ export default function Dashboard() {
               <div className="flex flex-wrap items-center gap-3">
                 <div className="bg-slate-950 border border-emerald-500/30 px-3 py-1 rounded-lg text-xs text-emerald-300 flex items-center gap-1.5">
                   <GlobeIcon />
-                  <span>Countries: <strong>{selectedCountries.length} Selected</strong></span>
+                  <span>Target Countries: <strong>{selectedCountries.length} Active</strong></span>
                 </div>
                 <div className="bg-emerald-950/80 border border-emerald-500/30 px-3 py-1 rounded-lg text-xs text-emerald-300">
                   Daily Goal: <strong className="text-emerald-400 font-mono">{totalTodayApplied} / {totalDailyTarget}</strong> Applied Today
@@ -965,7 +949,7 @@ export default function Dashboard() {
                     />
                   </div>
 
-                  {/* 🌍 NEW: Target Countries Selector (1 to 10 Max) & International Preferences Section */}
+                  {/* 🌍 NEW: Target Country Search Box & International Preferences Section */}
                   <div className="bg-slate-950/90 border border-cyan-500/30 p-5 rounded-xl space-y-5">
                     <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
                       <div className="flex items-center gap-2">
@@ -975,43 +959,90 @@ export default function Dashboard() {
                         </h4>
                       </div>
                       <span className="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-500/30 px-2.5 py-0.5 rounded font-mono">
-                        Global Target (1-10 Countries)
+                        Global Search Box (1-10 Countries)
                       </span>
                     </div>
 
-                    {/* 🌐 NEW: Multiple Countries Selector (Up to 10 max) */}
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
+                    {/* 🔍 Interactive Country Autocomplete Search Box */}
+                    <div className="space-y-3 relative">
+                      <div className="flex items-center justify-between">
                         <label className="block text-slate-300 font-semibold">
-                          🌐 Select Target Destination Countries (Choose 1 to 10 Countries)
+                          🌐 Search & Add Target Countries (Type country name, choose 1 to 10)
                         </label>
                         <span className="text-xs font-mono bg-emerald-950 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded font-bold">
                           Selected: {selectedCountries.length} / 10 Max
                         </span>
                       </div>
 
-                      <div className="flex flex-wrap gap-2 pt-1">
-                        {TARGET_COUNTRY_OPTIONS.map((country, idx) => {
-                          const isSelected = selectedCountries.includes(country);
-                          return (
-                            <button
-                              type="button"
-                              key={idx}
-                              onClick={() => toggleCountry(country)}
-                              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
-                                isSelected
-                                  ? "bg-emerald-950/90 border-emerald-500 text-emerald-200 shadow ring-1 ring-emerald-500/40"
-                                  : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
-                              }`}
-                            >
-                              {isSelected ? "✓ " : "+ "}{country}
-                            </button>
-                          );
-                        })}
+                      {/* Search Input Input Box */}
+                      <div className="relative">
+                        <input 
+                          type="text"
+                          value={countryQuery}
+                          onChange={e => {
+                            setCountryQuery(e.target.value);
+                            setIsCountryDropdownOpen(true);
+                          }}
+                          onFocus={() => setIsCountryDropdownOpen(true)}
+                          placeholder="Type a country name (e.g. United States, Germany, Japan, UAE...)"
+                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 text-xs focus:outline-none focus:border-cyan-500 font-medium"
+                        />
+                        
+                        {/* Dropdown Suggestions List */}
+                        {isCountryDropdownOpen && (
+                          <div className="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl max-h-56 overflow-y-auto z-50 divide-y divide-slate-800/60">
+                            {ALL_WORLD_COUNTRIES
+                              .filter(c => c.toLowerCase().includes(countryQuery.toLowerCase()))
+                              .map((country, idx) => {
+                                const isAlreadySelected = selectedCountries.includes(country);
+                                return (
+                                  <div
+                                    key={idx}
+                                    onClick={() => handleSelectCountryFromDropdown(country)}
+                                    className={`px-4 py-2.5 text-xs font-semibold cursor-pointer flex items-center justify-between transition-colors ${
+                                      isAlreadySelected
+                                        ? "bg-slate-950 text-slate-500 cursor-not-allowed"
+                                        : "hover:bg-cyan-950/60 text-slate-200 hover:text-cyan-300"
+                                    }`}
+                                  >
+                                    <span>{country}</span>
+                                    {isAlreadySelected ? (
+                                      <span className="text-[10px] text-emerald-400 font-mono">Already Selected</span>
+                                    ) : (
+                                      <span className="text-[10px] text-cyan-400 font-mono">+ Click to Add</span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            {ALL_WORLD_COUNTRIES.filter(c => c.toLowerCase().includes(countryQuery.toLowerCase())).length === 0 && (
+                              <div className="p-4 text-xs text-slate-400 text-center">No matching countries found</div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      <p className="text-[10px] text-slate-400 mt-2">
-                        The AI Agent will automatically filter opportunities and send your CV/resume to hiring managers located in your selected target countries.
-                      </p>
+
+                      {/* Selected Target Countries Tags / Badges Displayed Below */}
+                      <div>
+                        <span className="text-[11px] font-semibold text-slate-400 block mb-2">Active Target Countries List (CV will be sent to these countries):</span>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedCountries.map((country, idx) => (
+                            <span 
+                              key={idx}
+                              className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-200 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm"
+                            >
+                              <span>{country}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveCountry(country)}
+                                className="hover:text-red-400 text-slate-400 font-bold ml-1"
+                                title="Remove country"
+                              >
+                                ✕
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-800/80 pt-4">
