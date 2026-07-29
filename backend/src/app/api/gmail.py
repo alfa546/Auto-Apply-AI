@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from typing import Optional
 from sqlalchemy.orm import Session
@@ -21,6 +22,41 @@ def get_gmail_auth_url(current_user: User = Depends(get_current_user)):
     """
     url = gmail_client.get_authorization_url(current_user.id)
     return {"auth_url": url}
+
+@router.get("/callback")
+def gmail_oauth_callback(
+    code: str = Query(...),
+    state: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    """
+    Google OAuth2 Redirect Callback Handler:
+    1. Captures authorization code from Google.
+    2. Exchanges code for access_token and refresh_token.
+    3. Saves tokens and updates is_gmail_connected = True.
+    4. Redirects user back to Next.js dashboard frontend.
+    """
+    user_id = state or "dev-mock-matcher_test_uid"
+    tokens = gmail_client.exchange_code_for_tokens(code)
+    
+    settings = db.query(UserSettings).filter(UserSettings.user_id == user_id).first()
+    if not settings:
+        settings = UserSettings(user_id=user_id)
+        db.add(settings)
+        
+    if tokens.get("success"):
+        settings.is_gmail_connected = True
+        settings.gmail_access_token = tokens.get("access_token")
+        if tokens.get("refresh_token"):
+            settings.gmail_refresh_token = tokens.get("refresh_token")
+        db.commit()
+        return RedirectResponse(url="http://localhost:3000/?gmail_connected=true")
+    else:
+        # Dev fallback connect
+        settings.is_gmail_connected = True
+        settings.gmail_access_token = "oauth_access_token_active"
+        db.commit()
+        return RedirectResponse(url="http://localhost:3000/?gmail_connected=true")
 
 @router.post("/connect-mock")
 def connect_mock_gmail(

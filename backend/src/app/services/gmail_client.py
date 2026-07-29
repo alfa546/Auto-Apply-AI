@@ -38,6 +38,37 @@ class GmailClient:
         )
         return url
 
+    def exchange_code_for_tokens(self, code: str) -> Dict[str, Any]:
+        """
+        Exchanges Google OAuth authorization code for access_token and refresh_token.
+        """
+        import httpx
+        url = "https://oauth2.googleapis.com/token"
+        payload = {
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "code": code,
+            "grant_type": "authorization_code",
+            "redirect_uri": self.redirect_uri
+        }
+        try:
+            with httpx.Client(timeout=15.0) as client:
+                res = client.post(url, data=payload)
+                if res.status_code == 200:
+                    data = res.json()
+                    return {
+                        "success": True,
+                        "access_token": data.get("access_token"),
+                        "refresh_token": data.get("refresh_token"),
+                        "expires_in": data.get("expires_in")
+                    }
+                else:
+                    logger.error(f"OAuth token exchange error: {res.text}")
+                    return {"success": False, "error": res.text}
+        except Exception as e:
+            logger.error(f"OAuth token exchange exception: {e}")
+            return {"success": False, "error": str(e)}
+
     def create_mime_message(
         self,
         sender_email: str,
