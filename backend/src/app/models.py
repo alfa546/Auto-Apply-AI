@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Integer, Boolean, DateTime, JSON, ForeignKey, Numeric
+import uuid
+from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, Boolean, Float, Numeric, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from src.app.database import Base
@@ -6,15 +7,13 @@ from src.app.database import Base
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(String, primary_key=True, index=True) # Firebase Auth UID
+    id = Column(String, primary_key=True, index=True) # Firebase UID or Custom Auth ID
     email = Column(String, unique=True, index=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    profile = relationship("Profile", back_populates="user", uselist=False)
-    settings = relationship("UserSettings", back_populates="user", uselist=False)
-    applications = relationship("Application", back_populates="user")
-    email_interactions = relationship("EmailInteraction", back_populates="user")
+    profile = relationship("Profile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    settings = relationship("UserSettings", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    applications = relationship("Application", back_populates="user", cascade="all, delete-orphan")
 
 
 class Profile(Base):
@@ -23,20 +22,15 @@ class Profile(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), unique=True, index=True)
     
-    # Extracted data & User Links
-    resume_url = Column(String, nullable=True)
-    raw_resume_text = Column(String, nullable=True) # Full text extracted for RAG
-    portfolio_url = Column(String, nullable=True)
-    github_url = Column(String, nullable=True)
-    linkedin_url = Column(String, nullable=True)
-    target_roles = Column(JSON, default=[]) # Target job titles (e.g. ["Python Developer", "Full Stack"])
+    resume_url = Column(String, nullable=True) # PDF file storage URL/path
     summary = Column(String, nullable=True)
-    skills = Column(JSON, default=[]) # List of extracted skills
-    experience = Column(JSON, default=[]) # Extracted experience list of dicts
-    education = Column(JSON, default=[]) # Extracted education details list of dicts
-    projects = Column(JSON, default=[]) # Extracted projects list of dicts
-    languages = Column(JSON, default=[]) # Languages spoken
-    ats_score = Column(Integer, nullable=True)
+    skills = Column(JSON, default=[]) # Extracted list of skills e.g. ["Python", "FastAPI"]
+    experience = Column(JSON, default=[]) # Structured work history
+    education = Column(JSON, default=[])
+    projects = Column(JSON, default=[])
+    languages = Column(JSON, default=[])
+    
+    ats_score = Column(Integer, nullable=True) # ATS compatibility score (0-100)
     ats_suggestions = Column(JSON, default={})
     rag_collection_id = Column(String, nullable=True)
     
@@ -56,6 +50,14 @@ class UserSettings(Base):
     visa_sponsorship_required = Column(Boolean, default=False)
     daily_apply_limit = Column(Integer, default=20)
     
+    # 🔑 API Keys & Integration Credentials
+    openai_api_key = Column(String, nullable=True)
+    google_client_id = Column(String, nullable=True)
+    google_client_secret = Column(String, nullable=True)
+    adzuna_app_id = Column(String, nullable=True)
+    adzuna_app_key = Column(String, nullable=True)
+    jooble_api_key = Column(String, nullable=True)
+
     # Gmail OAuth & Email Connection Settings
     is_gmail_connected = Column(Boolean, default=False)
     gmail_email_address = Column(String, nullable=True)
@@ -138,13 +140,9 @@ class EmailInteraction(Base):
     application_id = Column(Integer, ForeignKey("applications.id", ondelete="SET NULL"), index=True, nullable=True)
     sender = Column(String, nullable=False)
     recipient = Column(String, nullable=False)
-    subject = Column(String, nullable=True)
-    body = Column(String, nullable=True)
-    received_at = Column(DateTime(timezone=True), server_default=func.now())
-    classification = Column(String, nullable=True) # e.g. "Interview Invite", "Rejection", "Confirmation"
-    response_draft = Column(String, nullable=True)
-    status = Column(String, default="Pending Review") # e.g. "Pending Review", "Approved", "Sent", "Dismissed"
+    subject = Column(String, nullable=False)
+    body_snippet = Column(String, nullable=True)
+    classification = Column(String, default="General") # "Interview", "Assessment", "Rejection", "General"
+    processed_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    user = relationship("User", back_populates="email_interactions")
     application = relationship("Application", back_populates="email_interactions")
-
