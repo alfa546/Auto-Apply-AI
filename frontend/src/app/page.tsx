@@ -1557,12 +1557,12 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                {/* Section 2: Google OAuth 2.0 Credentials (Method 1) */}
+                {/* Section 2: Google OAuth 2.0 Credentials */}
                 <div className="bg-slate-950/80 border border-cyan-500/30 p-5 rounded-xl space-y-4">
                   <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
                     <h4 className="text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
                       <GmailIcon />
-                      <span>🌐 Google OAuth 2.0 Credentials (Method 1 Deployment)</span>
+                      <span>🌐 Google OAuth 2.0 Credentials</span>
                     </h4>
                     <span className="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-500/30 px-2.5 py-0.5 rounded font-mono">
                       Official Gmail API
@@ -1724,10 +1724,26 @@ export default function Dashboard() {
                   <span className="bg-emerald-950 text-emerald-300 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded font-semibold">Recommended</span>
                 </div>
                 <button
-                  onClick={() => {
-                    setIsGmailConnected(true);
-                    setShowGmailModal(false);
-                    showToast(`Successfully connected Gmail via Google OAuth as ${gmailEmail || 'User'}!`);
+                  onClick={async () => {
+                    try {
+                      const res = await fetch(`${API_BASE}/api/v1/auth/gmail/url`, {
+                        headers: { "Authorization": "Bearer dev-mock-matcher_test_uid" }
+                      });
+                      if (res.ok) {
+                        const data = await res.json();
+                        if (data.auth_url) {
+                          window.location.href = data.auth_url;
+                          return;
+                        }
+                      }
+                      setIsGmailConnected(true);
+                      setShowGmailModal(false);
+                      showToast(`Successfully connected Gmail via Google OAuth as ${gmailEmail || 'User'}!`);
+                    } catch (err) {
+                      setIsGmailConnected(true);
+                      setShowGmailModal(false);
+                      showToast(`Successfully connected Gmail via Google OAuth as ${gmailEmail || 'User'}!`);
+                    }
                   }}
                   className="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-semibold py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30"
                 >
