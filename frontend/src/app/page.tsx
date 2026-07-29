@@ -161,7 +161,9 @@ export default function Dashboard() {
   const [showGmailModal, setShowGmailModal] = useState(false);
   const [smtpPassword, setSmtpPassword] = useState("");
 
-  // API Keys Settings State
+  // API Keys & AI Provider Settings State
+  const [llmProvider, setLlmProvider] = useState("openai");
+  const [llmModel, setLlmModel] = useState("gpt-4o");
   const [openaiApiKey, setOpenaiApiKey] = useState("");
   const [googleClientId, setGoogleClientId] = useState("");
   const [googleClientSecret, setGoogleClientSecret] = useState("");
@@ -378,6 +380,8 @@ export default function Dashboard() {
           "Authorization": "Bearer dev-mock-matcher_test_uid"
         },
         body: JSON.stringify({
+          llm_provider: llmProvider,
+          llm_model: llmModel,
           openai_api_key: openaiApiKey,
           google_client_id: googleClientId,
           google_client_secret: googleClientSecret,
@@ -1532,28 +1536,56 @@ export default function Dashboard() {
               </div>
 
               <form onSubmit={handleSaveApiSettings} className="space-y-6 text-xs">
-                {/* Section 1: OpenAI & LLM Settings */}
+                {/* Section 1: AI Model Provider & API Key Settings */}
                 <div className="bg-slate-950/80 border border-purple-500/30 p-5 rounded-xl space-y-4">
                   <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
                     <h4 className="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-2">
                       <SparklesIcon />
-                      <span>🧠 OpenAI & AI Model API Key</span>
+                      <span>🧠 AI Model Provider & Key Vault</span>
                     </h4>
                     <span className="text-[10px] bg-purple-950 text-purple-300 border border-purple-500/30 px-2.5 py-0.5 rounded font-mono">
-                      Cover Letter & ATS Audit
+                      Multi-Model Support
                     </span>
                   </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-slate-300 font-semibold mb-1">Select AI Provider</label>
+                      <select
+                        value={llmProvider}
+                        onChange={e => setLlmProvider(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 text-xs focus:outline-none focus:border-purple-500 font-medium"
+                      >
+                        <option value="openai">OpenAI (GPT-4o, GPT-4o-mini)</option>
+                        <option value="gemini">Google Gemini (Gemini 1.5 Pro, Flash)</option>
+                        <option value="groq">Groq (Llama 3.1 70B, Mixtral)</option>
+                        <option value="deepseek">DeepSeek (DeepSeek V3, DeepSeek R1)</option>
+                        <option value="anthropic">Anthropic Claude (Claude 3.5 Sonnet)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-300 font-semibold mb-1">AI Model Name</label>
+                      <input 
+                        type="text"
+                        value={llmModel}
+                        onChange={e => setLlmModel(e.target.value)}
+                        placeholder="gpt-4o, gemini-1.5-pro, deepseek-chat..."
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+                  </div>
+
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">OpenAI API Key (sk-proj-...)</label>
+                    <label className="block text-slate-300 font-semibold mb-1">AI Model API Key (OpenAI, Gemini, Groq, DeepSeek, Claude)</label>
                     <input 
                       type={showApiKeys ? "text" : "password"}
                       value={openaiApiKey}
                       onChange={e => setOpenaiApiKey(e.target.value)}
-                      placeholder="sk-proj-..."
+                      placeholder="sk-proj-..., AIzaSy..., gsk_..."
                       className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-purple-500"
                     />
-                    <p className="text-[10px] text-slate-400 mt-1">Used for deep ATS resume evaluation and custom cover letter generation.</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Auto-detects provider pattern (sk-proj-, AIzaSy, gsk_) or uses selected provider for deep ATS evaluation & custom cover letter generation.</p>
                   </div>
                 </div>
 
