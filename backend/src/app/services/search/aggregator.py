@@ -1,3 +1,4 @@
+import re
 import asyncio
 import logging
 from sqlalchemy.orm import Session
@@ -56,12 +57,27 @@ class SearchAggregator:
             # Check if opportunity already exists in database
             exists = db.query(JobFound).filter(JobFound.url == url).first()
             if not exists:
+                description = opp.get("description", "")
+                company = opp.get("company", "Company")
+                
+                # Extract hiring emails
+                from src.app.services.email_extractor import extract_emails_from_text, select_best_hiring_email
+                extracted_emails = extract_emails_from_text(description)
+                company_email = select_best_hiring_email(extracted_emails, company)
+                
+                # Fallback email structure if no explicit email found in description
+                if not company_email:
+                    clean_comp = re.sub(r'[^a-zA-Z0-9]', '', company.lower())
+                    company_email = f"careers@{clean_comp}.com"
+
                 # Save new job found record
                 job_record = JobFound(
                     title=opp.get("title"),
-                    company=opp.get("company"),
+                    company=company,
+                    company_email=company_email,
+                    extracted_emails=extracted_emails,
                     location=opp.get("location"),
-                    description=opp.get("description"),
+                    description=description,
                     url=url,
                     salary=opp.get("salary"),
                     opportunity_type=opp.get("opportunity_type", "job"),

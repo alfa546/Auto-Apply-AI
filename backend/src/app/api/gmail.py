@@ -1,0 +1,101 @@
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
+from typing import Optional
+from sqlalchemy.orm import Session
+
+from src.app.database import get_db
+from src.app.models import User, UserSettings
+from src.app.auth import get_current_user
+from src.app.services.gmail_client import gmail_client
+
+router = APIRouter(prefix="/auth/gmail", tags=["Gmail Authentication"])
+
+class SmtpSetupRequest(BaseModel):
+    email: str
+    app_password: str
+
+@router.get("/url")
+def get_gmail_auth_url(current_user: User = Depends(get_current_user)):
+    """
+    Returns Google OAuth authorization URL for connecting user's Gmail.
+    """
+    url = gmail_client.get_authorization_url(current_user.id)
+    return {"auth_url": url}
+
+@router.post("/connect-mock")
+def connect_mock_gmail(
+    email: str = Query("user@gmail.com"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Directly connects user's Gmail in dev/demo mode.
+    """
+    settings = db.query(UserSettings).filter(UserSettings.user_id == current_user.id).first()
+    if not settings:
+        settings = UserSettings(user_id=current_user.id)
+        db.add(settings)
+        
+    settings.is_gmail_connected = True
+    settings.gmail_email_address = email
+    settings.gmail_access_token = "mock_access_token_dev"
+    db.commit()
+    return {"message": f"Gmail connected successfully as {email}", "is_connected": True}
+
+@router.post("/setup-smtp")
+def setup_gmail_smtp(
+    payload: SmtpSetupRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Configures Gmail App Password for direct SMTP email applications.
+    """
+    settings = db.query(UserSettings).filter(UserSettings.user_id == current_user.id).first()
+    if not settings:
+        settings = UserSettings(user_id=current_user.id)
+        db.add(settings)
+        
+    settings.is_gmail_connected = True
+    settings.gmail_email_address = payload.email
+    settings.smtp_app_password = payload.app_password
+    db.commit()
+    return {"message": "Gmail SMTP configured successfully!", "is_connected": True}
+
+@router.get("/status")
+def get_gmail_status(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Check Gmail connection status for logged-in user.
+    """
+    settings = db.query(UserSettings).filter(UserSettings.user_id == current_user.id).first()
+    if not settings or not settings.is_gmail_connected:
+        return {
+            "is_connected": False,
+            "connected_email": None
+        }
+        
+    return {
+        "is_connected": True,
+        "connected_email": settings.gmail_email_address
+    }
+
+@router.post("/disconnect")
+def disconnect_gmail(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Disconnect Gmail integration.
+    """
+    settings = db.query(UserSettings).filter(UserSettings.user_id == current_user.id).first()
+    if settings:
+        settings.is_gmail_connected = False
+        settings.gmail_access_token = None
+        settings.gmail_refresh_token = None
+        settings.smtp_app_password = None
+        db.commit()
+        
+    return {"message": "Gmail disconnected successfully", "is_connected": False}

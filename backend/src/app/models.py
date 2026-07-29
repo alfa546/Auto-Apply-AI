@@ -23,8 +23,14 @@ class Profile(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), unique=True, index=True)
     
-    # Extracted data details
+    # Extracted data & User Links
     resume_url = Column(String, nullable=True)
+    raw_resume_text = Column(String, nullable=True) # Full text extracted for RAG
+    portfolio_url = Column(String, nullable=True)
+    github_url = Column(String, nullable=True)
+    linkedin_url = Column(String, nullable=True)
+    target_roles = Column(JSON, default=[]) # Target job titles (e.g. ["Python Developer", "Full Stack"])
+    summary = Column(String, nullable=True)
     skills = Column(JSON, default=[]) # List of extracted skills
     experience = Column(JSON, default=[]) # Extracted experience list of dicts
     education = Column(JSON, default=[]) # Extracted education details list of dicts
@@ -32,6 +38,7 @@ class Profile(Base):
     languages = Column(JSON, default=[]) # Languages spoken
     ats_score = Column(Integer, nullable=True)
     ats_suggestions = Column(JSON, default={})
+    rag_collection_id = Column(String, nullable=True)
     
     user = relationship("User", back_populates="profile")
 
@@ -48,6 +55,13 @@ class UserSettings(Base):
     remote_preference = Column(String, default="both") # "remote", "onsite", "both"
     visa_sponsorship_required = Column(Boolean, default=False)
     daily_apply_limit = Column(Integer, default=20)
+    
+    # Gmail OAuth & Email Connection Settings
+    is_gmail_connected = Column(Boolean, default=False)
+    gmail_email_address = Column(String, nullable=True)
+    gmail_access_token = Column(String, nullable=True)
+    gmail_refresh_token = Column(String, nullable=True)
+    smtp_app_password = Column(String, nullable=True)
     
     # Active Search Flags
     search_jobs = Column(Boolean, default=True)
@@ -66,12 +80,18 @@ class Application(Base):
     
     title = Column(String, nullable=False) # e.g. "Software Engineer"
     company = Column(String, nullable=False) # e.g. "Google"
+    company_email = Column(String, nullable=True) # Extracted HR contact email
     opportunity_type = Column(String, default="job") # "job", "internship", "scholarship", "hackathon"
-    status = Column(String, default="Applied") # "Applied", "Interview Pending", "Rejected", "Resume Required", "Accepted"
+    status = Column(String, default="Applied") # "Applied", "Interview Pending", "Rejected", "Sent via Gmail", "Accepted"
     url = Column(String, nullable=True)
     applied_at = Column(DateTime(timezone=True), server_default=func.now())
     cover_letter = Column(String, nullable=True)
     notes = Column(String, nullable=True)
+    
+    # Gmail Proof Fields
+    sent_via_gmail = Column(Boolean, default=False)
+    gmail_message_id = Column(String, nullable=True)
+    cv_attached_path = Column(String, nullable=True)
     
     user = relationship("User", back_populates="applications")
     custom_cover_letter = relationship("CustomCoverLetter", back_populates="application", uselist=False, cascade="all, delete-orphan")
@@ -84,11 +104,16 @@ class JobFound(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     company = Column(String, nullable=False)
+    company_email = Column(String, nullable=True) # Extracted company hiring email
+    extracted_emails = Column(JSON, default=[]) # List of emails found in job description
     location = Column(String, nullable=True)
     description = Column(String, nullable=True)
     url = Column(String, unique=True, index=True, nullable=False)
     salary = Column(String, nullable=True)
     opportunity_type = Column(String, default="job") # "job", "internship", "scholarship", "hackathon"
+    skills_required = Column(JSON, default=[])
+    match_score = Column(Numeric(5, 2), default=0.0) # Percentage match based on RAG
+    source = Column(String, default="aggregator")
     posted_at = Column(DateTime(timezone=True), nullable=True)
     found_at = Column(DateTime(timezone=True), server_default=func.now())
     raw_data = Column(JSON, default={})

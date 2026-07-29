@@ -17,11 +17,32 @@ def parse_resume_text(text: str) -> dict:
         try:
             parsed_data = parse_resume_with_openai(text)
             if parsed_data:
+                links_data = extract_contact_and_links(text)
+                parsed_data.update(links_data)
                 return parsed_data
         except Exception as e:
             logger.error(f"Failed to parse resume with LLM: {e}. Falling back to rule-based parser.")
             
-    return rule_based_parse(text)
+    parsed_data = rule_based_parse(text)
+    links_data = extract_contact_and_links(text)
+    parsed_data.update(links_data)
+    return parsed_data
+
+def extract_contact_and_links(text: str) -> dict:
+    """
+    Extract email, GitHub URL, portfolio URL, and LinkedIn URL using regular expressions.
+    """
+    email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', text)
+    github_match = re.search(r'https?://(?:www\.)?github\.com/[\w-]+', text, re.IGNORECASE)
+    linkedin_match = re.search(r'https?://(?:www\.)?linkedin\.com/in/[\w-]+', text, re.IGNORECASE)
+    portfolio_match = re.search(r'https?://(?!github|linkedin)[\w\.-]+\.[a-z]{2,}(?:/[\w\.-]*)*', text, re.IGNORECASE)
+    
+    return {
+        "extracted_email": email_match.group(0) if email_match else None,
+        "github_url": github_match.group(0) if github_match else None,
+        "linkedin_url": linkedin_match.group(0) if linkedin_match else None,
+        "portfolio_url": portfolio_match.group(0) if portfolio_match else None
+    }
 
 def parse_resume_with_openai(text: str) -> dict:
     """

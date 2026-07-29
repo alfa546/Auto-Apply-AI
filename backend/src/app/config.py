@@ -45,8 +45,13 @@ class Settings(BaseSettings):
     PLAYWRIGHT_HEADLESS: bool = True
     PLAYWRIGHT_TIMEOUT: int = 30000
     
-    # Email Agent Configurations
+    # Email & Gmail OAuth Configurations
+    GOOGLE_CLIENT_ID: Optional[str] = None
+    GOOGLE_CLIENT_SECRET: Optional[str] = None
+    GOOGLE_REDIRECT_URI: str = "http://localhost:3000/api/auth/gmail/callback"
     EMAIL_IMAP_SERVER: Optional[str] = None
+    EMAIL_SMTP_SERVER: str = "smtp.gmail.com"
+    EMAIL_SMTP_PORT: int = 587
     EMAIL_ADDRESS: Optional[str] = None
     EMAIL_PASSWORD: Optional[str] = None
     EMAIL_CHECK_INTERVAL_MINUTES: int = 15
