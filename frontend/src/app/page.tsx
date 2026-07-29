@@ -271,11 +271,11 @@ export default function Dashboard() {
       <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-600/20 rounded-xl border border-purple-500/30">
-              <SparklesIcon />
+            <div className="p-1.5 bg-slate-900 rounded-xl border border-sky-500/30 shadow-lg shadow-sky-500/10">
+              <img src="/logo.png" alt="AutoApplyAI Logo" className="w-8 h-8 rounded-lg object-contain" />
             </div>
             <div>
-              <h1 className="text-lg font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent">
+              <h1 className="text-lg font-bold bg-gradient-to-r from-sky-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent">
                 Auto-Apply AI Agent
               </h1>
               <p className="text-xs text-slate-400">RAG Resume Analyzer & Gmail Direct Auto-Apply Engine</p>

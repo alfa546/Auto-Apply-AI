@@ -13,8 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AutoApplyAI - Automated Application Dashboard",
+  title: "AutoApplyAI - RAG Resume & Direct Gmail Auto-Apply Agent",
   description: "Automated agentic suite that matches, applies, and schedules responses for your applications lifecycle",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
