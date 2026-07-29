@@ -34,6 +34,7 @@
   - [Infrastructure (Docker Compose)](#1-infrastructure-docker-compose)
   - [Backend Setup (FastAPI)](#2-backend-setup-fastapi)
   - [Frontend Setup (Next.js)](#3-frontend-setup-nextjs)
+  - [Connecting Gmail on Localhost](#4-connecting-gmail-on-localhost)
 - [Environment Variables](#-environment-variables)
 - [API Documentation](#-api-documentation)
 - [Testing & Verification](#-testing--verification)
@@ -281,6 +282,31 @@ Verify services are running:
 
 ---
 
+### 4. Connecting Gmail on Localhost (2 Easy Methods)
+
+When running the application locally on localhost (`http://localhost:3000`), a candidate can connect their Gmail account so that the AI Agent can send application emails with custom cover letters and PDF CVs directly to company HR emails.
+
+#### Method A: Gmail App Password (SMTP) - Fast 1-Minute Setup (Recommended for Localhost)
+No Google Cloud Console configuration required!
+1. Go to your **Google Account** (`https://myaccount.google.com/`).
+2. Go to **Security** → Enable **2-Step Verification** (if not already enabled).
+3. Search for **App Passwords** or visit `https://myaccount.google.com/apppasswords`.
+4. Create a new App Password (e.g., App Name: `Auto-Apply AI`).
+5. Google will generate a **16-character password** (e.g., `abcd efgh ijkl mnop`).
+6. In the dashboard top bar, click **"Connect Gmail Account"** → Select **Option 2: Gmail App Password (SMTP)**.
+7. Enter your Gmail address, paste your 16-character App Password, and click **Connect via App Password**.
+8. **Result**: All job applications sent by the agent will be sent directly through your Gmail account and will appear in your official **Gmail "Sent"** folder!
+
+#### Method B: Google OAuth 2.0 Client ID
+1. Open the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a Project and enable the **Gmail API**.
+3. Create an **OAuth 2.0 Client ID** (Application type: *Web application*).
+4. Add the Authorized Redirect URI: `http://localhost:8000/api/v1/auth/gmail/callback`.
+5. Add `GMAIL_CLIENT_ID` and `GMAIL_CLIENT_SECRET` to your `backend/.env` file.
+6. In the dashboard top bar, click **Connect with Google OAuth**!
+
+---
+
 ## 🔑 Environment Variables
 
 ### Backend (`backend/.env`)
@@ -331,6 +357,7 @@ FastAPI provides an interactive OpenAPI / Swagger UI out of the box at `http://l
 | **Applications**| `/api/v1/applications` | `GET` / `POST` | List and track active user job applications |
 | **Auto Apply**| `/api/v1/auto-apply/send-email`| `POST` | Send CV directly via connected Gmail with message ID tracking |
 | **Gmail** | `/api/v1/auth/gmail/status` | `GET` | Get Gmail connection status & connected email |
+| **Gmail** | `/api/v1/auth/gmail/setup-smtp` | `POST` | Configure 16-character App Password SMTP credentials |
 | **Users** | `/api/v1/users/profile` | `PUT` | Save user profile, social links, target countries, & preferences |
 
 ---
