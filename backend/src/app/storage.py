@@ -2,7 +2,12 @@ import os
 import uuid
 import logging
 from abc import ABC, abstractmethod
-from firebase_admin import storage
+try:
+    from firebase_admin import storage
+    HAS_FIREBASE_STORAGE = True
+except ImportError:
+    storage = None
+    HAS_FIREBASE_STORAGE = False
 from src.app.config import settings
 
 logger = logging.getLogger(__name__)
@@ -54,7 +59,7 @@ class FirebaseStorageProvider(StorageProvider):
 
 # Determine provider based on configuration
 def get_storage_provider() -> StorageProvider:
-    if settings.FIREBASE_STORAGE_BUCKET and settings.FIREBASE_PROJECT_ID != "your-firebase-project-id":
+    if HAS_FIREBASE_STORAGE and settings.FIREBASE_STORAGE_BUCKET and settings.FIREBASE_PROJECT_ID != "your-firebase-project-id":
         return FirebaseStorageProvider()
     return LocalStorageProvider()
 

@@ -113,3 +113,15 @@ def get_llm_headers_and_url(
 
 def is_llm_configured(api_key: str = None) -> bool:
     return bool(api_key or settings.OPENAI_API_KEY or settings.GEMINI_API_KEY)
+
+def generate_custom_cover_letter(candidate_name: str = "Candidate", job_title: str = "Software Engineer", company: str = "Company", skills: list = None, job_description: str = None) -> str:
+    """
+    Generates a custom tailored cover letter using the active LLM provider.
+    """
+    from src.app.services.application.cover_letter import generate_cover_letter
+    profile_data = {
+        "skills": skills or ["Software Development", "Problem Solving", "AI Engineering"],
+        "experience": [{"role": "Developer", "company": "Tech Company"}],
+        "education": []
+    }
+    return generate_cover_letter(profile_data, job_title, company, job_description or "")

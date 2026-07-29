@@ -75,6 +75,24 @@ class UserSettings(Base):
     user = relationship("User", back_populates="settings")
 
 
+class JobFound(Base):
+    __tablename__ = "jobs_found"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    company = Column(String, nullable=False)
+    location = Column(String, nullable=True)
+    country = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    url = Column(String, unique=True, index=True, nullable=False)
+    company_email = Column(String, nullable=True) # Extracted HR Email
+    salary = Column(String, nullable=True)
+    source = Column(String, default="Adzuna") # "Adzuna", "Jooble", "Scraper", "Direct"
+    opportunity_type = Column(String, default="job") # "job", "internship", "scholarship", "hackathon"
+    match_score = Column(Integer, default=85)
+    found_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
 class Application(Base):
     __tablename__ = "applications"
 
@@ -92,3 +110,30 @@ class Application(Base):
     notes = Column(String, nullable=True)
 
     user = relationship("User", back_populates="applications")
+
+
+class EmailInteraction(Base):
+    __tablename__ = "email_interactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    application_id = Column(Integer, ForeignKey("applications.id", ondelete="CASCADE"), nullable=True)
+    
+    sender_email = Column(String, nullable=False)
+    recipient_email = Column(String, nullable=False)
+    subject = Column(String, nullable=False)
+    body = Column(String, nullable=False)
+    gmail_message_id = Column(String, nullable=True)
+    sent_at = Column(DateTime(timezone=True), server_default=func.now())
+    status = Column(String, default="Sent")
+
+
+class CustomCoverLetter(Base):
+    __tablename__ = "custom_cover_letters"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    job_id = Column(Integer, ForeignKey("jobs_found.id", ondelete="CASCADE"), nullable=True)
+    
+    content = Column(String, nullable=False)
+    generated_at = Column(DateTime(timezone=True), server_default=func.now())

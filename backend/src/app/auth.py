@@ -1,6 +1,12 @@
 import logging
-import firebase_admin
-from firebase_admin import credentials, auth
+try:
+    import firebase_admin
+    from firebase_admin import credentials, auth
+    HAS_FIREBASE = True
+except ImportError:
+    firebase_admin = None
+    auth = None
+    HAS_FIREBASE = False
 from fastapi import HTTPException, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from src.app.config import settings
@@ -9,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 # Initialize Firebase App
 firebase_initialized = False
-if settings.FIREBASE_PROJECT_ID and settings.FIREBASE_PROJECT_ID != "your-firebase-project-id":
+if HAS_FIREBASE and settings.FIREBASE_PROJECT_ID and settings.FIREBASE_PROJECT_ID != "your-firebase-project-id":
     try:
         firebase_admin.get_app()
         firebase_initialized = True
