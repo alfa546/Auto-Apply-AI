@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/search", tags=["search"])
 
 class TriggerSearchRequest(BaseModel):
-    query: str = Field(..., description="The search query, e.g. 'Python Developer'")
-    country: str = Field("us", description="Country code, e.g. 'us', 'gb'")
+    query: Optional[str] = Field(None, description="The search query, e.g. 'Python Developer'. If empty, RAG & Preferences search is triggered.")
+    country: Optional[str] = Field(None, description="Country code, e.g. 'us', 'gb'")
 
 @router.post("/trigger")
 async def trigger_search(
@@ -24,18 +24,27 @@ async def trigger_search(
     db: Session = Depends(get_db)
 ):
     """
-    Manually triggers the Search Aggregator pipeline to scan for new opportunities.
+    Triggers the Search Aggregator pipeline to scan for new opportunities based on user preferences and RAG skills.
     """
     aggregator = SearchAggregator()
     try:
-        new_jobs = await aggregator.run_aggregation(
-            db=db,
-            query=payload.query,
-            country=payload.country
-        )
+        user_id = current_user.get("uid", "dev-mock-matcher_test_uid")
+        
+        if payload.query:
+            new_jobs = await aggregator.run_aggregation(
+                db=db,
+                query=payload.query,
+                country=payload.country or "us"
+            )
+        else:
+            new_jobs = await aggregator.run_rag_guided_search(
+                db=db,
+                user_id=user_id
+            )
+            
         return {
             "status": "success",
-            "message": f"Search completed. Discovered {new_jobs} new opportunities.",
+            "message": f"RAG & Preferences guided search completed. Discovered {new_jobs} new opportunities.",
             "new_opportunities_found": new_jobs
         }
     except Exception as e:

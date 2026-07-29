@@ -91,3 +91,61 @@ class SearchAggregator:
             
         logger.info(f"Aggregator pipeline complete. Saved {new_records_count} new opportunities to the database.")
         return new_records_count
+
+    async def run_rag_guided_search(self, db: Session, user_id: str):
+        """
+        Smooth RAG & Preferences Guided Job Search Agent:
+        1. Reads user preferences (target countries, target roles, employment types).
+        2. Reads candidate RAG resume profile skills & keywords from vector DB / Profile model.
+        3. Formulates optimized search queries blending RAG skills + user target preferences.
+        4. Runs search aggregator across preferred countries and evaluates RAG match scores.
+        """
+        from src.app.models import Profile, UserSettings
+        from src.app.services.matching.matcher import MatchingEngine
+        
+        profile = db.query(Profile).filter(Profile.user_id == user_id).first()
+        user_settings = db.query(UserSettings).filter(UserSettings.user_id == user_id).first()
+
+        # Extract target countries or default to US/GB/DE/CA/AE
+        target_countries = ["us", "ca", "gb", "de", "ae"]
+        if user_settings and user_settings.preferred_countries:
+            country_map = {
+                "united states": "us", "canada": "ca", "united kingdom": "gb", 
+                "germany": "de", "netherlands": "nl", "switzerland": "ch", 
+                "sweden": "se", "australia": "au", "singapore": "sg", 
+                "united arab emirates": "ae", "saudi arabia": "sa", "japan": "jp"
+            }
+            extracted_codes = []
+            for country_str in user_settings.preferred_countries:
+                c_clean = country_str.lower()
+                for name_key, code in country_map.items():
+                    if name_key in c_clean or code in c_clean:
+                        extracted_codes.append(code)
+                        break
+            if extracted_codes:
+                target_countries = list(set(extracted_codes))
+
+        # Extract RAG resume skills & target roles
+        rag_skills = (profile.skills if profile and profile.skills else ["Python", "FastAPI", "React", "Next.js"])
+        target_roles = (user_settings.target_job_titles if user_settings and user_settings.target_job_titles else ["Full Stack Developer", "AI Engineer"])
+
+        # Formulate RAG search queries
+        search_queries = []
+        for role in target_roles[:2]:
+            top_skills = " ".join(rag_skills[:2]) if rag_skills else ""
+            search_queries.append(f"{role} {top_skills}".strip())
+
+        total_new_opportunities = 0
+        for country in target_countries[:3]:
+            for query in search_queries:
+                count = await self.run_aggregation(db=db, query=query, country=country)
+                total_new_opportunities += count
+
+        # Run RAG Matcher evaluation for unrated jobs
+        matcher = MatchingEngine()
+        unrated_jobs = db.query(JobFound).all()
+        for job in unrated_jobs:
+            eval_res = await matcher.evaluate_job_match(db=db, user_id=user_id, job_id=job.id)
+            logger.info(f"RAG Evaluated Job {job.id} ({job.title}): Score={eval_res.get('score')} Match={eval_res.get('is_match')}")
+
+        return total_new_opportunities
