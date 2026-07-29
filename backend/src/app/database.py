@@ -42,54 +42,41 @@ Base = declarative_base()
 
 def sync_sqlite_schema(db_engine):
     """
-    Auto-inspects SQLite tables and dynamically adds missing columns
-    so SQLite local DB never fails with 'no such column' OperationalErrors.
+    Dynamically inspects ALL SQLAlchemy models and automatically adds ANY missing column
+    to existing SQLite tables so OperationalError 'no such column' can NEVER happen.
     """
     try:
+        from src.app.models import User, Profile, UserSettings, JobFound, Application, EmailInteraction, CustomCoverLetter
         with db_engine.connect() as conn:
-            # 1. jobs_found table
-            cursor = conn.execute(text("PRAGMA table_info(jobs_found)"))
-            cols = [row[1] for row in cursor.fetchall()]
-            if cols:
-                if "country" not in cols:
-                    conn.execute(text("ALTER TABLE jobs_found ADD COLUMN country VARCHAR"))
-                if "company_email" not in cols:
-                    conn.execute(text("ALTER TABLE jobs_found ADD COLUMN company_email VARCHAR"))
-                if "opportunity_type" not in cols:
-                    conn.execute(text("ALTER TABLE jobs_found ADD COLUMN opportunity_type VARCHAR DEFAULT 'job'"))
-                if "match_score" not in cols:
-                    conn.execute(text("ALTER TABLE jobs_found ADD COLUMN match_score INTEGER DEFAULT 85"))
-                conn.commit()
-
-            # 2. applications table
-            cursor = conn.execute(text("PRAGMA table_info(applications)"))
-            cols = [row[1] for row in cursor.fetchall()]
-            if cols:
-                if "company_email" not in cols:
-                    conn.execute(text("ALTER TABLE applications ADD COLUMN company_email VARCHAR"))
-                if "opportunity_type" not in cols:
-                    conn.execute(text("ALTER TABLE applications ADD COLUMN opportunity_type VARCHAR DEFAULT 'job'"))
-                if "notes" not in cols:
-                    conn.execute(text("ALTER TABLE applications ADD COLUMN notes VARCHAR"))
-                conn.commit()
-
-            # 3. user_settings table
-            cursor = conn.execute(text("PRAGMA table_info(user_settings)"))
-            cols = [row[1] for row in cursor.fetchall()]
-            if cols:
-                if "target_roles" not in cols:
-                    conn.execute(text("ALTER TABLE user_settings ADD COLUMN target_roles JSON"))
-                if "preferred_countries" not in cols:
-                    conn.execute(text("ALTER TABLE user_settings ADD COLUMN preferred_countries JSON"))
-                if "llm_provider" not in cols:
-                    conn.execute(text("ALTER TABLE user_settings ADD COLUMN llm_provider VARCHAR DEFAULT 'openai'"))
-                if "llm_model" not in cols:
-                    conn.execute(text("ALTER TABLE user_settings ADD COLUMN llm_model VARCHAR DEFAULT 'gpt-4o'"))
-                if "custom_api_base" not in cols:
-                    conn.execute(text("ALTER TABLE user_settings ADD COLUMN custom_api_base VARCHAR"))
-                conn.commit()
+            for table_name, table in Base.metadata.tables.items():
+                cursor = conn.execute(text(f"PRAGMA table_info({table_name})"))
+                existing_cols = {row[1] for row in cursor.fetchall()}
+                if not existing_cols:
+                    continue
+                
+                for col in table.columns:
+                    if col.name not in existing_cols:
+                        col_type = str(col.type).upper()
+                        if "JSON" in col_type:
+                            sql_type = "JSON"
+                        elif "INT" in col_type:
+                            sql_type = "INTEGER"
+                        elif "BOOL" in col_type:
+                            sql_type = "BOOLEAN"
+                        elif "DATETIME" in col_type:
+                            sql_type = "DATETIME"
+                        else:
+                            sql_type = "VARCHAR"
+                        
+                        alter_query = f"ALTER TABLE {table_name} ADD COLUMN {col.name} {sql_type}"
+                        try:
+                            conn.execute(text(alter_query))
+                            conn.commit()
+                            print(f"Auto-migrated SQLite column: {table_name}.{col.name}")
+                        except Exception as ex:
+                            logger.warning(f"Could not alter {table_name}.{col.name}: {ex}")
     except Exception as e:
-        logger.warning(f"SQLite schema sync warning: {e}")
+        logger.warning(f"SQLite dynamic schema sync warning: {e}")
 
 # If using SQLite fallback, ensure tables are created & synced automatically on startup
 if fallback_to_sqlite:
