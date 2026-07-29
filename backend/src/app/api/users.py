@@ -21,6 +21,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 class SettingsUpdateRequest(BaseModel):
     llm_provider: Optional[str] = None
     llm_model: Optional[str] = None
+    custom_api_base: Optional[str] = None
     openai_api_key: Optional[str] = None
     google_client_id: Optional[str] = None
     google_client_secret: Optional[str] = None
@@ -77,12 +78,13 @@ def get_user_settings(current_user: dict = Depends(get_current_user), db: Sessio
     return {
         "llm_provider": settings.llm_provider or "openai",
         "llm_model": settings.llm_model or "gpt-4o",
+        "custom_api_base": settings.custom_api_base or "",
         "openai_api_key": mask_key(settings.openai_api_key),
         "google_client_id": settings.google_client_id or "",
         "google_client_secret": mask_key(settings.google_client_secret),
         "adzuna_app_id": settings.adzuna_app_id or "",
         "adzuna_app_key": mask_key(settings.adzuna_app_key),
-        "jooble_api_key": mask_key(settings.jooble_api_key),
+        "jooble_api_key": settings.jooble_api_key or "",
         "is_gmail_connected": settings.is_gmail_connected,
         "gmail_email_address": settings.gmail_email_address or ""
     }
@@ -106,6 +108,8 @@ def update_user_settings(
         settings.llm_provider = payload.llm_provider
     if payload.llm_model is not None:
         settings.llm_model = payload.llm_model
+    if payload.custom_api_base is not None:
+        settings.custom_api_base = payload.custom_api_base
     if payload.openai_api_key is not None and not payload.openai_api_key.startswith("••"):
         settings.openai_api_key = payload.openai_api_key
     if payload.google_client_id is not None:

@@ -7,10 +7,11 @@ logger = logging.getLogger(__name__)
 def detect_llm_provider(api_key: str) -> str:
     """
     Automatically detects AI Model Provider based on API key prefix pattern.
-    - 'sk-proj-' or 'sk-' -> OpenAI
+    - 'gsk_' -> Groq (Free High-Speed Open Source Tier)
+    - 'sk-or-' -> OpenRouter (Free Open Source Models)
     - 'AIzaSy' -> Google Gemini
-    - 'gsk_' -> Groq
     - 'sk-ant-' -> Anthropic Claude
+    - 'sk-proj-' or 'sk-' -> OpenAI / DeepSeek
     """
     if not api_key:
         return "openai"
@@ -18,6 +19,8 @@ def detect_llm_provider(api_key: str) -> str:
     k = api_key.strip()
     if k.startswith("gsk_"):
         return "groq"
+    elif k.startswith("sk-or-"):
+        return "openrouter"
     elif k.startswith("AIzaSy"):
         return "gemini"
     elif k.startswith("sk-ant-"):
@@ -27,27 +30,56 @@ def detect_llm_provider(api_key: str) -> str:
     
     return "openai"
 
-def get_llm_headers_and_url(api_key: str = None, provider: str = None, model_name: str = None) -> Tuple[Dict[str, str], str, str]:
+def get_llm_headers_and_url(
+    api_key: str = None, 
+    provider: str = None, 
+    model_name: str = None, 
+    custom_api_base: str = None
+) -> Tuple[Dict[str, str], str, str]:
     """
-    Returns (headers, endpoint_url, model_name) for any AI provider in the world.
-    Supports OpenAI, Google Gemini, Groq, DeepSeek, Anthropic, and custom endpoints.
+    Returns (headers, endpoint_url, model_name) for any AI provider in the world,
+    including 100% Free Open Source Endpoints (Ollama, LM Studio, Groq Free Tier, OpenRouter Free).
     """
-    key = api_key or settings.OPENAI_API_KEY or settings.GEMINI_API_KEY
-    if not key:
-        return {}, "", ""
-
+    key = api_key or settings.OPENAI_API_KEY or settings.GEMINI_API_KEY or "free-local"
     detected_provider = provider or detect_llm_provider(key)
 
-    if detected_provider == "groq":
+    # 1. Ollama or Local Offline Open-Source Models (100% Free, no API Key needed)
+    if detected_provider == "ollama" or custom_api_base:
+        base_url = (custom_api_base or "http://localhost:11434/v1").rstrip("/")
+        url = f"{base_url}/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {key or 'ollama-free'}",
+            "Content-Type": "application/json"
+        }
+        model = model_name or "llama3"
+        logger.info(f"Using Free Local Open Source Model (Ollama/LM Studio) at {url} with model: {model}")
+        return headers, url, model
+
+    # 2. OpenRouter Free Open-Source Models
+    elif detected_provider == "openrouter":
+        headers = {
+            "Authorization": f"Bearer {key}",
+            "HTTP-Referer": "https://github.com/alfa546/Auto-Apply-AI",
+            "X-Title": "Auto-Apply AI",
+            "Content-Type": "application/json"
+        }
+        url = "https://openrouter.ai/api/v1/chat/completions"
+        model = model_name or "meta-llama/llama-3.1-8b-instruct:free"
+        logger.info(f"Using OpenRouter Free Model API with model: {model}")
+        return headers, url, model
+
+    # 3. Groq Cloud (Free Open Source Models Tier)
+    elif detected_provider == "groq":
         headers = {
             "Authorization": f"Bearer {key}",
             "Content-Type": "application/json"
         }
         url = "https://api.groq.com/openai/v1/chat/completions"
         model = model_name or "llama-3.1-70b-versatile"
-        logger.info(f"Using Groq LLM with model: {model}")
+        logger.info(f"Using Groq Free Tier Open Source Model: {model}")
         return headers, url, model
 
+    # 4. Google Gemini
     elif detected_provider == "gemini":
         headers = {
             "Authorization": f"Bearer {key}",
@@ -58,6 +90,7 @@ def get_llm_headers_and_url(api_key: str = None, provider: str = None, model_nam
         logger.info(f"Using Gemini LLM with model: {model}")
         return headers, url, model
 
+    # 5. DeepSeek
     elif detected_provider == "deepseek":
         headers = {
             "Authorization": f"Bearer {key}",
@@ -68,7 +101,7 @@ def get_llm_headers_and_url(api_key: str = None, provider: str = None, model_nam
         logger.info(f"Using DeepSeek LLM with model: {model}")
         return headers, url, model
 
-    # Default to OpenAI standard format (OpenAI, Anyscale, Together, Ollama)
+    # Default to OpenAI standard format
     headers = {
         "Authorization": f"Bearer {key}",
         "Content-Type": "application/json"

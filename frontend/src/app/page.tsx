@@ -164,6 +164,7 @@ export default function Dashboard() {
   // API Keys & AI Provider Settings State
   const [llmProvider, setLlmProvider] = useState("openai");
   const [llmModel, setLlmModel] = useState("gpt-4o");
+  const [customApiBase, setCustomApiBase] = useState("");
   const [openaiApiKey, setOpenaiApiKey] = useState("");
   const [googleClientId, setGoogleClientId] = useState("");
   const [googleClientSecret, setGoogleClientSecret] = useState("");
@@ -382,6 +383,7 @@ export default function Dashboard() {
         body: JSON.stringify({
           llm_provider: llmProvider,
           llm_model: llmModel,
+          custom_api_base: customApiBase,
           openai_api_key: openaiApiKey,
           google_client_id: googleClientId,
           google_client_secret: googleClientSecret,
@@ -1544,23 +1546,25 @@ export default function Dashboard() {
                       <span>🧠 AI Model Provider & Key Vault</span>
                     </h4>
                     <span className="text-[10px] bg-purple-950 text-purple-300 border border-purple-500/30 px-2.5 py-0.5 rounded font-mono">
-                      Multi-Model Support
+                      Includes 100% Free Open-Source Models
                     </span>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-slate-300 font-semibold mb-1">Select AI Provider</label>
+                      <label className="block text-slate-300 font-semibold mb-1">Select AI Provider (Free & Paid)</label>
                       <select
                         value={llmProvider}
                         onChange={e => setLlmProvider(e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 text-xs focus:outline-none focus:border-purple-500 font-medium"
                       >
                         <option value="openai">OpenAI (GPT-4o, GPT-4o-mini)</option>
+                        <option value="ollama">Ollama / LM Studio (100% Free Local Offline Models)</option>
+                        <option value="groq">Groq Cloud (Free Open Source Models Tier)</option>
+                        <option value="openrouter">OpenRouter (Free Open Source Models API)</option>
                         <option value="gemini">Google Gemini (Gemini 1.5 Pro, Flash)</option>
-                        <option value="groq">Groq (Llama 3.1 70B, Mixtral)</option>
                         <option value="deepseek">DeepSeek (DeepSeek V3, DeepSeek R1)</option>
-                        <option value="anthropic">Anthropic Claude (Claude 3.5 Sonnet)</option>
+                        <option value="custom">Custom OpenAI-Compatible Endpoint</option>
                       </select>
                     </div>
 
@@ -1570,22 +1574,36 @@ export default function Dashboard() {
                         type="text"
                         value={llmModel}
                         onChange={e => setLlmModel(e.target.value)}
-                        placeholder="gpt-4o, gemini-1.5-pro, deepseek-chat..."
+                        placeholder="gpt-4o, llama3, llama-3.1-70b, deepseek-chat..."
                         className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-purple-500"
                       />
                     </div>
                   </div>
 
+                  {(llmProvider === "ollama" || llmProvider === "custom") && (
+                    <div>
+                      <label className="block text-slate-300 font-semibold mb-1">Custom API Base URL (Ollama / Local LLM / LM Studio)</label>
+                      <input 
+                        type="text"
+                        value={customApiBase}
+                        onChange={e => setCustomApiBase(e.target.value)}
+                        placeholder="http://localhost:11434/v1 or http://localhost:1234/v1"
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-purple-500"
+                      />
+                      <p className="text-[10px] text-slate-400 mt-1">Default Ollama URL: http://localhost:11434/v1 (No paid API Key needed! Runs 100% offline & free).</p>
+                    </div>
+                  )}
+
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">AI Model API Key (OpenAI, Gemini, Groq, DeepSeek, Claude)</label>
+                    <label className="block text-slate-300 font-semibold mb-1">AI Model API Key (Leave empty if using local Ollama/LM Studio)</label>
                     <input 
                       type={showApiKeys ? "text" : "password"}
                       value={openaiApiKey}
                       onChange={e => setOpenaiApiKey(e.target.value)}
-                      placeholder="sk-proj-..., AIzaSy..., gsk_..."
+                      placeholder="sk-proj-..., gsk_..., sk-or-v1-..."
                       className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-purple-500"
                     />
-                    <p className="text-[10px] text-slate-400 mt-1">Auto-detects provider pattern (sk-proj-, AIzaSy, gsk_) or uses selected provider for deep ATS evaluation & custom cover letter generation.</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Supports free Groq keys (gsk_), free OpenRouter keys (sk-or-v1-), OpenAI keys, or free local Ollama endpoints!</p>
                   </div>
                 </div>
 

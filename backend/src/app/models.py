@@ -49,8 +49,9 @@ class UserSettings(Base):
     daily_apply_limit = Column(Integer, default=20)
     
     # 🔑 API Keys & AI Provider Configuration
-    llm_provider = Column(String, default="openai") # "openai", "gemini", "deepseek", "groq", "anthropic"
+    llm_provider = Column(String, default="openai") # "openai", "gemini", "deepseek", "groq", "openrouter", "ollama", "custom"
     llm_model = Column(String, default="gpt-4o") # "gpt-4o", "gemini-1.5-pro", "deepseek-chat", "llama-3.1-70b"
+    custom_api_base = Column(String, nullable=True) # e.g. "http://localhost:11434/v1" or "https://openrouter.ai/api/v1"
     openai_api_key = Column(String, nullable=True)
     google_client_id = Column(String, nullable=True)
     google_client_secret = Column(String, nullable=True)
