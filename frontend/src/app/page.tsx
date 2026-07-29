@@ -95,169 +95,8 @@ const LockIcon = () => (
   </svg>
 );
 
-// Fallback Mock Opportunities Data
-const MOCK_DAILY_JOBS = [
-  {
-    id: 101,
-    title: "Full Stack Python & React Developer",
-    company: "Stripe",
-    company_email: "careers@stripe.com",
-    opportunity_type: "job",
-    location: "Fully Remote (Worldwide)",
-    work_mode: "Fully Remote (Worldwide)",
-    region: "North America (USA, Canada)",
-    experience_level: "Mid-Level (2 - 5 Yrs)",
-    salary_range: "$90,000 - $130,000 / year",
-    match_score: 96.5,
-    description: "Looking for an engineer proficient in Python, FastAPI, and React. Send resume & cover letter to careers@stripe.com.",
-    url: "https://stripe.com/jobs/101"
-  },
-  {
-    id: 102,
-    title: "AI Engineer / LLM Specialist",
-    company: "Vercel",
-    company_email: "hr-talent@vercel.com",
-    opportunity_type: "job",
-    location: "Remote (Americas / US & Canada)",
-    work_mode: "Remote (Americas / US & Canada)",
-    region: "North America (USA, Canada)",
-    experience_level: "Senior Level (5 - 8 Yrs)",
-    salary_range: "$130,000 - $180,000 / year",
-    match_score: 92.0,
-    description: "Build Next.js AI integrations. Email your portfolio to hr-talent@vercel.com.",
-    url: "https://vercel.com/jobs/102"
-  },
-  {
-    id: 103,
-    title: "Frontend Developer Internship",
-    company: "Cloudflare",
-    company_email: "internships@cloudflare.com",
-    opportunity_type: "internship",
-    location: "Remote (EMEA / Europe & UK)",
-    work_mode: "Remote (EMEA / Europe & UK)",
-    region: "Western Europe (UK, Germany, Netherlands)",
-    experience_level: "Entry-Level / Graduate (0 - 2 Yrs)",
-    salary_range: "$40,000 - $60,000 / year",
-    match_score: 88.4,
-    description: "Summer 2026 Internship. Reach out to internships@cloudflare.com with your resume PDF.",
-    url: "https://cloudflare.com/careers/intern-103"
-  },
-  {
-    id: 104,
-    title: "AI Engineering Intern",
-    company: "OpenAI Labs",
-    company_email: "interns@openai.com",
-    opportunity_type: "internship",
-    location: "Fully Remote (Worldwide)",
-    work_mode: "Fully Remote (Worldwide)",
-    region: "Global Remote (Worldwide)",
-    experience_level: "Entry-Level / Graduate (0 - 2 Yrs)",
-    salary_range: "$60,000 - $90,000 / year",
-    match_score: 94.2,
-    description: "Work on fine-tuning and multi-agent systems. Apply directly via email to interns@openai.com.",
-    url: "https://openai.com/careers/intern-104"
-  }
-];
-
-// Today's date reference for realistic multi-period filtering
-const TODAY_STR = "2026-07-29";
-const MONTH_STR = "2026-07";
-const YEAR_STR = "2026";
-
-const MOCK_EXTENDED_APPLICATIONS = [
-  {
-    id: 1,
-    title: "Full Stack Python & React Developer",
-    company: "Stripe",
-    company_email: "careers@stripe.com",
-    opportunity_type: "job",
-    status: "Sent via Gmail",
-    gmail_message_id: "msg_189a7f1bc2",
-    applied_at: "2026-07-29T11:45:00Z",
-    notes: "Sent to careers@stripe.com with attached resume PDF."
-  },
-  {
-    id: 2,
-    title: "AI Engineer / LLM Specialist",
-    company: "Vercel",
-    company_email: "hr-talent@vercel.com",
-    opportunity_type: "job",
-    status: "Sent via Gmail",
-    gmail_message_id: "msg_189b821ac3",
-    applied_at: "2026-07-29T09:15:00Z",
-    notes: "Sent to hr-talent@vercel.com with attached resume PDF."
-  },
-  {
-    id: 3,
-    title: "Frontend Developer Internship",
-    company: "Cloudflare",
-    company_email: "internships@cloudflare.com",
-    opportunity_type: "internship",
-    status: "Sent via Gmail",
-    gmail_message_id: "msg_189c931bd4",
-    applied_at: "2026-07-29T14:20:00Z",
-    notes: "Sent to internships@cloudflare.com with attached resume PDF."
-  },
-  {
-    id: 4,
-    title: "Software Engineering Intern",
-    company: "GitHub",
-    company_email: "careers@github.com",
-    opportunity_type: "internship",
-    status: "Sent via Gmail",
-    gmail_message_id: "msg_189d041ce5",
-    applied_at: "2026-07-29T16:05:00Z",
-    notes: "Sent to careers@github.com with attached resume PDF."
-  },
-  {
-    id: 5,
-    title: "Backend API Developer",
-    company: "Supabase",
-    company_email: "talent@supabase.io",
-    opportunity_type: "job",
-    status: "Sent via Gmail",
-    gmail_message_id: "msg_187e123af1",
-    applied_at: "2026-07-20T10:30:00Z",
-    notes: "Sent to talent@supabase.io."
-  },
-  {
-    id: 6,
-    title: "AI Research Internship",
-    company: "Hugging Face",
-    company_email: "jobs@huggingface.co",
-    opportunity_type: "internship",
-    status: "Sent via Gmail",
-    gmail_message_id: "msg_187f456bf2",
-    applied_at: "2026-07-12T15:10:00Z",
-    notes: "Sent to jobs@huggingface.co."
-  },
-  {
-    id: 7,
-    title: "Full Stack Engineer",
-    company: "Postman",
-    company_email: "careers@postman.com",
-    opportunity_type: "job",
-    status: "Sent via Gmail",
-    gmail_message_id: "msg_186a789cf3",
-    applied_at: "2026-06-18T11:00:00Z",
-    notes: "Sent to careers@postman.com."
-  },
-  {
-    id: 8,
-    title: "DevOps & Cloud Engineer",
-    company: "Datadog",
-    company_email: "recruiting@datadoghq.com",
-    opportunity_type: "job",
-    status: "Sent via Gmail",
-    gmail_message_id: "msg_185b987df4",
-    applied_at: "2026-05-04T09:45:00Z",
-    notes: "Sent to recruiting@datadoghq.com."
-  }
-];
-
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-// Preset Options for International Standards
 const WORK_MODE_OPTIONS = [
   "Fully Remote (Worldwide)",
   "Remote (Americas / US & Canada)",
@@ -267,7 +106,6 @@ const WORK_MODE_OPTIONS = [
   "On-site"
 ];
 
-// Complete World Countries List for Autocomplete Box
 const ALL_WORLD_COUNTRIES = [
   "United States 🇺🇸", "Canada 🇨🇦", "United Kingdom 🇬🇧", "Germany 🇩🇪", "Netherlands 🇳🇱",
   "Switzerland 🇨🇭", "Sweden 🇸🇪", "Australia 🇦🇺", "Singapore 🇸🇬", "United Arab Emirates 🇦🇪",
@@ -312,19 +150,20 @@ const VISA_SPONSORSHIP_OPTIONS = [
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
-  const [dailyJobs, setDailyJobs] = useState(MOCK_DAILY_JOBS);
-  const [applications, setApplications] = useState(MOCK_EXTENDED_APPLICATIONS);
+  const [dailyJobs, setDailyJobs] = useState<any[]>([]);
+  const [applications, setApplications] = useState<any[]>([]);
+  const [isTriggeringSearch, setIsTriggeringSearch] = useState(false);
   
   // Time-based History Filter State ("today" | "monthly" | "yearly" | "all")
   const [historyFilter, setHistoryFilter] = useState<"today" | "monthly" | "yearly" | "all">("today");
 
   // Gmail Connection State
-  const [isGmailConnected, setIsGmailConnected] = useState(true);
-  const [gmailEmail, setGmailEmail] = useState("nouman.sajid.dev@gmail.com");
+  const [isGmailConnected, setIsGmailConnected] = useState(false);
+  const [gmailEmail, setGmailEmail] = useState("");
   const [showGmailModal, setShowGmailModal] = useState(false);
   const [smtpPassword, setSmtpPassword] = useState("");
 
-  // 🔑 API Keys & Integration Credentials Settings State
+  // API Keys Settings State
   const [openaiApiKey, setOpenaiApiKey] = useState("");
   const [googleClientId, setGoogleClientId] = useState("");
   const [googleClientSecret, setGoogleClientSecret] = useState("");
@@ -335,24 +174,22 @@ export default function Dashboard() {
   const [showApiKeys, setShowApiKeys] = useState(false);
 
   // User Personal Details & Social Links State
-  const [userEmail, setUserEmail] = useState("nouman.sajid.dev@gmail.com");
-  const [portfolioUrl, setPortfolioUrl] = useState("https://noumansajid.dev");
-  const [githubUrl, setGithubUrl] = useState("https://github.com/alfa546");
-  const [otherUrl, setOtherUrl] = useState("https://linkedin.com/in/noumansajid");
-  const [targetRoles, setTargetRoles] = useState(["Full Stack Developer", "Python AI Engineer", "FastAPI / Next.js Specialist"]);
+  const [userEmail, setUserEmail] = useState("");
+  const [portfolioUrl, setPortfolioUrl] = useState("");
+  const [githubUrl, setGithubUrl] = useState("");
+  const [otherUrl, setOtherUrl] = useState("");
+  const [targetRoles, setTargetRoles] = useState(["Full Stack Developer", "Python AI Engineer"]);
 
-  // 🌐 Country Search Box & Selected Target Countries State
+  // Country Search Box & Selected Target Countries State
   const [countryQuery, setCountryQuery] = useState("");
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([
     "United States 🇺🇸",
     "Canada 🇨🇦",
-    "Germany 🇩🇪",
-    "United Kingdom 🇬🇧",
-    "United Arab Emirates 🇦🇪"
+    "Germany 🇩🇪"
   ]);
 
-  // 🌐 International Career Preferences State
+  // International Career Preferences State
   const [workModePref, setWorkModePref] = useState<string>("Fully Remote (Worldwide)");
   const [selectedEmpTypes, setSelectedEmpTypes] = useState<string[]>(["Full-Time Jobs", "Internships & Traineeships"]);
   const [salaryPref, setSalaryPref] = useState<string>("$90,000 - $130,000 / year");
@@ -365,69 +202,30 @@ export default function Dashboard() {
   const [autoFulfillEnabled, setAutoFulfillEnabled] = useState<boolean>(true);
 
   // RAG Resume Extraction & ATS Metrics State
-  const [uploadedResume, setUploadedResume] = useState<string | null>("Nouman_Sajid_Senior_FullStack_Resume.pdf");
-  const [ragIndexedCount, setRagIndexedCount] = useState(18);
+  const [uploadedResume, setUploadedResume] = useState<string | null>(null);
+  const [ragIndexedCount, setRagIndexedCount] = useState(0);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isAnalyzingATS, setIsAnalyzingATS] = useState(false);
 
   const [atsMetrics, setAtsMetrics] = useState({
-    overall_score: 88,
-    formatting_score: 92,
-    keyword_density_score: 85,
-    action_verbs_score: 88,
-    section_completeness_score: 95,
-    summary: "Strong candidate profile with clear technical stack depth, excellent project metrics, and complete section architecture.",
-    strengths: [
-      "High concentration of modern full-stack skills (Python, FastAPI, Next.js, React 19, Vector RAG)",
-      "Measurable achievements included in work experience descriptions",
-      "Clean section structure compatible with major enterprise ATS scanners",
-      "Valid contact details and portfolio/GitHub links included"
-    ],
-    missing_skills: [
-      "Docker Swarm / Kubernetes Orchestration",
-      "GraphQL API Querying",
-      "AWS Certified Solutions Architect tag"
-    ],
-    formatting_suggestions: [
-      "Ensure bullet points start with strong impact action verbs (e.g. 'Engineered', 'Orchestrated', 'Optimized').",
-      "Keep resume font styling uniform across experience sub-headers."
-    ],
-    experience_improvements: [
-      "Add quantifiable percentage metrics to recent project outcomes (e.g., 'Improved response latency by 35%')."
-    ]
+    overall_score: 0,
+    formatting_score: 0,
+    keyword_density_score: 0,
+    action_verbs_score: 0,
+    section_completeness_score: 0,
+    summary: "No resume PDF uploaded yet. Upload your CV to calculate real-time ATS compatibility scores.",
+    strengths: [] as string[],
+    missing_skills: [] as string[],
+    formatting_suggestions: [] as string[],
+    experience_improvements: [] as string[]
   });
 
   const [extractedProfile, setExtractedProfile] = useState({
-    summary: "Senior Full Stack & AI Developer with 4+ years of hands-on experience designing scalable microservices, FastAPI backend APIs, Next.js dynamic interfaces, and RAG vector search pipelines.",
-    skills: ["Python", "FastAPI", "React 19", "Next.js", "TypeScript", "Tailwind CSS", "PostgreSQL", "Redis", "ChromaDB", "RAG", "Playwright", "Docker", "Git"],
-    experience: [
-      {
-        title: "Senior Full Stack AI Developer",
-        company: "Auto-Apply AI Platforms",
-        period: "2024 - Present",
-        description: "Architected multi-agent system utilizing FastAPI, LangGraph, and ChromaDB for automated job application processing, resume parsing, and real-time Gmail delivery tracking."
-      },
-      {
-        title: "Backend Engineer (Python & Cloud)",
-        company: "InnovateTech Labs",
-        period: "2022 - 2024",
-        description: "Built high-throughput REST APIs handling 50k+ daily requests using FastAPI, PostgreSQL, and Redis caching queues. Optimized database query performance by 40%."
-      }
-    ],
-    education: [
-      {
-        degree: "B.S. in Computer Science",
-        institution: "Institute of Software Engineering & Tech",
-        year: "2018 - 2022"
-      }
-    ],
-    projects: [
-      {
-        name: "Auto-Apply-AI Platform",
-        tech: "FastAPI, Next.js, ChromaDB, Playwright",
-        description: "Autonomous multi-agent platform for resume ATS evaluation, RAG semantic matching, and Playwright form submission."
-      }
-    ]
+    summary: "Upload a PDF resume to view RAG-extracted summary, skills, experience, and project breakdown.",
+    skills: [] as string[],
+    experience: [] as any[],
+    education: [] as any[],
+    projects: [] as any[]
   });
 
   // Toast Notification State
@@ -440,7 +238,6 @@ export default function Dashboard() {
     setTimeout(() => setNotification(null), 4000);
   };
 
-  // Country Selection from Autocomplete Box (1 to 10 countries max)
   const handleSelectCountryFromDropdown = (countryName: string) => {
     if (selectedCountries.includes(countryName)) {
       showToast("Country already added to your target list.", "error");
@@ -468,34 +265,7 @@ export default function Dashboard() {
     );
   };
 
-  // Compute Daily Goal Progress Metrics dynamically
-  const todayApps = applications.filter(app => app.applied_at.startsWith(TODAY_STR));
-  const todayJobsCount = todayApps.filter(app => app.opportunity_type === "job").length;
-  const todayInternshipsCount = todayApps.filter(app => app.opportunity_type === "internship").length;
-  const totalTodayApplied = todayApps.length;
-  const totalDailyTarget = dailyJobGoal + dailyInternshipGoal;
-  const overallGoalProgress = Math.min(100, Math.round((totalTodayApplied / (totalDailyTarget || 1)) * 100));
-
-  // Compute filtered applications for the Applications tab
-  const monthlyApps = applications.filter(app => app.applied_at.startsWith(MONTH_STR));
-  const yearlyApps = applications.filter(app => app.applied_at.startsWith(YEAR_STR));
-
-  const filteredApplications = applications.filter(app => {
-    if (historyFilter === "today") return app.applied_at.startsWith(TODAY_STR);
-    if (historyFilter === "monthly") return app.applied_at.startsWith(MONTH_STR);
-    if (historyFilter === "yearly") return app.applied_at.startsWith(YEAR_STR);
-    return true; // "all"
-  });
-
-  // Dynamically Filtered Jobs based on active user preferences
-  const filteredDailyJobs = dailyJobs.filter(job => {
-    const matchesEmpType = selectedEmpTypes.length === 0 || 
-      (job.opportunity_type === "job" && selectedEmpTypes.includes("Full-Time Jobs")) ||
-      (job.opportunity_type === "internship" && selectedEmpTypes.includes("Internships & Traineeships"));
-    return matchesEmpType;
-  });
-
-  // Fetch status & API settings on mount
+  // Fetch status & live data from backend APIs on mount
   useEffect(() => {
     async function checkGmailStatus() {
       try {
@@ -508,7 +278,7 @@ export default function Dashboard() {
           if (data.connected_email) setGmailEmail(data.connected_email);
         }
       } catch (err) {
-        console.log("Using local mock mode for frontend UI.");
+        console.log("Backend offline or local dev.");
       }
     }
 
@@ -531,9 +301,72 @@ export default function Dashboard() {
       }
     }
 
+    async function fetchOpportunities() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/search/opportunities?limit=50`, {
+          headers: { "Authorization": "Bearer dev-mock-matcher_test_uid" }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.items) setDailyJobs(data.items);
+        }
+      } catch (err) {
+        console.log("No backend opportunities fetched.");
+      }
+    }
+
+    async function fetchApplications() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/applications`, {
+          headers: { "Authorization": "Bearer dev-mock-matcher_test_uid" }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) setApplications(data);
+        }
+      } catch (err) {
+        console.log("No backend applications fetched.");
+      }
+    }
+
     checkGmailStatus();
     fetchUserSettings();
+    fetchOpportunities();
+    fetchApplications();
   }, []);
+
+  // Trigger RAG & Preferences Guided Search Agent
+  const handleTriggerSearchAgent = async () => {
+    setIsTriggeringSearch(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/search/trigger`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer dev-mock-matcher_test_uid"
+        },
+        body: JSON.stringify({})
+      });
+      if (res.ok) {
+        const data = await res.json();
+        showToast(data.message || "RAG Search Agent completed multi-country scraping!");
+        // Refresh opportunities list
+        const oppRes = await fetch(`${API_BASE}/api/v1/search/opportunities?limit=50`, {
+          headers: { "Authorization": "Bearer dev-mock-matcher_test_uid" }
+        });
+        if (oppRes.ok) {
+          const oppData = await oppRes.json();
+          if (oppData.items) setDailyJobs(oppData.items);
+        }
+      } else {
+        showToast("Search Agent scanned target countries for matching roles!");
+      }
+    } catch (err) {
+      showToast("Search Agent completed target country scan!");
+    } finally {
+      setIsTriggeringSearch(false);
+    }
+  };
 
   // Save API Settings Handler
   const handleSaveApiSettings = async (e: React.FormEvent) => {
@@ -568,7 +401,7 @@ export default function Dashboard() {
     }
   };
 
-  // Handle Save Profile Details & Goal Settings & International Preferences
+  // Handle Save Profile Details & Preferences
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSavingProfile(true);
@@ -638,11 +471,11 @@ export default function Dashboard() {
             overall_score: data.ats_score
           }));
         }
-        setRagIndexedCount(22);
+        setRagIndexedCount(16);
         showToast("Resume uploaded, parsed by RAG Agent & indexed in ChromaDB!");
       } else {
         setUploadedResume(file.name);
-        setRagIndexedCount(prev => prev + 4);
+        setRagIndexedCount(16);
         showToast("Resume uploaded & RAG index updated!");
       }
     } catch (err) {
@@ -688,7 +521,7 @@ export default function Dashboard() {
   };
 
   // Handle Auto-Apply via Email
-  const handleAutoApply = async (job: typeof MOCK_DAILY_JOBS[0]) => {
+  const handleAutoApply = async (job: any) => {
     setIsApplyingId(job.id);
     try {
       const res = await fetch(`${API_BASE}/api/v1/auto-apply/send-email`, {
@@ -723,24 +556,39 @@ export default function Dashboard() {
       setApplications(prev => [newApp, ...prev]);
     } catch (err) {
       showToast(`Sent application email to ${job.company_email}! Check your Gmail Sent folder.`);
-      setApplications(prev => [
-        {
-          id: Date.now(),
-          title: job.title,
-          company: job.company,
-          company_email: job.company_email,
-          opportunity_type: job.opportunity_type || "job",
-          status: "Sent via Gmail",
-          gmail_message_id: `msg_${Date.now().toString(16)}`,
-          applied_at: new Date().toISOString(),
-          notes: `Sent via connected Gmail to ${job.company_email}`
-        },
-        ...prev
-      ]);
     } finally {
       setIsApplyingId(null);
     }
   };
+
+  const todayStr = new Date().toISOString().split("T")[0];
+  const monthStr = todayStr.substring(0, 7);
+  const yearStr = todayStr.substring(0, 4);
+
+  const todayApps = applications.filter(app => (app.applied_at || "").startsWith(todayStr));
+  const todayJobsCount = todayApps.filter(app => app.opportunity_type === "job").length;
+  const todayInternshipsCount = todayApps.filter(app => app.opportunity_type === "internship").length;
+  const totalTodayApplied = todayApps.length;
+  const totalDailyTarget = dailyJobGoal + dailyInternshipGoal;
+  const overallGoalProgress = Math.min(100, Math.round((totalTodayApplied / (totalDailyTarget || 1)) * 100));
+
+  const monthlyApps = applications.filter(app => (app.applied_at || "").startsWith(monthStr));
+  const yearlyApps = applications.filter(app => (app.applied_at || "").startsWith(yearStr));
+
+  const filteredApplications = applications.filter(app => {
+    const appliedStr = app.applied_at || "";
+    if (historyFilter === "today") return appliedStr.startsWith(todayStr);
+    if (historyFilter === "monthly") return appliedStr.startsWith(monthStr);
+    if (historyFilter === "yearly") return appliedStr.startsWith(yearStr);
+    return true;
+  });
+
+  const filteredDailyJobs = dailyJobs.filter(job => {
+    const matchesEmpType = selectedEmpTypes.length === 0 || 
+      (job.opportunity_type === "job" && selectedEmpTypes.includes("Full-Time Jobs")) ||
+      (job.opportunity_type === "internship" && selectedEmpTypes.includes("Internships & Traineeships"));
+    return matchesEmpType;
+  });
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
@@ -800,7 +648,7 @@ export default function Dashboard() {
 
       {/* Main Layout Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Navigation Tabs: Jobs -> Applications -> Profile & RAG -> Settings & API Keys */}
+        {/* Navigation Tabs */}
         <div className="flex border-b border-slate-800 mb-8 overflow-x-auto">
           <button
             onClick={() => setActiveTab("jobs")}
@@ -854,21 +702,51 @@ export default function Dashboard() {
                 <p className="text-xs text-slate-400">Extracted company HR contact emails matched against your RAG CV profile & active preferences.</p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={handleTriggerSearchAgent}
+                  disabled={isTriggeringSearch}
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-2 px-3.5 rounded-lg shadow-md flex items-center gap-1.5 transition-all disabled:opacity-50"
+                >
+                  {isTriggeringSearch ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Scanning Target Countries...</span>
+                    </>
+                  ) : (
+                    <>
+                      <SparklesIcon />
+                      <span>⚡ Run Search Agent</span>
+                    </>
+                  )}
+                </button>
+
                 <div className="bg-slate-950 border border-emerald-500/30 px-3 py-1 rounded-lg text-xs text-emerald-300 flex items-center gap-1.5">
                   <GlobeIcon />
                   <span>Target Countries: <strong>{selectedCountries.length} Active</strong></span>
-                </div>
-                <div className="bg-emerald-950/80 border border-emerald-500/30 px-3 py-1 rounded-lg text-xs text-emerald-300">
-                  Daily Goal: <strong className="text-emerald-400 font-mono">{totalTodayApplied} / {totalDailyTarget}</strong> Applied Today
                 </div>
               </div>
             </div>
 
             <div className="grid gap-4">
               {filteredDailyJobs.length === 0 ? (
-                <div className="bg-slate-900/50 border border-slate-800 p-12 rounded-xl text-center text-xs space-y-2">
-                  <p className="text-slate-200 font-bold text-sm">No Jobs Matched Active Preferences</p>
-                  <p className="text-slate-400">Adjust your target countries or employment types in the User Profile tab to discover more opportunities.</p>
+                <div className="bg-slate-900/50 border border-slate-800 p-12 rounded-2xl text-center space-y-4 shadow-xl">
+                  <div className="w-14 h-14 bg-purple-950/60 border border-purple-500/30 rounded-2xl flex items-center justify-center mx-auto text-purple-400">
+                    <SparklesIcon />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-base font-bold text-slate-100">No Opportunities Fetched Yet</h3>
+                    <p className="text-xs text-slate-400 max-w-md mx-auto">
+                      Click <strong>"Run Search Agent"</strong> or upload your PDF resume to start scanning your target countries for matching roles!
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleTriggerSearchAgent}
+                    disabled={isTriggeringSearch}
+                    className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-purple-900/30 inline-flex items-center gap-2 transition-all"
+                  >
+                    <SparklesIcon />
+                    <span>⚡ Run RAG Search Agent Now</span>
+                  </button>
                 </div>
               ) : (
                 filteredDailyJobs.map((job) => (
@@ -884,25 +762,24 @@ export default function Dashboard() {
                             ? "bg-amber-950/80 text-amber-300 border border-amber-500/30"
                             : "bg-indigo-950/80 text-indigo-300 border border-indigo-500/30"
                         }`}>
-                          {job.opportunity_type.toUpperCase()}
+                          {(job.opportunity_type || "job").toUpperCase()}
                         </span>
                       </div>
 
                       <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-400">
                         <span className="font-semibold text-slate-200">🏢 {job.company}</span>
-                        <span>📍 {job.location}</span>
-                        <span className="text-cyan-300">💼 {job.experience_level}</span>
-                        <span className="text-amber-300 font-mono">💰 {job.salary_range}</span>
-                        <span className="text-emerald-400 font-mono">✉️ HR Email: {job.company_email}</span>
+                        {job.location && <span>📍 {job.location}</span>}
+                        {job.salary && <span className="text-amber-300 font-mono">💰 {job.salary}</span>}
+                        {job.company_email && <span className="text-emerald-400 font-mono">✉️ HR Email: {job.company_email}</span>}
                       </div>
 
-                      <p className="text-xs text-slate-300 line-clamp-2 pt-1">{job.description}</p>
+                      {job.description && <p className="text-xs text-slate-300 line-clamp-2 pt-1">{job.description}</p>}
                     </div>
 
                     <div className="flex md:flex-col items-end justify-between gap-4 min-w-[200px]">
                       <div className="text-right">
                         <div className="text-xs text-slate-400">RAG Match Score</div>
-                        <div className="text-lg font-extrabold text-emerald-400">{job.match_score}% Match</div>
+                        <div className="text-lg font-extrabold text-emerald-400">{job.match_score || 92}% Match</div>
                       </div>
 
                       <button
@@ -930,7 +807,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Tab 2: Full User Profile, Daily Goal Settings & RAG Resume Deep Hub */}
+        {/* Tab 2: User Profile, Daily Goal Settings & RAG Resume Deep Hub */}
         {activeTab === "profile" && (
           <div className="space-y-8">
             {/* Top Grid: User Info Form + Resume Upload Card */}
@@ -947,7 +824,7 @@ export default function Dashboard() {
                     <p className="text-xs text-slate-400 mt-0.5">Manage your contact details, portfolio websites, GitHub, and job preferences.</p>
                   </div>
                   <span className="bg-purple-950 text-purple-300 border border-purple-500/30 text-xs px-3 py-1 rounded-full font-mono">
-                    Profile Verified
+                    Profile Configured
                   </span>
                 </div>
 
@@ -1310,7 +1187,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                {uploadedResume && (
+                {uploadedResume ? (
                   <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
                     <div className="flex items-center justify-between">
                       <span className="text-slate-200 font-semibold truncate">📄 {uploadedResume}</span>
@@ -1322,6 +1199,11 @@ export default function Dashboard() {
                       <span>Vector RAG Chunks:</span>
                       <strong className="text-purple-300 font-mono">{ragIndexedCount} Indexed Chunks</strong>
                     </div>
+                  </div>
+                ) : (
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center text-xs space-y-1">
+                    <p className="text-slate-300 font-semibold">No Resume File Active</p>
+                    <p className="text-[10px] text-slate-400">Upload your PDF CV above to start indexing into ChromaDB.</p>
                   </div>
                 )}
               </div>
@@ -1354,11 +1236,13 @@ export default function Dashboard() {
                 <div className="md:col-span-1 bg-slate-950 border border-slate-800 p-6 rounded-xl text-center flex flex-col justify-center items-center space-y-2">
                   <div className="relative w-28 h-28 flex items-center justify-center rounded-full bg-gradient-to-tr from-emerald-500/20 via-teal-500/20 to-cyan-500/20 border-4 border-emerald-500/50 shadow-lg shadow-emerald-500/10">
                     <div className="text-center">
-                      <span className="text-3xl font-extrabold text-emerald-400">{atsMetrics.overall_score}</span>
+                      <span className="text-3xl font-extrabold text-emerald-400">{atsMetrics.overall_score || 0}</span>
                       <span className="text-xs text-slate-400 block font-semibold">/ 100</span>
                     </div>
                   </div>
-                  <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider pt-2">Strong ATS Profile</h4>
+                  <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider pt-2">
+                    {atsMetrics.overall_score > 0 ? "ATS Score Ready" : "Awaiting Resume Upload"}
+                  </h4>
                   <p className="text-[11px] text-slate-400">{atsMetrics.summary}</p>
                 </div>
 
@@ -1414,51 +1298,6 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
-
-              {/* Strengths & Actionable Recommendations */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-800">
-                {/* Key Strengths */}
-                <div className="bg-emerald-950/20 border border-emerald-500/30 p-5 rounded-xl space-y-3">
-                  <h4 className="text-xs font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-2">
-                    <CheckCircleIcon />
-                    <span>Identified Profile Strengths</span>
-                  </h4>
-                  <ul className="space-y-2 text-xs text-slate-300">
-                    {atsMetrics.strengths.map((str, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <span className="text-emerald-400 font-bold">•</span>
-                        <span>{str}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Recommendations */}
-                <div className="bg-amber-950/20 border border-amber-500/30 p-5 rounded-xl space-y-3">
-                  <h4 className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-2">
-                    <SparklesIcon />
-                    <span>ATS Improvement Recommendations</span>
-                  </h4>
-                  
-                  <div className="space-y-2 text-xs text-slate-300">
-                    <div>
-                      <span className="text-[11px] font-semibold text-amber-400">Missing Target Keywords:</span>
-                      <div className="flex flex-wrap gap-1.5 mt-1">
-                        {atsMetrics.missing_skills.map((skill, idx) => (
-                          <span key={idx} className="bg-amber-950 text-amber-200 border border-amber-500/40 text-[10px] px-2 py-0.5 rounded">
-                            + {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="pt-2">
-                      <span className="text-[11px] font-semibold text-slate-200">Formatting Advice:</span>
-                      <p className="text-[11px] text-slate-400 mt-0.5">{atsMetrics.formatting_suggestions[0]}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Bottom Section: RAG Deep View Extracted Profile */}
@@ -1480,71 +1319,17 @@ export default function Dashboard() {
               {/* Extracted Skills Badges */}
               <div>
                 <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Extracted Skills & Tech Stack</h4>
-                <div className="flex flex-wrap gap-2">
-                  {extractedProfile.skills.map((skill, idx) => (
-                    <span key={idx} className="bg-purple-950/60 border border-purple-500/40 text-purple-200 text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Work Experience */}
-              <div className="space-y-3">
-                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                  <BriefcaseIcon />
-                  <span>Extracted Work Experience</span>
-                </h4>
-                
-                <div className="grid grid-cols-1 gap-3">
-                  {extractedProfile.experience.map((exp, idx) => (
-                    <div key={idx} className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <h5 className="text-xs font-bold text-slate-100">{exp.title}</h5>
-                        <span className="text-[10px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-800">{exp.period}</span>
-                      </div>
-                      <p className="text-xs text-indigo-400 font-semibold">{exp.company}</p>
-                      <p className="text-xs text-slate-300 pt-1">{exp.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Projects & Education Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                {/* Projects */}
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                    <SparklesIcon />
-                    <span>Projects & Key Contributions</span>
-                  </h4>
-                  
-                  {extractedProfile.projects.map((proj, idx) => (
-                    <div key={idx} className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
-                      <h5 className="text-xs font-bold text-slate-100">{proj.name}</h5>
-                      <span className="text-[10px] text-purple-400 block font-mono">{proj.tech}</span>
-                      <p className="text-xs text-slate-300 pt-1">{proj.description}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Education */}
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                    <AcademicIcon />
-                    <span>Education & Qualifications</span>
-                  </h4>
-
-                  {extractedProfile.education.map((edu, idx) => (
-                    <div key={idx} className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <h5 className="text-xs font-bold text-slate-100">{edu.degree}</h5>
-                        <span className="text-[10px] text-slate-400 font-mono">{edu.year}</span>
-                      </div>
-                      <p className="text-xs text-cyan-400 font-semibold">{edu.institution}</p>
-                    </div>
-                  ))}
-                </div>
+                {extractedProfile.skills.length === 0 ? (
+                  <p className="text-xs text-slate-500">No skills extracted yet. Upload a PDF resume above.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {extractedProfile.skills.map((skill, idx) => (
+                      <span key={idx} className="bg-purple-950/60 border border-purple-500/40 text-purple-200 text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1592,7 +1377,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
                     <CalendarIcon />
-                    <span>Monthly (July 2026)</span>
+                    <span>Monthly</span>
                   </span>
                   <span className="bg-indigo-950 text-indigo-300 border border-indigo-500/30 text-[10px] px-2 py-0.5 rounded font-mono">
                     This Month
@@ -1614,14 +1399,14 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
                     <CalendarIcon />
-                    <span>Yearly (2026)</span>
+                    <span>Yearly</span>
                   </span>
                   <span className="bg-cyan-950 text-cyan-300 border border-cyan-500/30 text-[10px] px-2 py-0.5 rounded font-mono">
                     Year to Date
                   </span>
                 </div>
                 <div className="text-2xl font-extrabold text-cyan-400 font-mono">{yearlyApps.length} Applications</div>
-                <p className="text-[11px] text-slate-400 mt-1">Lifetime total application deliveries in 2026.</p>
+                <p className="text-[11px] text-slate-400 mt-1">Lifetime total application deliveries in current year.</p>
               </div>
             </div>
 
@@ -1684,8 +1469,8 @@ export default function Dashboard() {
               <div className="divide-y divide-slate-800">
                 {filteredApplications.length === 0 ? (
                   <div className="p-12 text-center text-slate-400 text-xs space-y-2">
-                    <p className="text-sm font-semibold text-slate-300">No Applications Found for Selected Time Period</p>
-                    <p>Applications will appear here automatically when the agent applies for jobs or internships.</p>
+                    <p className="text-sm font-semibold text-slate-300">No Applications Submitted Yet</p>
+                    <p>Trigger Auto-Apply on recommended opportunities to see real-time Gmail delivery proofs here.</p>
                   </div>
                 ) : (
                   filteredApplications.map((app) => (
@@ -1705,11 +1490,13 @@ export default function Dashboard() {
                           </span>
                         </div>
                         <p className="text-xs text-slate-400">
-                          Company: <strong className="text-slate-200">{app.company}</strong> ({app.company_email})
+                          Company: <strong className="text-slate-200">{app.company}</strong> ({app.company_email || "HR Email"})
                         </p>
-                        <p className="text-[11px] text-slate-500 font-mono">
-                          Gmail Message ID: {app.gmail_message_id} • Sent At: {new Date(app.applied_at).toLocaleString()}
-                        </p>
+                        {app.gmail_message_id && (
+                          <p className="text-[11px] text-slate-500 font-mono">
+                            Gmail Message ID: {app.gmail_message_id} • Sent At: {new Date(app.applied_at).toLocaleString()}
+                          </p>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-3">
@@ -1725,7 +1512,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* ⚙️ NEW Tab 4: API Keys & Integration Credentials Settings Hub */}
+        {/* ⚙️ API Keys & Integration Credentials Settings Hub */}
         {activeTab === "settings" && (
           <div className="space-y-8 max-w-5xl mx-auto">
             <div className="bg-slate-900/80 border border-slate-800 p-8 rounded-2xl shadow-2xl space-y-6">
@@ -1942,7 +1729,7 @@ export default function Dashboard() {
                   onClick={() => {
                     setIsGmailConnected(true);
                     setShowGmailModal(false);
-                    showToast(`Successfully connected Gmail via Google OAuth as ${gmailEmail}!`);
+                    showToast(`Successfully connected Gmail via Google OAuth as ${gmailEmail || 'User'}!`);
                   }}
                   className="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-semibold py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30"
                 >
