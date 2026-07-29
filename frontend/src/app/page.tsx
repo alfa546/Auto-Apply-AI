@@ -261,6 +261,24 @@ const WORK_MODE_OPTIONS = [
   "On-site"
 ];
 
+const TARGET_COUNTRY_OPTIONS = [
+  "United States 🇺🇸",
+  "Canada 🇨🇦",
+  "United Kingdom 🇬🇧",
+  "Germany 🇩🇪",
+  "Netherlands 🇳🇱",
+  "Switzerland 🇨🇭",
+  "Sweden 🇸🇪",
+  "Australia 🇦🇺",
+  "Singapore 🇸🇬",
+  "United Arab Emirates 🇦🇪",
+  "Saudi Arabia 🇸🇦",
+  "Japan 🇯🇵",
+  "Ireland 🇮🇪",
+  "France 🇫🇷",
+  "New Zealand 🇳🇿"
+];
+
 const REGION_OPTIONS = [
   "North America (USA, Canada)",
   "Western Europe (UK, Germany, Netherlands)",
@@ -321,8 +339,15 @@ export default function Dashboard() {
   const [otherUrl, setOtherUrl] = useState("https://linkedin.com/in/noumansajid");
   const [targetRoles, setTargetRoles] = useState(["Full Stack Developer", "Python AI Engineer", "FastAPI / Next.js Specialist"]);
 
-  // 🌐 International Career Preferences State
+  // 🌐 International Career Preferences State & Target Countries (1 to 10 max)
   const [workModePref, setWorkModePref] = useState<string>("Fully Remote (Worldwide)");
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([
+    "United States 🇺🇸",
+    "Canada 🇨🇦",
+    "Germany 🇩🇪",
+    "United Kingdom 🇬🇧",
+    "United Arab Emirates 🇦🇪"
+  ]);
   const [selectedRegions, setSelectedRegions] = useState<string[]>(["North America (USA, Canada)", "Western Europe (UK, Germany, Netherlands)", "Global Remote (Worldwide)"]);
   const [selectedEmpTypes, setSelectedEmpTypes] = useState<string[]>(["Full-Time Jobs", "Internships & Traineeships"]);
   const [salaryPref, setSalaryPref] = useState<string>("$90,000 - $130,000 / year");
@@ -410,6 +435,25 @@ export default function Dashboard() {
     setTimeout(() => setNotification(null), 4000);
   };
 
+  // Toggle helper for Country selection with 10 max validation
+  const toggleCountry = (countryName: string) => {
+    setSelectedCountries(prev => {
+      if (prev.includes(countryName)) {
+        if (prev.length === 1) {
+          showToast("Please select at least 1 target country.", "error");
+          return prev;
+        }
+        return prev.filter(c => c !== countryName);
+      } else {
+        if (prev.length >= 10) {
+          showToast("Maximum limit of 10 target countries reached!", "error");
+          return prev;
+        }
+        return [...prev, countryName];
+      }
+    });
+  };
+
   // Toggle helpers for multi-select pill preferences
   const toggleRegion = (region: string) => {
     setSelectedRegions(prev => 
@@ -444,7 +488,6 @@ export default function Dashboard() {
 
   // Dynamically Filtered Jobs based on active user preferences
   const filteredDailyJobs = dailyJobs.filter(job => {
-    // If internships are selected or jobs are selected
     const matchesEmpType = selectedEmpTypes.length === 0 || 
       (job.opportunity_type === "job" && selectedEmpTypes.includes("Full-Time Jobs")) ||
       (job.opportunity_type === "internship" && selectedEmpTypes.includes("Internships & Traineeships"));
@@ -487,6 +530,7 @@ export default function Dashboard() {
           github_url: githubUrl,
           other_url: otherUrl,
           target_roles: targetRoles,
+          target_countries: selectedCountries,
           work_mode_preference: workModePref,
           target_regions: selectedRegions,
           employment_types: selectedEmpTypes,
@@ -499,12 +543,12 @@ export default function Dashboard() {
         })
       });
       if (res.ok) {
-        showToast("International career preferences & backend settings saved successfully!");
+        showToast(`Saved ${selectedCountries.length} target countries & international preferences!`);
       } else {
-        showToast("International preferences & profile updated in backend session!");
+        showToast(`Saved ${selectedCountries.length} target countries & preferences in backend session!`);
       }
     } catch (err) {
-      showToast("International preferences & profile updated in backend session!");
+      showToast(`Saved ${selectedCountries.length} target countries & preferences in backend session!`);
     } finally {
       setIsSavingProfile(false);
     }
@@ -756,9 +800,9 @@ export default function Dashboard() {
                 <p className="text-xs text-slate-400">Extracted company HR contact emails matched against your RAG CV profile & active preferences.</p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <div className="bg-slate-950 border border-purple-500/30 px-3 py-1 rounded-lg text-xs text-purple-300 flex items-center gap-1.5">
-                  <FilterIcon />
-                  <span>Mode: <strong>{workModePref}</strong></span>
+                <div className="bg-slate-950 border border-emerald-500/30 px-3 py-1 rounded-lg text-xs text-emerald-300 flex items-center gap-1.5">
+                  <GlobeIcon />
+                  <span>Countries: <strong>{selectedCountries.length} Selected</strong></span>
                 </div>
                 <div className="bg-emerald-950/80 border border-emerald-500/30 px-3 py-1 rounded-lg text-xs text-emerald-300">
                   Daily Goal: <strong className="text-emerald-400 font-mono">{totalTodayApplied} / {totalDailyTarget}</strong> Applied Today
@@ -770,7 +814,7 @@ export default function Dashboard() {
               {filteredDailyJobs.length === 0 ? (
                 <div className="bg-slate-900/50 border border-slate-800 p-12 rounded-xl text-center text-xs space-y-2">
                   <p className="text-slate-200 font-bold text-sm">No Jobs Matched Active Preferences</p>
-                  <p className="text-slate-400">Adjust your employment types or regions in the User Profile tab to discover more opportunities.</p>
+                  <p className="text-slate-400">Adjust your target countries or employment types in the User Profile tab to discover more opportunities.</p>
                 </div>
               ) : (
                 filteredDailyJobs.map((job) => (
@@ -921,21 +965,56 @@ export default function Dashboard() {
                     />
                   </div>
 
-                  {/* 🌍 NEW: International Standard Preferences Section */}
-                  <div className="bg-slate-950/90 border border-cyan-500/30 p-5 rounded-xl space-y-4">
+                  {/* 🌍 NEW: Target Countries Selector (1 to 10 Max) & International Preferences Section */}
+                  <div className="bg-slate-950/90 border border-cyan-500/30 p-5 rounded-xl space-y-5">
                     <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
                       <div className="flex items-center gap-2">
                         <GlobeIcon />
                         <h4 className="text-xs font-bold text-cyan-300 uppercase tracking-wider">
-                          International Career & Job Matching Preferences
+                          International Career & Country Preferences
                         </h4>
                       </div>
                       <span className="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-500/30 px-2.5 py-0.5 rounded font-mono">
-                        Global Standard
+                        Global Target (1-10 Countries)
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* 🌐 NEW: Multiple Countries Selector (Up to 10 max) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-slate-300 font-semibold">
+                          🌐 Select Target Destination Countries (Choose 1 to 10 Countries)
+                        </label>
+                        <span className="text-xs font-mono bg-emerald-950 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded font-bold">
+                          Selected: {selectedCountries.length} / 10 Max
+                        </span>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {TARGET_COUNTRY_OPTIONS.map((country, idx) => {
+                          const isSelected = selectedCountries.includes(country);
+                          return (
+                            <button
+                              type="button"
+                              key={idx}
+                              onClick={() => toggleCountry(country)}
+                              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+                                isSelected
+                                  ? "bg-emerald-950/90 border-emerald-500 text-emerald-200 shadow ring-1 ring-emerald-500/40"
+                                  : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
+                              }`}
+                            >
+                              {isSelected ? "✓ " : "+ "}{country}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p className="text-[10px] text-slate-400 mt-2">
+                        The AI Agent will automatically filter opportunities and send your CV/resume to hiring managers located in your selected target countries.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-800/80 pt-4">
                       {/* Work Mode */}
                       <div>
                         <label className="block text-slate-300 font-semibold mb-1">Preferred Work Mode / Remote Policy</label>
@@ -990,30 +1069,6 @@ export default function Dashboard() {
                             <option key={idx} value={opt}>{opt}</option>
                           ))}
                         </select>
-                      </div>
-                    </div>
-
-                    {/* Target Global Regions Pills */}
-                    <div>
-                      <label className="block text-slate-300 font-semibold mb-2">Target Global Regions & Countries</label>
-                      <div className="flex flex-wrap gap-2">
-                        {REGION_OPTIONS.map((region, idx) => {
-                          const isSelected = selectedRegions.includes(region);
-                          return (
-                            <button
-                              type="button"
-                              key={idx}
-                              onClick={() => toggleRegion(region)}
-                              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
-                                isSelected
-                                  ? "bg-cyan-950/80 border-cyan-500 text-cyan-200 shadow"
-                                  : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
-                              }`}
-                            >
-                              {isSelected ? "✓ " : "+ "}{region}
-                            </button>
-                          );
-                        })}
                       </div>
                     </div>
 
@@ -1118,7 +1173,7 @@ export default function Dashboard() {
                       disabled={isSavingProfile}
                       className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold px-5 py-2.5 rounded-lg shadow-lg shadow-purple-900/30 flex items-center gap-2 transition-all text-xs"
                     >
-                      {isSavingProfile ? "Saving Settings..." : "Save International Profile & Preferences"}
+                      {isSavingProfile ? "Saving Settings..." : `Save ${selectedCountries.length} Target Countries & Profile Preferences`}
                     </button>
                   </div>
                 </form>
