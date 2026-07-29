@@ -5,7 +5,7 @@
 <h1 align="center">🚀 Auto Apply AI</h1>
 
 <p align="center">
-  <b>Autonomous Multi-Agent AI Platform for Resume Optimization, Unified Job/Scholarship Search, RAG Semantic Matching, Playwright Browser Auto-Apply, and Gmail Email Tracking.</b>
+  <b>Autonomous Multi-Agent AI Platform for Resume Optimization, Multi-Country Target Search, RAG Semantic Matching, Playwright Browser Auto-Apply, and Gmail Email Tracking.</b>
 </p>
 
 <p align="center">
@@ -47,44 +47,43 @@
 **Auto Apply AI** is an enterprise-grade, end-to-end autonomous multi-agent platform designed to streamline and automate the entire career application lifecycle. 
 
 Instead of spending hours manually browsing multiple job portals, tailoring resumes, filling repetitive forms, and tracking application emails, **Auto Apply AI** automates:
-1. **Resume Ingestion & Parsing**: Extracts sections, skills, work experience, and calculates ATS compatibility scores.
-2. **Unified Opportunity Discovery**: Background scheduler periodically aggregates jobs, internships, scholarships, and hackathons across external platforms.
-3. **RAG & Semantic Matching**: Generates vector embeddings for candidate profiles and job listings using `SentenceTransformers` and `ChromaDB` to compute precise compatibility metrics and tailored feedback.
-4. **Autonomous Web Application**: Leverages headless Playwright browser automation to auto-fill forms and submit applications.
-5. **Smart Email Assistant**: Connects to Gmail API/IMAP to monitor responses, classify status updates (Interviews, Assessments, Rejections), and auto-draft professional follow-up responses.
+1. **Resume Ingestion & RAG Parsing**: Extracts sections, skills, work experience, and calculates authentic ATS compatibility scores (0-100%).
+2. **Interactive Searchable Country Box**: Search and add up to **10 target destination countries** (e.g., United States 🇺🇸, Canada 🇨🇦, UK 🇬🇧, Germany 🇩🇪, UAE 🇦🇪, Japan 🇯🇵) with live removable tag badges.
+3. **Multi-Agent RAG Search Aggregator**: Combines candidate RAG vector skills from ChromaDB + user target roles + selected target countries to execute targeted multi-country opportunity scraping.
+4. **Daily Application Goals & Automation Targets**: Allows users to set custom daily job and internship application targets with live percentage completion bars.
+5. **Gmail Email Auto-Apply Proofs**: Sends candidate CVs directly to company hiring emails with message IDs delivered to the user's Gmail "Sent" folder, complete with **Today / Monthly / Yearly** period history filters.
 
 ---
 
 ## 🔥 Key Features
 
-### 📄 1. Resume Agent & ATS Analyzer
-- **Multi-Format PDF Extraction**: Powered by `pdfplumber` and `PyPDF2`.
-- **Structured JSON Schema**: Converts unstructured resumes into validated candidate profiles.
-- **ATS Compatibility Scoring**: Evaluates section completeness, formatting, action verbs, and skill density.
-- **Semantic Vector Storage**: Embeds candidate skills and experience in `ChromaDB` for instant semantic retrieval.
+### 🔍 1. Interactive Country Autocomplete Search Box (1-10 Countries)
+- **Real-Time Autocomplete Dropdown**: Search from 50+ global destination countries by typing in the search box.
+- **Dynamic Tag Badges**: Selected countries appear below the search box as removable badges (`✓ Country ✕`).
+- **Strict 1-10 Limit Enforcement**: Allows candidates to target multiple international markets simultaneously with toast notifications for boundary limits.
 
-### 🔍 2. Unified Search Aggregator Engine
-- Aggregates **Jobs, Internships, Scholarships, and Hackathons**.
-- **Background Daemon Scheduler**: Periodic automated search execution with deduplication.
-- Flexible filtering by location, remote status, job type, salary range, and required skills.
+### 🌐 2. International Career & Preference Center
+- **Work Mode / Remote Policies**: `Fully Remote (Worldwide)`, `Remote (Americas)`, `Remote (EMEA)`, `Remote (APAC)`, `Hybrid`, `On-site`.
+- **Compensation & Experience**: Standardized USD salary bands ($40,000 - $180,000+ / yr) and experience tiers (Entry-Level to Staff/Principal).
+- **Visa & Relocation Settings**: Filter roles based on visa sponsorship and relocation support needs.
 
-### 🎯 3. Semantic RAG Matching Engine
-- **Vector Cosine Similarity**: Match percentage calculation between candidate profiles and job requirements.
-- **Skill Gap Analysis**: Highlights missing core skills, bonus qualifications, and experience mismatches.
-- **Tailored Recommendations**: Generates actionable insights to improve application success rates.
+### 🎯 3. Multi-Agent RAG Search & Match Engine
+- **RAG-Guided Search**: Merges vector embeddings of candidate CV skills from ChromaDB + user preferences to discover high-relevance opportunities.
+- **Semantic Compatibility Scoring**: Computes composite match percentages (e.g. 96.5% Match) based on cosine similarity and technical skill density.
+- **Hiring HR Email Extractor**: Automatically parses company HR contact emails (`careers@company.com`, `hr@...`) for direct email application delivery.
 
-### 🤖 4. Autonomous Application Agent (Playwright)
-- **Headless Browser Automation**: Automatically opens job portals, fills personal details, uploads tailored resumes, and navigates multi-step application forms.
-- **Live Status Tracking**: Records real-time application states (`APPLIED`, `FAILED`, `MANUAL_ACTION_REQUIRED`).
+### 🎯 4. Daily Application Goals & Progress Tracker
+- **Customizable Targets**: Set independent daily application targets for Jobs and Internships.
+- **Live Progress Bar**: Visual completion percentage tracker (`Today's Goal Progress: X / Y Applications`).
 
-### 📧 5. Gmail Tracking & Follow-Up Assistant
-- **Automated Inbox Scanning**: Connects via OAuth2 / IMAP to monitor employer emails.
-- **AI Classification**: Categorizes incoming emails into *Interview Invitation*, *Technical Assessment*, *Rejection*, or *General Inquiry*.
-- **Auto-Drafting**: Generates personalized, professional reply drafts directly in your inbox.
+### 📧 5. Gmail Proofs & History Hub (Today / Monthly / Yearly)
+- **Direct Gmail Integration**: Connects via Google OAuth2 or 16-character App Password (SMTP).
+- **Time-Period Filters**: Filter applications by **Today** (24 hours), **Monthly** (current month), **Yearly** (2026), or **All**.
+- **Delivery Proof**: Displays Gmail Message IDs verifying that applications are sent from the candidate's personal Gmail account.
 
-### 💻 6. Premium Next.js Dashboard
-- Modern, dark-mode inspired UI built with Next.js 16 (App Router), Tailwind CSS v4, and Lucide React icons.
-- Real-time application tracking metrics, interactive resume score breakdowns, job discovery feeds, and email management interfaces.
+### 📄 6. Authentic ATS Resume Scoring & RAG Deep Hub
+- **ATS Metrics Dashboard**: Evaluates formatting, skill density, impact action verbs, and section completeness.
+- **Actionable Recommendations**: Generates missing keyword suggestions and formatting feedback.
 
 ---
 
@@ -103,7 +102,7 @@ graph TD
 
     subgraph Multi-Agent Processing Engine
         REST <--> ResumeAgent[Resume & ATS Parser]
-        REST <--> SearchAgent[Search Aggregator Engine]
+        REST <--> SearchAgent[RAG & Country Guided Search Aggregator]
         REST <--> MatchAgent[RAG Semantic Matcher]
         REST <--> ApplyAgent[Playwright Application Bot]
         REST <--> EmailAgent[Gmail & Email Tracking Engine]
@@ -113,8 +112,8 @@ graph TD
         ResumeAgent --> LocalEmbeddings[SentenceTransformer\nall-MiniLM-L6-v2]
         ResumeAgent --> OpenAI[OpenAI API / LLM]
         ApplyAgent --> Playwright[Playwright Headless Browser]
-        EmailAgent --> Gmail[Gmail API / OAuth2 / IMAP]
-        SearchAgent --> ExternalAPIs[Job Boards / Hackathons / Portals]
+        EmailAgent --> Gmail[Gmail API / OAuth2 / SMTP]
+        SearchAgent --> ExternalAPIs[Multi-Country Job Scrapers / Adzuna / Jooble / RSS]
     end
 ```
 
@@ -124,15 +123,15 @@ graph TD
 
 | Domain | Technology | Description |
 | :--- | :--- | :--- |
-| **Frontend Framework** | Next.js 16 (App Router) | React 19, TypeScript, Server & Client Components |
-| **Styling** | Tailwind CSS v4 | Responsive modern dark-themed glassmorphic UI |
-| **Backend Framework** | FastAPI (Python 3.12+) | Async RESTful API service |
+| **Frontend Framework** | Next.js 16 (App Router) | React 19, TypeScript, Client-side State & Components |
+| **Styling** | Tailwind CSS v4 | Responsive dark-themed UI with glassmorphism |
+| **Backend Framework** | FastAPI (Python 3.12+) | Asynchronous RESTful API services |
 | **Database (Relational)** | PostgreSQL 16 | ORM via SQLAlchemy 2.0 & Alembic Migrations |
-| **Vector Database** | ChromaDB | Local / Containerized vector storage for RAG embeddings |
-| **Caching & Queues** | Redis 7 | Background task caching and rate limiting |
+| **Vector Database** | ChromaDB | Vector storage for candidate RAG resume embeddings |
+| **Caching & Queues** | Redis 7 | Background task queues and rate limiting |
 | **Browser Automation**| Playwright Python | Automated browser form submission and interactions |
 | **Embeddings & AI** | SentenceTransformers | `all-MiniLM-L6-v2` local embeddings + OpenAI LLM support |
-| **Authentication** | Firebase Admin / JWT | Secure auth verification and user profile management |
+| **Authentication** | Firebase Admin / JWT / SMTP | Secure auth verification and email credentials |
 | **Containerization** | Docker & Docker Compose | Multi-container orchestration |
 
 ---
@@ -152,16 +151,16 @@ Auto-Apply-AI/
 │   │       │   ├── gmail.py        # Gmail OAuth & inbox tracking
 │   │       │   ├── matching.py     # RAG matching & compatibility scores
 │   │       │   ├── resumes.py      # Resume parsing & ATS endpoints
-│   │       │   ├── search.py       # Aggregator search endpoints
+│   │       │   ├── search.py       # RAG & Country search endpoints
 │   │       │   └── users.py        # User profile & settings management
 │   │       ├── services/           # Core Business Logic & Agents
 │   │       │   ├── application/    # Application submission logic
 │   │       │   ├── email/          # Email parsers & drafting
 │   │       │   ├── matching/       # RAG ranking algorithms
-│   │       │   ├── search/         # Unified opportunity search scrapers
+│   │       │   ├── search/         # Search Aggregator with RAG + Preferences
 │   │       │   ├── ats_checker.py  # ATS grading & recommendations
 │   │       │   ├── embeddings.py   # Vector embedding generators
-│   │       │   ├── gmail_client.py # Gmail API integration client
+│   │       │   ├── gmail_client.py # Gmail API / SMTP integration client
 │   │       │   ├── pdf_parser.py   # PDF text extraction utilities
 │   │       │   ├── rag_service.py  # Vector search & RAG retriever
 │   │       │   └── resume_parser.py# Structured resume extractor
@@ -178,13 +177,13 @@ Auto-Apply-AI/
 ├── frontend/                       # Next.js Frontend Application
 │   ├── src/
 │   │   └── app/                    # Next.js App Router Pages
-│   │       ├── page.tsx            # Main Unified Dashboard UI
+│   │       ├── page.tsx            # Unified Dashboard (Jobs -> Proofs -> Profile/RAG)
 │   │       ├── layout.tsx          # Root Layout & Provider Wrapper
 │   │       └── globals.css         # Tailwind CSS imports & theme rules
 │   ├── package.json                # Frontend dependencies
 │   └── next.config.ts              # Next.js configuration
 ├── docker-compose.yml              # Services orchestration (PostgreSQL, Redis, ChromaDB)
-└── README.md                       # Project Documentation
+└── README.md                       # Main Project Documentation
 ```
 
 ---
@@ -324,14 +323,15 @@ FastAPI provides an interactive OpenAPI / Swagger UI out of the box at `http://l
 | Category | Endpoint | Method | Description |
 | :--- | :--- | :--- | :--- |
 | **System** | `/api/v1/health` | `GET` | Health check endpoint |
-| **Resumes** | `/api/v1/resumes/upload` | `POST` | Upload PDF resume, extract text, run ATS check & embed |
+| **Resumes** | `/api/v1/resumes/upload` | `POST` | Upload PDF resume, extract text, run ATS check & embed in ChromaDB |
 | **Resumes** | `/api/v1/resumes/ats-check` | `POST` | Evaluate ATS compatibility score & get recommendations |
-| **Search** | `/api/v1/search` | `GET` | Query aggregated jobs/scholarships/internships |
+| **Search** | `/api/v1/search/trigger` | `POST` | Run RAG & Preferences guided multi-country opportunity search |
+| **Search** | `/api/v1/search/opportunities`| `GET` | Fetch aggregated jobs, internships, and scholarships |
 | **Matching**| `/api/v1/matching/evaluate` | `POST` | Compute vector RAG semantic match between resume & job |
 | **Applications**| `/api/v1/applications` | `GET` / `POST` | List and track active user job applications |
-| **Auto Apply**| `/api/v1/auto-apply/run` | `POST` | Trigger Playwright browser bot for auto application |
-| **Gmail** | `/api/v1/gmail/auth-url` | `GET` | Generate Gmail OAuth authorization URL |
-| **Gmail** | `/api/v1/gmail/scan` | `POST` | Scan inbox for employer responses & auto-draft replies |
+| **Auto Apply**| `/api/v1/auto-apply/send-email`| `POST` | Send CV directly via connected Gmail with message ID tracking |
+| **Gmail** | `/api/v1/auth/gmail/status` | `GET` | Get Gmail connection status & connected email |
+| **Users** | `/api/v1/users/profile` | `PUT` | Save user profile, social links, target countries, & preferences |
 
 ---
 
@@ -349,11 +349,11 @@ pytest -v
 ## 🗺️ Roadmap
 
 - [x] **Phase 1**: Core FastAPI backend architecture, database schemas, and Next.js UI integration.
-- [x] **Phase 2**: PDF parser engine, ATS checker, and vector embeddings in ChromaDB.
-- [x] **Phase 3**: Multi-board search aggregator & semantic RAG matching engine.
-- [x] **Phase 4**: Basic Playwright auto-apply bot execution.
-- [x] **Phase 5**: Gmail API OAuth integration & reply drafting.
-- [ ] **Phase 6**: Custom Playwright plugins for complex portals (Workday, Greenhouse, Lever).
+- [x] **Phase 2**: PDF parser engine, authentic ATS checker, and vector embeddings in ChromaDB.
+- [x] **Phase 3**: RAG & Preferences guided multi-country search aggregator & semantic matching engine.
+- [x] **Phase 4**: Interactive Country Autocomplete Search Box (1-10 Countries Max).
+- [x] **Phase 5**: Daily Application Goals Tracker & Gmail Auto-Apply email delivery proofs.
+- [x] **Phase 6**: Time-based history filters (Today / Monthly / Yearly).
 - [ ] **Phase 7**: Chrome / Firefox Extension for one-click job scraping directly from browser tabs.
 
 ---
