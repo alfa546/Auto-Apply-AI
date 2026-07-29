@@ -771,20 +771,12 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Gmail Connection Status Badge & Settings Quick Trigger */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setActiveTab("settings")}
-              className="text-xs bg-slate-900 hover:bg-slate-800 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-300 flex items-center gap-1.5 transition-all"
-            >
-              <KeyIcon />
-              <span>API Settings</span>
-            </button>
-
-            {isGmailConnected ? (
-              <div className="flex items-center gap-3 bg-emerald-950/40 border border-emerald-500/30 px-3 py-1.5 rounded-full text-xs text-emerald-300">
+          {/* Top Right Header Controls */}
+          <div className="flex items-center gap-3">
+            {isGmailConnected && (
+              <div className="flex items-center gap-2 bg-emerald-950/40 border border-emerald-500/30 px-3 py-1.5 rounded-full text-xs text-emerald-300">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Gmail Connected: <strong>{gmailEmail}</strong></span>
+                <span>Gmail: <strong>{gmailEmail}</strong></span>
                 <button 
                   onClick={() => setIsGmailConnected(false)}
                   className="hover:text-red-400 ml-1 font-semibold text-slate-400"
@@ -793,15 +785,15 @@ export default function Dashboard() {
                   ✕
                 </button>
               </div>
-            ) : (
-              <button
-                onClick={() => setShowGmailModal(true)}
-                className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-lg shadow-red-900/20 transition-all"
-              >
-                <GmailIcon />
-                <span>Connect Gmail Account</span>
-              </button>
             )}
+
+            <button
+              onClick={() => setActiveTab("settings")}
+              className="text-xs bg-slate-900 hover:bg-slate-800 border border-amber-500/30 text-amber-300 px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition-all shadow-md font-semibold"
+            >
+              <KeyIcon />
+              <span>API Settings</span>
+            </button>
           </div>
         </div>
       </header>
