@@ -70,7 +70,20 @@ const AcademicIcon = () => (
   </svg>
 );
 
-// Fallback Mock Jobs & Applications Data
+const TargetIcon = () => (
+  <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+  </svg>
+);
+
+const CalendarIcon = () => (
+  <svg className="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>
+);
+
+// Fallback Mock Opportunities Data
 const MOCK_DAILY_JOBS = [
   {
     id: 101,
@@ -104,19 +117,113 @@ const MOCK_DAILY_JOBS = [
     match_score: 88.4,
     description: "Summer 2026 Internship. Reach out to internships@cloudflare.com with your resume PDF.",
     url: "https://cloudflare.com/careers/intern-103"
+  },
+  {
+    id: 104,
+    title: "AI Engineering Intern",
+    company: "OpenAI Labs",
+    company_email: "interns@openai.com",
+    opportunity_type: "internship",
+    location: "San Francisco, CA / Remote",
+    match_score: 94.2,
+    description: "Work on fine-tuning and multi-agent systems. Apply directly via email to interns@openai.com.",
+    url: "https://openai.com/careers/intern-104"
   }
 ];
 
-const MOCK_APPLICATIONS = [
+// Today's date reference for realistic multi-period filtering
+const TODAY_STR = "2026-07-29";
+const MONTH_STR = "2026-07";
+const YEAR_STR = "2026";
+
+const MOCK_EXTENDED_APPLICATIONS = [
   {
     id: 1,
-    title: "Full Stack Python Developer",
+    title: "Full Stack Python & React Developer",
     company: "Stripe",
     company_email: "careers@stripe.com",
+    opportunity_type: "job",
     status: "Sent via Gmail",
     gmail_message_id: "msg_189a7f1bc2",
-    applied_at: "2026-07-29T11:45:00Z",
+    applied_at: "2026-07-29T11:45:00Z", // Today
     notes: "Sent to careers@stripe.com with attached resume PDF."
+  },
+  {
+    id: 2,
+    title: "AI Engineer / LLM Specialist",
+    company: "Vercel",
+    company_email: "hr-talent@vercel.com",
+    opportunity_type: "job",
+    status: "Sent via Gmail",
+    gmail_message_id: "msg_189b821ac3",
+    applied_at: "2026-07-29T09:15:00Z", // Today
+    notes: "Sent to hr-talent@vercel.com with attached resume PDF."
+  },
+  {
+    id: 3,
+    title: "Frontend Developer Internship",
+    company: "Cloudflare",
+    company_email: "internships@cloudflare.com",
+    opportunity_type: "internship",
+    status: "Sent via Gmail",
+    gmail_message_id: "msg_189c931bd4",
+    applied_at: "2026-07-29T14:20:00Z", // Today
+    notes: "Sent to internships@cloudflare.com with attached resume PDF."
+  },
+  {
+    id: 4,
+    title: "Software Engineering Intern",
+    company: "GitHub",
+    company_email: "careers@github.com",
+    opportunity_type: "internship",
+    status: "Sent via Gmail",
+    gmail_message_id: "msg_189d041ce5",
+    applied_at: "2026-07-29T16:05:00Z", // Today
+    notes: "Sent to careers@github.com with attached resume PDF."
+  },
+  {
+    id: 5,
+    title: "Backend API Developer",
+    company: "Supabase",
+    company_email: "talent@supabase.io",
+    opportunity_type: "job",
+    status: "Sent via Gmail",
+    gmail_message_id: "msg_187e123af1",
+    applied_at: "2026-07-20T10:30:00Z", // Monthly (July 2026)
+    notes: "Sent to talent@supabase.io."
+  },
+  {
+    id: 6,
+    title: "AI Research Internship",
+    company: "Hugging Face",
+    company_email: "jobs@huggingface.co",
+    opportunity_type: "internship",
+    status: "Sent via Gmail",
+    gmail_message_id: "msg_187f456bf2",
+    applied_at: "2026-07-12T15:10:00Z", // Monthly (July 2026)
+    notes: "Sent to jobs@huggingface.co."
+  },
+  {
+    id: 7,
+    title: "Full Stack Engineer",
+    company: "Postman",
+    company_email: "careers@postman.com",
+    opportunity_type: "job",
+    status: "Sent via Gmail",
+    gmail_message_id: "msg_186a789cf3",
+    applied_at: "2026-06-18T11:00:00Z", // Yearly (June 2026)
+    notes: "Sent to careers@postman.com."
+  },
+  {
+    id: 8,
+    title: "DevOps & Cloud Engineer",
+    company: "Datadog",
+    company_email: "recruiting@datadoghq.com",
+    opportunity_type: "job",
+    status: "Sent via Gmail",
+    gmail_message_id: "msg_185b987df4",
+    applied_at: "2026-05-04T09:45:00Z", // Yearly (May 2026)
+    notes: "Sent to recruiting@datadoghq.com."
   }
 ];
 
@@ -125,8 +232,11 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
   const [dailyJobs, setDailyJobs] = useState(MOCK_DAILY_JOBS);
-  const [applications, setApplications] = useState(MOCK_APPLICATIONS);
+  const [applications, setApplications] = useState(MOCK_EXTENDED_APPLICATIONS);
   
+  // Time-based History Filter State ("today" | "monthly" | "yearly" | "all")
+  const [historyFilter, setHistoryFilter] = useState<"today" | "monthly" | "yearly" | "all">("today");
+
   // Gmail Connection State
   const [isGmailConnected, setIsGmailConnected] = useState(true);
   const [gmailEmail, setGmailEmail] = useState("nouman.sajid.dev@gmail.com");
@@ -139,6 +249,11 @@ export default function Dashboard() {
   const [otherUrl, setOtherUrl] = useState("https://linkedin.com/in/noumansajid");
   const [preferredLocation, setPreferredLocation] = useState("Remote / Hybrid (USA & Europe)");
   const [targetRoles, setTargetRoles] = useState(["Full Stack Developer", "Python AI Engineer", "FastAPI / Next.js Specialist"]);
+
+  // Daily Application Goal Settings State
+  const [dailyJobGoal, setDailyJobGoal] = useState<number>(5);
+  const [dailyInternshipGoal, setDailyInternshipGoal] = useState<number>(3);
+  const [autoFulfillEnabled, setAutoFulfillEnabled] = useState<boolean>(true);
 
   // RAG Resume Extraction & ATS Metrics State
   const [uploadedResume, setUploadedResume] = useState<string | null>("Nouman_Sajid_Senior_FullStack_Resume.pdf");
@@ -216,6 +331,25 @@ export default function Dashboard() {
     setTimeout(() => setNotification(null), 4000);
   };
 
+  // Compute Daily Goal Progress Metrics dynamically
+  const todayApps = applications.filter(app => app.applied_at.startsWith(TODAY_STR));
+  const todayJobsCount = todayApps.filter(app => app.opportunity_type === "job").length;
+  const todayInternshipsCount = todayApps.filter(app => app.opportunity_type === "internship").length;
+  const totalTodayApplied = todayApps.length;
+  const totalDailyTarget = dailyJobGoal + dailyInternshipGoal;
+  const overallGoalProgress = Math.min(100, Math.round((totalTodayApplied / (totalDailyTarget || 1)) * 100));
+
+  // Compute filtered applications for the Applications tab
+  const monthlyApps = applications.filter(app => app.applied_at.startsWith(MONTH_STR));
+  const yearlyApps = applications.filter(app => app.applied_at.startsWith(YEAR_STR));
+
+  const filteredApplications = applications.filter(app => {
+    if (historyFilter === "today") return app.applied_at.startsWith(TODAY_STR);
+    if (historyFilter === "monthly") return app.applied_at.startsWith(MONTH_STR);
+    if (historyFilter === "yearly") return app.applied_at.startsWith(YEAR_STR);
+    return true; // "all"
+  });
+
   // Fetch status on mount
   useEffect(() => {
     async function checkGmailStatus() {
@@ -235,7 +369,7 @@ export default function Dashboard() {
     checkGmailStatus();
   }, []);
 
-  // Handle Save Profile Details
+  // Handle Save Profile Details & Goal Settings
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSavingProfile(true);
@@ -252,16 +386,19 @@ export default function Dashboard() {
           github_url: githubUrl,
           other_url: otherUrl,
           preferred_location: preferredLocation,
-          target_roles: targetRoles
+          target_roles: targetRoles,
+          daily_job_goal: dailyJobGoal,
+          daily_internship_goal: dailyInternshipGoal,
+          auto_fulfill_enabled: autoFulfillEnabled
         })
       });
       if (res.ok) {
-        showToast("Profile details & portfolio links saved successfully!");
+        showToast("Profile details & daily application goals saved successfully!");
       } else {
-        showToast("Profile details saved to local session state!");
+        showToast("Profile details & daily goals updated in local session!");
       }
     } catch (err) {
-      showToast("Profile details saved to local session state!");
+      showToast("Profile details & daily goals updated in local session!");
     } finally {
       setIsSavingProfile(false);
     }
@@ -359,38 +496,27 @@ export default function Dashboard() {
         body: JSON.stringify({ job_id: job.id })
       });
 
+      const newApp = {
+        id: Date.now(),
+        title: job.title,
+        company: job.company,
+        company_email: job.company_email,
+        opportunity_type: job.opportunity_type || "job",
+        status: "Sent via Gmail",
+        gmail_message_id: `msg_${Date.now().toString(16)}`,
+        applied_at: new Date().toISOString(),
+        notes: `Sent via connected Gmail to ${job.company_email}`
+      };
+
       if (res.ok) {
         const data = await res.json();
+        if (data.gmail_message_id) newApp.gmail_message_id = data.gmail_message_id;
         showToast(data.message || `Applied to ${job.company}! Check your Gmail Sent folder.`);
-        setApplications(prev => [
-          {
-            id: Date.now(),
-            title: job.title,
-            company: job.company,
-            company_email: job.company_email,
-            status: "Sent via Gmail",
-            gmail_message_id: data.gmail_message_id || `msg_${Date.now().toString(16)}`,
-            applied_at: new Date().toISOString(),
-            notes: `Sent via connected Gmail to ${job.company_email}`
-          },
-          ...prev
-        ]);
       } else {
         showToast(`Sent application email to ${job.company_email}! Check your Gmail Sent folder.`);
-        setApplications(prev => [
-          {
-            id: Date.now(),
-            title: job.title,
-            company: job.company,
-            company_email: job.company_email,
-            status: "Sent via Gmail",
-            gmail_message_id: `msg_${Date.now().toString(16)}`,
-            applied_at: new Date().toISOString(),
-            notes: `Sent via connected Gmail to ${job.company_email}`
-          },
-          ...prev
-        ]);
       }
+
+      setApplications(prev => [newApp, ...prev]);
     } catch (err) {
       showToast(`Sent application email to ${job.company_email}! Check your Gmail Sent folder.`);
       setApplications(prev => [
@@ -399,6 +525,7 @@ export default function Dashboard() {
           title: job.title,
           company: job.company,
           company_email: job.company_email,
+          opportunity_type: job.opportunity_type || "job",
           status: "Sent via Gmail",
           gmail_message_id: `msg_${Date.now().toString(16)}`,
           applied_at: new Date().toISOString(),
@@ -487,18 +614,6 @@ export default function Dashboard() {
           </button>
 
           <button
-            onClick={() => setActiveTab("profile")}
-            className={`pb-4 px-6 font-medium text-sm border-b-2 transition-all flex items-center gap-2 ${
-              activeTab === "profile"
-                ? "border-purple-500 text-purple-400"
-                : "border-transparent text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <UserIcon />
-            <span>User Profile & RAG Resume Hub</span>
-          </button>
-
-          <button
             onClick={() => setActiveTab("history")}
             className={`pb-4 px-6 font-medium text-sm border-b-2 transition-all flex items-center gap-2 ${
               activeTab === "history"
@@ -508,9 +623,21 @@ export default function Dashboard() {
           >
             <GmailIcon />
             <span>Applications & Gmail Proofs</span>
-            <span className="ml-1 bg-slate-800 text-slate-300 text-xs px-2 py-0.5 rounded-full">
+            <span className="ml-1 bg-emerald-900/50 text-emerald-300 border border-emerald-500/30 text-xs px-2 py-0.5 rounded-full font-mono">
               {applications.length}
             </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("profile")}
+            className={`pb-4 px-6 font-medium text-sm border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === "profile"
+                ? "border-purple-500 text-purple-400"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <UserIcon />
+            <span>User Profile & RAG Resume Hub</span>
           </button>
         </div>
 
@@ -522,8 +649,10 @@ export default function Dashboard() {
                 <h2 className="text-base font-semibold text-slate-100">Recommended Daily Opportunities</h2>
                 <p className="text-xs text-slate-400">Extracted company HR contact emails matched against your RAG CV profile.</p>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400">Match Strategy:</span>
+              <div className="flex items-center gap-3">
+                <div className="bg-emerald-950/80 border border-emerald-500/30 px-3 py-1 rounded-lg text-xs text-emerald-300">
+                  Daily Goal: <strong className="text-emerald-400 font-mono">{totalTodayApplied} / {totalDailyTarget}</strong> Applied Today
+                </div>
                 <span className="bg-purple-950/80 text-purple-300 border border-purple-500/40 text-xs font-semibold px-2.5 py-1 rounded-md">
                   RAG Vector Score &gt; 85%
                 </span>
@@ -587,7 +716,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Tab 2: Full User Profile & RAG Resume Deep Hub */}
+        {/* Tab 2: Full User Profile, Daily Goal Settings & RAG Resume Deep Hub */}
         {activeTab === "profile" && (
           <div className="space-y-8">
             {/* Top Grid: User Info Form + Resume Upload Card */}
@@ -608,7 +737,7 @@ export default function Dashboard() {
                   </span>
                 </div>
 
-                <form onSubmit={handleSaveProfile} className="space-y-4 text-xs">
+                <form onSubmit={handleSaveProfile} className="space-y-6 text-xs">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-slate-300 font-semibold mb-1">Email Address</label>
@@ -665,7 +794,7 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-slate-300 font-semibold mb-1">Preferred Location / Remote</label>
                       <input 
@@ -689,13 +818,83 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-end pt-3">
+                  {/* 🎯 NEW: Daily Application Goal & Auto-Fulfill Settings Card */}
+                  <div className="bg-slate-950/80 border border-amber-500/30 p-5 rounded-xl space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                      <div className="flex items-center gap-2">
+                        <TargetIcon />
+                        <h4 className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+                          Daily Application Goals & Automation Targets
+                        </h4>
+                      </div>
+                      <span className="text-[10px] bg-amber-950 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded font-mono">
+                        Auto-Fulfill Active
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">
+                          💼 Daily Jobs Goal (Applications / Day)
+                        </label>
+                        <input 
+                          type="number"
+                          min="1"
+                          max="50"
+                          value={dailyJobGoal}
+                          onChange={e => setDailyJobGoal(parseInt(e.target.value) || 1)}
+                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono text-xs focus:outline-none focus:border-amber-500"
+                        />
+                        <p className="text-[10px] text-slate-400 mt-1">Set how many job applications the agent should apply for daily.</p>
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">
+                          🎓 Daily Internships Goal (Applications / Day)
+                        </label>
+                        <input 
+                          type="number"
+                          min="1"
+                          max="50"
+                          value={dailyInternshipGoal}
+                          onChange={e => setDailyInternshipGoal(parseInt(e.target.value) || 1)}
+                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono text-xs focus:outline-none focus:border-amber-500"
+                        />
+                        <p className="text-[10px] text-slate-400 mt-1">Set how many internship applications the agent should apply for daily.</p>
+                      </div>
+                    </div>
+
+                    {/* Goal Progress Tracker Bar */}
+                    <div className="bg-slate-900 p-4 rounded-lg border border-slate-800/80 space-y-3">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-200 font-semibold flex items-center gap-1.5">
+                          <span>⚡ Today's Goal Progress:</span>
+                          <strong className="text-emerald-400 font-mono">{totalTodayApplied} / {totalDailyTarget} Applications</strong>
+                        </span>
+                        <span className="text-amber-400 font-mono font-bold">{overallGoalProgress}% Completed</span>
+                      </div>
+
+                      <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                        <div 
+                          className="bg-gradient-to-r from-amber-500 via-emerald-400 to-cyan-400 h-full rounded-full transition-all duration-500" 
+                          style={{ width: `${overallGoalProgress}%` }}
+                        ></div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-400 pt-1">
+                        <div>• Jobs Applied Today: <strong className="text-indigo-300 font-mono">{todayJobsCount} / {dailyJobGoal}</strong></div>
+                        <div>• Internships Applied Today: <strong className="text-amber-300 font-mono">{todayInternshipsCount} / {dailyInternshipGoal}</strong></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end pt-2">
                     <button
                       type="submit"
                       disabled={isSavingProfile}
                       className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold px-5 py-2.5 rounded-lg shadow-lg shadow-purple-900/30 flex items-center gap-2 transition-all text-xs"
                     >
-                      {isSavingProfile ? "Saving Profile..." : "Save Profile Information"}
+                      {isSavingProfile ? "Saving Settings..." : "Save Profile & Goal Settings"}
                     </button>
                   </div>
                 </form>
@@ -768,7 +967,7 @@ export default function Dashboard() {
                 </button>
               </div>
 
-              {/* Score Meter & Meters Breakdown */}
+              {/* Score Gauge Card */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 
                 {/* Score Gauge Card */}
@@ -971,44 +1170,177 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Tab 3: Applications & Gmail Proof History */}
+        {/* Tab 3: Applications & Gmail Proof History with Today/Monthly/Yearly Filters */}
         {activeTab === "history" && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
-            <div className="p-6 border-b border-slate-800 flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-bold text-slate-100">Applications Sent via Connected Gmail</h3>
-                <p className="text-xs text-slate-400">Direct proof of emails delivered from your Gmail account to company hiring managers.</p>
+          <div className="space-y-6">
+            {/* Top Metric Cards for Today, Monthly, Yearly */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Card 1: Today */}
+              <div 
+                onClick={() => setHistoryFilter("today")}
+                className={`p-5 rounded-2xl border cursor-pointer transition-all shadow-lg ${
+                  historyFilter === "today"
+                    ? "bg-purple-950/40 border-purple-500/80 ring-2 ring-purple-500/30"
+                    : "bg-slate-900/80 border-slate-800 hover:border-slate-700"
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <CalendarIcon />
+                    <span>Today's Submissions</span>
+                  </span>
+                  <span className="bg-purple-950 text-purple-300 border border-purple-500/30 text-[10px] px-2 py-0.5 rounded font-mono">
+                    24 Hours
+                  </span>
+                </div>
+                <div className="text-2xl font-extrabold text-purple-400 font-mono">{todayApps.length} Applications</div>
+                <div className="text-[11px] text-slate-400 mt-1 flex justify-between">
+                  <span>Jobs: <strong className="text-slate-200 font-mono">{todayJobsCount}</strong></span>
+                  <span>Internships: <strong className="text-amber-300 font-mono">{todayInternshipsCount}</strong></span>
+                </div>
               </div>
-              <span className="text-xs bg-emerald-950 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full font-mono">
-                {applications.length} Sent
-              </span>
+
+              {/* Card 2: Monthly */}
+              <div 
+                onClick={() => setHistoryFilter("monthly")}
+                className={`p-5 rounded-2xl border cursor-pointer transition-all shadow-lg ${
+                  historyFilter === "monthly"
+                    ? "bg-indigo-950/40 border-indigo-500/80 ring-2 ring-indigo-500/30"
+                    : "bg-slate-900/80 border-slate-800 hover:border-slate-700"
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <CalendarIcon />
+                    <span>Monthly (July 2026)</span>
+                  </span>
+                  <span className="bg-indigo-950 text-indigo-300 border border-indigo-500/30 text-[10px] px-2 py-0.5 rounded font-mono">
+                    This Month
+                  </span>
+                </div>
+                <div className="text-2xl font-extrabold text-indigo-400 font-mono">{monthlyApps.length} Applications</div>
+                <p className="text-[11px] text-slate-400 mt-1">Total applications submitted during current billing period.</p>
+              </div>
+
+              {/* Card 3: Yearly */}
+              <div 
+                onClick={() => setHistoryFilter("yearly")}
+                className={`p-5 rounded-2xl border cursor-pointer transition-all shadow-lg ${
+                  historyFilter === "yearly"
+                    ? "bg-cyan-950/40 border-cyan-500/80 ring-2 ring-cyan-500/30"
+                    : "bg-slate-900/80 border-slate-800 hover:border-slate-700"
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <CalendarIcon />
+                    <span>Yearly (2026)</span>
+                  </span>
+                  <span className="bg-cyan-950 text-cyan-300 border border-cyan-500/30 text-[10px] px-2 py-0.5 rounded font-mono">
+                    Year to Date
+                  </span>
+                </div>
+                <div className="text-2xl font-extrabold text-cyan-400 font-mono">{yearlyApps.length} Applications</div>
+                <p className="text-[11px] text-slate-400 mt-1">Lifetime total application deliveries in 2026.</p>
+              </div>
             </div>
 
-            <div className="divide-y divide-slate-800">
-              {applications.map((app) => (
-                <div key={app.id} className="p-6 hover:bg-slate-900/40 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-3">
-                      <h4 className="text-sm font-bold text-slate-100">{app.title}</h4>
-                      <span className="bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-full font-semibold">
-                        {app.status}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-400">
-                      Company: <strong className="text-slate-200">{app.company}</strong> ({app.company_email})
-                    </p>
-                    <p className="text-[11px] text-slate-500 font-mono">
-                      Gmail Message ID: {app.gmail_message_id} • Sent At: {new Date(app.applied_at).toLocaleString()}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-emerald-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-                      ✓ Appears in your Gmail "Sent" folder
-                    </span>
-                  </div>
+            {/* Main Application Table Card */}
+            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+              <div className="p-6 border-b border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+                    <GmailIcon />
+                    <span>Applications Sent via Connected Gmail</span>
+                  </h3>
+                  <p className="text-xs text-slate-400">Direct proof of emails delivered from your Gmail account to company hiring managers.</p>
                 </div>
-              ))}
+
+                {/* Period Filter Buttons */}
+                <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+                  <button
+                    onClick={() => setHistoryFilter("today")}
+                    className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                      historyFilter === "today"
+                        ? "bg-purple-600 text-white shadow"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    ⚡ Today ({todayApps.length})
+                  </button>
+                  <button
+                    onClick={() => setHistoryFilter("monthly")}
+                    className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                      historyFilter === "monthly"
+                        ? "bg-indigo-600 text-white shadow"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    📅 Monthly ({monthlyApps.length})
+                  </button>
+                  <button
+                    onClick={() => setHistoryFilter("yearly")}
+                    className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                      historyFilter === "yearly"
+                        ? "bg-cyan-600 text-white shadow"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    🗓️ Yearly ({yearlyApps.length})
+                  </button>
+                  <button
+                    onClick={() => setHistoryFilter("all")}
+                    className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+                      historyFilter === "all"
+                        ? "bg-slate-800 text-white shadow"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    🌐 All ({applications.length})
+                  </button>
+                </div>
+              </div>
+
+              <div className="divide-y divide-slate-800">
+                {filteredApplications.length === 0 ? (
+                  <div className="p-12 text-center text-slate-400 text-xs space-y-2">
+                    <p className="text-sm font-semibold text-slate-300">No Applications Found for Selected Time Period</p>
+                    <p>Applications will appear here automatically when the agent applies for jobs or internships.</p>
+                  </div>
+                ) : (
+                  filteredApplications.map((app) => (
+                    <div key={app.id} className="p-6 hover:bg-slate-900/40 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="space-y-1.5 flex-1">
+                        <div className="flex items-center gap-3">
+                          <h4 className="text-sm font-bold text-slate-100">{app.title}</h4>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                            app.opportunity_type === "internship"
+                              ? "bg-amber-950/80 text-amber-300 border border-amber-500/30"
+                              : "bg-indigo-950/80 text-indigo-300 border border-indigo-500/30"
+                          }`}>
+                            {(app.opportunity_type || "job").toUpperCase()}
+                          </span>
+                          <span className="bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-full font-semibold">
+                            {app.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400">
+                          Company: <strong className="text-slate-200">{app.company}</strong> ({app.company_email})
+                        </p>
+                        <p className="text-[11px] text-slate-500 font-mono">
+                          Gmail Message ID: {app.gmail_message_id} • Sent At: {new Date(app.applied_at).toLocaleString()}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-emerald-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 font-mono">
+                          ✓ Appears in Gmail "Sent" folder
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         )}
