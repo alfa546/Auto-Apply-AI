@@ -202,9 +202,8 @@ export default function Dashboard() {
   const [dailyInternshipGoal, setDailyInternshipGoal] = useState<number>(3);
   const [autoFulfillEnabled, setAutoFulfillEnabled] = useState<boolean>(true);
 
-  // RAG Resume Extraction & ATS Metrics State
+  // AI Resume Extraction & ATS Metrics State
   const [uploadedResume, setUploadedResume] = useState<string | null>(null);
-  const [ragIndexedCount, setRagIndexedCount] = useState(0);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isAnalyzingATS, setIsAnalyzingATS] = useState(false);
 
@@ -222,7 +221,7 @@ export default function Dashboard() {
   });
 
   const [extractedProfile, setExtractedProfile] = useState({
-    summary: "Upload a PDF resume to view RAG-extracted summary, skills, experience, and project breakdown.",
+    summary: "Upload a PDF resume to view AI-extracted summary, skills, experience, and project breakdown.",
     skills: [] as string[],
     experience: [] as any[],
     education: [] as any[],
@@ -336,7 +335,7 @@ export default function Dashboard() {
     fetchApplications();
   }, []);
 
-  // Trigger RAG & Preferences Guided Search Agent
+  // Trigger Smart Job Search Agent
   const handleTriggerSearchAgent = async () => {
     setIsTriggeringSearch(true);
     try {
@@ -350,8 +349,7 @@ export default function Dashboard() {
       });
       if (res.ok) {
         const data = await res.json();
-        showToast(data.message || "RAG Search Agent completed multi-country scraping!");
-        // Refresh opportunities list
+        showToast(data.message || "Smart Job Search Agent completed multi-country scan!");
         const oppRes = await fetch(`${API_BASE}/api/v1/search/opportunities?limit=50`, {
           headers: { "Authorization": "Bearer dev-mock-matcher_test_uid" }
         });
@@ -360,10 +358,10 @@ export default function Dashboard() {
           if (oppData.items) setDailyJobs(oppData.items);
         }
       } else {
-        showToast("Search Agent scanned target countries for matching roles!");
+        showToast("Smart Search Agent scanned target countries for matching roles!");
       }
     } catch (err) {
-      showToast("Search Agent completed target country scan!");
+      showToast("Smart Search Agent completed target country scan!");
     } finally {
       setIsTriggeringSearch(false);
     }
@@ -445,7 +443,7 @@ export default function Dashboard() {
     }
   };
 
-  // Handle PDF Resume Upload & RAG Analysis Trigger
+  // Handle PDF Resume Upload & AI Analysis Trigger
   const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -475,16 +473,14 @@ export default function Dashboard() {
             overall_score: data.ats_score
           }));
         }
-        setRagIndexedCount(16);
-        showToast("Resume uploaded, parsed by RAG Agent & indexed in ChromaDB!");
+        showToast("Resume uploaded and parsed successfully by AI Engine!");
       } else {
         setUploadedResume(file.name);
-        setRagIndexedCount(16);
-        showToast("Resume uploaded & RAG index updated!");
+        showToast("Resume uploaded & candidate profile updated!");
       }
     } catch (err) {
       setUploadedResume(file.name);
-      showToast("Resume uploaded & RAG profile analyzed!");
+      showToast("Resume uploaded & candidate profile analyzed!");
     } finally {
       setIsUploading(false);
     }
@@ -513,9 +509,9 @@ export default function Dashboard() {
             experience_improvements: data.ats_suggestions?.experience_improvements || prev.experience_improvements
           }));
         }
-        showToast("RAG Agent completed real-time ATS Audit!");
+        showToast("AI Agent completed real-time ATS Audit!");
       } else {
-        showToast("RAG Agent completed ATS Audit check!");
+        showToast("AI Agent completed ATS Audit check!");
       }
     } catch (err) {
       showToast("ATS Audit completed!");
@@ -619,7 +615,7 @@ export default function Dashboard() {
               <h1 className="text-lg font-bold bg-gradient-to-r from-sky-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent">
                 Auto-Apply AI Platform
               </h1>
-              <p className="text-xs text-slate-400">Multi-Agent RAG Resume Analyzer & Direct Gmail Auto-Apply Engine</p>
+              <p className="text-xs text-slate-400">AI Job Matcher, ATS Evaluator & Direct Gmail Auto-Apply Engine</p>
             </div>
           </div>
 
@@ -693,7 +689,7 @@ export default function Dashboard() {
             }`}
           >
             <UserIcon />
-            <span>User Profile & RAG Resume Hub</span>
+            <span>User Profile & CV Management</span>
           </button>
         </div>
 
@@ -703,7 +699,7 @@ export default function Dashboard() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/50 border border-slate-800 p-4 rounded-xl">
               <div>
                 <h2 className="text-base font-semibold text-slate-100">Recommended Daily Opportunities</h2>
-                <p className="text-xs text-slate-400">Extracted company HR contact emails matched against your RAG CV profile & active preferences.</p>
+                <p className="text-xs text-slate-400">Extracted company HR contact emails matched against your candidate profile & active preferences.</p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <button
@@ -749,7 +745,7 @@ export default function Dashboard() {
                     className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-purple-900/30 inline-flex items-center gap-2 transition-all"
                   >
                     <SparklesIcon />
-                    <span>⚡ Run RAG Search Agent Now</span>
+                    <span>⚡ Run Smart Search Agent Now</span>
                   </button>
                 </div>
               ) : (
@@ -782,7 +778,7 @@ export default function Dashboard() {
 
                     <div className="flex md:flex-col items-end justify-between gap-4 min-w-[200px]">
                       <div className="text-right">
-                        <div className="text-xs text-slate-400">RAG Match Score</div>
+                        <div className="text-xs text-slate-400">AI Match Score</div>
                         <div className="text-lg font-extrabold text-emerald-400">{job.match_score || 92}% Match</div>
                       </div>
 
@@ -811,10 +807,10 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Tab 2: User Profile, Daily Goal Settings & RAG Resume Deep Hub */}
+        {/* Tab 2: User Profile, Daily Goal Settings & Resume Management */}
         {activeTab === "profile" && (
           <div className="space-y-8">
-            {/* Top Grid: User Info Form + Resume Upload Card */}
+            {/* Top Grid: User Info Form + Resume Upload Card & AI Profile Breakdown */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               
               {/* Col 1 & 2: User Personal Details & Portfolio Links Form */}
@@ -1161,55 +1157,95 @@ export default function Dashboard() {
                 </form>
               </div>
 
-              {/* Col 3: PDF Resume Upload & RAG Status */}
-              <div className="lg:col-span-1 bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-6 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
-                    <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                      <UploadIcon />
-                      <span>PDF Resume Upload</span>
+              {/* Col 3: PDF Resume Upload & Extracted Candidate Profile Breakdown Card */}
+              <div className="lg:col-span-1 space-y-6">
+                
+                {/* Upload Card */}
+                <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-6 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+                      <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+                        <UploadIcon />
+                        <span>PDF Resume Upload</span>
+                      </h3>
+                      <span className="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded font-mono">
+                        AI Parsing Engine
+                      </span>
+                    </div>
+
+                    <div className="border-2 border-dashed border-slate-700 hover:border-purple-500 p-6 rounded-xl text-center bg-slate-950/60 cursor-pointer relative transition-all group">
+                      <input 
+                        type="file" 
+                        accept=".pdf,.doc,.docx"
+                        onChange={handleResumeUpload}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="w-12 h-12 bg-purple-950/60 border border-purple-500/30 rounded-xl flex items-center justify-center mx-auto text-purple-400 group-hover:scale-110 transition-transform">
+                        <UploadIcon />
+                      </div>
+                      <p className="text-xs font-semibold text-slate-200 mt-3">
+                        {isUploading ? "Extracting Candidate Profile..." : "Click or Drag PDF Resume File"}
+                      </p>
+                      <p className="text-[10px] text-slate-400 mt-1">Parses skills, work experience & matches candidate profile against global jobs</p>
+                    </div>
+                  </div>
+
+                  {uploadedResume ? (
+                    <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-200 font-semibold truncate">📄 {uploadedResume}</span>
+                        <span className="bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-mono">
+                          Active PDF
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/60">
+                        <span>AI Processed Status:</span>
+                        <strong className="text-purple-300 font-mono">Profile Ready</strong>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center text-xs space-y-1">
+                      <p className="text-slate-300 font-semibold">No Active Resume</p>
+                      <p className="text-[10px] text-slate-400">Upload your PDF resume above to extract candidate profile details.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Candidate AI Profile Breakdown Card (Picture 1 placed right under Upload Card) */}
+                <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-5">
+                  <div className="border-b border-slate-800 pb-3 flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                      <SparklesIcon />
+                      <span>Extracted Candidate Profile Breakdown</span>
                     </h3>
-                    <span className="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded font-mono">
-                      RAG Vector Engine
+                    <span className="text-[10px] bg-purple-950 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded font-mono">
+                      AI Live Summary
                     </span>
                   </div>
 
-                  <div className="border-2 border-dashed border-slate-700 hover:border-purple-500 p-6 rounded-xl text-center bg-slate-950/60 cursor-pointer relative transition-all group">
-                    <input 
-                      type="file" 
-                      accept=".pdf,.doc,.docx"
-                      onChange={handleResumeUpload}
-                      className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                    />
-                    <div className="w-12 h-12 bg-purple-950/60 border border-purple-500/30 rounded-xl flex items-center justify-center mx-auto text-purple-400 group-hover:scale-110 transition-transform">
-                      <UploadIcon />
-                    </div>
-                    <p className="text-xs font-semibold text-slate-200 mt-3">
-                      {isUploading ? "Extracting & Chunking Embeddings..." : "Click or Drag PDF Resume File"}
-                    </p>
-                    <p className="text-[10px] text-slate-400 mt-1">Parses skills, experience & indexes vector chunks into ChromaDB</p>
+                  {/* Candidate Executive Summary */}
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                    <h4 className="text-[11px] font-bold text-purple-400 uppercase tracking-wider">Executive Summary</h4>
+                    <p className="text-xs text-slate-300 leading-relaxed">{extractedProfile.summary}</p>
+                  </div>
+
+                  {/* Extracted Skills Badges */}
+                  <div>
+                    <h4 className="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">Extracted Skills & Tech Stack</h4>
+                    {extractedProfile.skills.length === 0 ? (
+                      <p className="text-xs text-slate-500">No skills extracted yet. Upload a PDF resume above.</p>
+                    ) : (
+                      <div className="flex flex-wrap gap-1.5">
+                        {extractedProfile.skills.map((skill, idx) => (
+                          <span key={idx} className="bg-purple-950/60 border border-purple-500/40 text-purple-200 text-xs font-semibold px-2.5 py-1 rounded-lg shadow-sm">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {uploadedResume ? (
-                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-200 font-semibold truncate">📄 {uploadedResume}</span>
-                      <span className="bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-mono">
-                        Active PDF
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/60">
-                      <span>Vector RAG Chunks:</span>
-                      <strong className="text-purple-300 font-mono">{ragIndexedCount} Indexed Chunks</strong>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center text-xs space-y-1">
-                    <p className="text-slate-300 font-semibold">No Resume File Active</p>
-                    <p className="text-[10px] text-slate-400">Upload your PDF CV above to start indexing into ChromaDB.</p>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -1274,7 +1310,7 @@ export default function Dashboard() {
                     <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
                       <div className="bg-purple-400 h-full rounded-full" style={{ width: `${atsMetrics.keyword_density_score}%` }}></div>
                     </div>
-                    <p className="text-[10px] text-slate-400">High frequency of core full-stack & AI framework keywords.</p>
+                    <p className="text-[10px] text-slate-400">High frequency of core technical & job keywords.</p>
                   </div>
 
                   {/* Meter 3: Action Verbs */}
@@ -1301,39 +1337,6 @@ export default function Dashboard() {
                     <p className="text-[10px] text-slate-400">Education, experience, skills & contact links present.</p>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Bottom Section: RAG Deep View Extracted Profile */}
-            <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-6">
-              <div className="border-b border-slate-800 pb-4">
-                <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                  <SparklesIcon />
-                  <span>RAG Deep View: Extracted Resume Profile Details</span>
-                </h3>
-                <p className="text-xs text-slate-400">Comprehensive breakdown of extracted skills, experience history, projects, and education as indexed by the AI agent.</p>
-              </div>
-
-              {/* Candidate Summary */}
-              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                <h4 className="text-xs font-bold text-purple-400 uppercase tracking-wider mb-1">Executive Candidate Summary</h4>
-                <p className="text-xs text-slate-300 leading-relaxed">{extractedProfile.summary}</p>
-              </div>
-
-              {/* Extracted Skills Badges */}
-              <div>
-                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Extracted Skills & Tech Stack</h4>
-                {extractedProfile.skills.length === 0 ? (
-                  <p className="text-xs text-slate-500">No skills extracted yet. Upload a PDF resume above.</p>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {extractedProfile.skills.map((skill, idx) => (
-                      <span key={idx} className="bg-purple-950/60 border border-purple-500/40 text-purple-200 text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm">
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
           </div>
