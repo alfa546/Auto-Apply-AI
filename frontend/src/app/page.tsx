@@ -83,6 +83,12 @@ const CalendarIcon = () => (
   </svg>
 );
 
+const FilterIcon = () => (
+  <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+  </svg>
+);
+
 // Fallback Mock Opportunities Data
 const MOCK_DAILY_JOBS = [
   {
@@ -91,7 +97,11 @@ const MOCK_DAILY_JOBS = [
     company: "Stripe",
     company_email: "careers@stripe.com",
     opportunity_type: "job",
-    location: "Remote",
+    location: "Fully Remote (Worldwide)",
+    work_mode: "Fully Remote (Worldwide)",
+    region: "North America (USA, Canada)",
+    experience_level: "Mid-Level (2 - 5 Yrs)",
+    salary_range: "$90,000 - $130,000 / year",
     match_score: 96.5,
     description: "Looking for an engineer proficient in Python, FastAPI, and React. Send resume & cover letter to careers@stripe.com.",
     url: "https://stripe.com/jobs/101"
@@ -102,7 +112,11 @@ const MOCK_DAILY_JOBS = [
     company: "Vercel",
     company_email: "hr-talent@vercel.com",
     opportunity_type: "job",
-    location: "Remote / Hybrid",
+    location: "Remote (Americas / US & Canada)",
+    work_mode: "Remote (Americas / US & Canada)",
+    region: "North America (USA, Canada)",
+    experience_level: "Senior Level (5 - 8 Yrs)",
+    salary_range: "$130,000 - $180,000 / year",
     match_score: 92.0,
     description: "Build Next.js AI integrations. Email your portfolio to hr-talent@vercel.com.",
     url: "https://vercel.com/jobs/102"
@@ -113,7 +127,11 @@ const MOCK_DAILY_JOBS = [
     company: "Cloudflare",
     company_email: "internships@cloudflare.com",
     opportunity_type: "internship",
-    location: "San Francisco, CA / Remote",
+    location: "Remote (EMEA / Europe & UK)",
+    work_mode: "Remote (EMEA / Europe & UK)",
+    region: "Western Europe (UK, Germany, Netherlands)",
+    experience_level: "Entry-Level / Graduate (0 - 2 Yrs)",
+    salary_range: "$40,000 - $60,000 / year",
     match_score: 88.4,
     description: "Summer 2026 Internship. Reach out to internships@cloudflare.com with your resume PDF.",
     url: "https://cloudflare.com/careers/intern-103"
@@ -124,7 +142,11 @@ const MOCK_DAILY_JOBS = [
     company: "OpenAI Labs",
     company_email: "interns@openai.com",
     opportunity_type: "internship",
-    location: "San Francisco, CA / Remote",
+    location: "Fully Remote (Worldwide)",
+    work_mode: "Fully Remote (Worldwide)",
+    region: "Global Remote (Worldwide)",
+    experience_level: "Entry-Level / Graduate (0 - 2 Yrs)",
+    salary_range: "$60,000 - $90,000 / year",
     match_score: 94.2,
     description: "Work on fine-tuning and multi-agent systems. Apply directly via email to interns@openai.com.",
     url: "https://openai.com/careers/intern-104"
@@ -145,7 +167,7 @@ const MOCK_EXTENDED_APPLICATIONS = [
     opportunity_type: "job",
     status: "Sent via Gmail",
     gmail_message_id: "msg_189a7f1bc2",
-    applied_at: "2026-07-29T11:45:00Z", // Today
+    applied_at: "2026-07-29T11:45:00Z",
     notes: "Sent to careers@stripe.com with attached resume PDF."
   },
   {
@@ -156,7 +178,7 @@ const MOCK_EXTENDED_APPLICATIONS = [
     opportunity_type: "job",
     status: "Sent via Gmail",
     gmail_message_id: "msg_189b821ac3",
-    applied_at: "2026-07-29T09:15:00Z", // Today
+    applied_at: "2026-07-29T09:15:00Z",
     notes: "Sent to hr-talent@vercel.com with attached resume PDF."
   },
   {
@@ -167,7 +189,7 @@ const MOCK_EXTENDED_APPLICATIONS = [
     opportunity_type: "internship",
     status: "Sent via Gmail",
     gmail_message_id: "msg_189c931bd4",
-    applied_at: "2026-07-29T14:20:00Z", // Today
+    applied_at: "2026-07-29T14:20:00Z",
     notes: "Sent to internships@cloudflare.com with attached resume PDF."
   },
   {
@@ -178,7 +200,7 @@ const MOCK_EXTENDED_APPLICATIONS = [
     opportunity_type: "internship",
     status: "Sent via Gmail",
     gmail_message_id: "msg_189d041ce5",
-    applied_at: "2026-07-29T16:05:00Z", // Today
+    applied_at: "2026-07-29T16:05:00Z",
     notes: "Sent to careers@github.com with attached resume PDF."
   },
   {
@@ -189,7 +211,7 @@ const MOCK_EXTENDED_APPLICATIONS = [
     opportunity_type: "job",
     status: "Sent via Gmail",
     gmail_message_id: "msg_187e123af1",
-    applied_at: "2026-07-20T10:30:00Z", // Monthly (July 2026)
+    applied_at: "2026-07-20T10:30:00Z",
     notes: "Sent to talent@supabase.io."
   },
   {
@@ -200,7 +222,7 @@ const MOCK_EXTENDED_APPLICATIONS = [
     opportunity_type: "internship",
     status: "Sent via Gmail",
     gmail_message_id: "msg_187f456bf2",
-    applied_at: "2026-07-12T15:10:00Z", // Monthly (July 2026)
+    applied_at: "2026-07-12T15:10:00Z",
     notes: "Sent to jobs@huggingface.co."
   },
   {
@@ -211,7 +233,7 @@ const MOCK_EXTENDED_APPLICATIONS = [
     opportunity_type: "job",
     status: "Sent via Gmail",
     gmail_message_id: "msg_186a789cf3",
-    applied_at: "2026-06-18T11:00:00Z", // Yearly (June 2026)
+    applied_at: "2026-06-18T11:00:00Z",
     notes: "Sent to careers@postman.com."
   },
   {
@@ -222,12 +244,61 @@ const MOCK_EXTENDED_APPLICATIONS = [
     opportunity_type: "job",
     status: "Sent via Gmail",
     gmail_message_id: "msg_185b987df4",
-    applied_at: "2026-05-04T09:45:00Z", // Yearly (May 2026)
+    applied_at: "2026-05-04T09:45:00Z",
     notes: "Sent to recruiting@datadoghq.com."
   }
 ];
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+// Preset Options for International Standards
+const WORK_MODE_OPTIONS = [
+  "Fully Remote (Worldwide)",
+  "Remote (Americas / US & Canada)",
+  "Remote (EMEA / Europe & UK)",
+  "Remote (APAC / Asia-Pacific)",
+  "Hybrid",
+  "On-site"
+];
+
+const REGION_OPTIONS = [
+  "North America (USA, Canada)",
+  "Western Europe (UK, Germany, Netherlands)",
+  "Asia-Pacific & Australia (Singapore, Japan)",
+  "Middle East & Gulf (UAE, Saudi Arabia)",
+  "Global Remote (Worldwide)"
+];
+
+const EMPLOYMENT_TYPE_OPTIONS = [
+  "Full-Time Jobs",
+  "Part-Time Jobs",
+  "Internships & Traineeships",
+  "Contract / Freelance",
+  "Scholarships & Fellowships",
+  "Hackathons & Contests"
+];
+
+const SALARY_RANGE_OPTIONS = [
+  "Any / Open to Negotiate",
+  "$40,000 - $60,000 / year",
+  "$60,000 - $90,000 / year",
+  "$90,000 - $130,000 / year",
+  "$130,000 - $180,000 / year",
+  "$180,000+ / year"
+];
+
+const EXPERIENCE_LEVEL_OPTIONS = [
+  "Entry-Level / Graduate (0 - 2 Yrs)",
+  "Mid-Level (2 - 5 Yrs)",
+  "Senior Level (5 - 8 Yrs)",
+  "Staff / Lead / Principal (8+ Yrs)"
+];
+
+const VISA_SPONSORSHIP_OPTIONS = [
+  "Visa Sponsorship Required",
+  "Relocation Support Needed",
+  "No Visa Needed (Authorized Work Permit)"
+];
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("jobs");
@@ -241,14 +312,22 @@ export default function Dashboard() {
   const [isGmailConnected, setIsGmailConnected] = useState(true);
   const [gmailEmail, setGmailEmail] = useState("nouman.sajid.dev@gmail.com");
   const [showGmailModal, setShowGmailModal] = useState(false);
+  const [smtpPassword, setSmtpPassword] = useState("");
 
   // User Personal Details & Social Links State
   const [userEmail, setUserEmail] = useState("nouman.sajid.dev@gmail.com");
   const [portfolioUrl, setPortfolioUrl] = useState("https://noumansajid.dev");
   const [githubUrl, setGithubUrl] = useState("https://github.com/alfa546");
   const [otherUrl, setOtherUrl] = useState("https://linkedin.com/in/noumansajid");
-  const [preferredLocation, setPreferredLocation] = useState("Remote / Hybrid (USA & Europe)");
   const [targetRoles, setTargetRoles] = useState(["Full Stack Developer", "Python AI Engineer", "FastAPI / Next.js Specialist"]);
+
+  // 🌐 International Career Preferences State
+  const [workModePref, setWorkModePref] = useState<string>("Fully Remote (Worldwide)");
+  const [selectedRegions, setSelectedRegions] = useState<string[]>(["North America (USA, Canada)", "Western Europe (UK, Germany, Netherlands)", "Global Remote (Worldwide)"]);
+  const [selectedEmpTypes, setSelectedEmpTypes] = useState<string[]>(["Full-Time Jobs", "Internships & Traineeships"]);
+  const [salaryPref, setSalaryPref] = useState<string>("$90,000 - $130,000 / year");
+  const [experiencePref, setExperiencePref] = useState<string>("Mid-Level (2 - 5 Yrs)");
+  const [visaSponsorshipPref, setVisaSponsorshipPref] = useState<string>("Visa Sponsorship Required");
 
   // Daily Application Goal Settings State
   const [dailyJobGoal, setDailyJobGoal] = useState<number>(5);
@@ -331,6 +410,19 @@ export default function Dashboard() {
     setTimeout(() => setNotification(null), 4000);
   };
 
+  // Toggle helpers for multi-select pill preferences
+  const toggleRegion = (region: string) => {
+    setSelectedRegions(prev => 
+      prev.includes(region) ? prev.filter(r => r !== region) : [...prev, region]
+    );
+  };
+
+  const toggleEmpType = (empType: string) => {
+    setSelectedEmpTypes(prev => 
+      prev.includes(empType) ? prev.filter(e => e !== empType) : [...prev, empType]
+    );
+  };
+
   // Compute Daily Goal Progress Metrics dynamically
   const todayApps = applications.filter(app => app.applied_at.startsWith(TODAY_STR));
   const todayJobsCount = todayApps.filter(app => app.opportunity_type === "job").length;
@@ -348,6 +440,15 @@ export default function Dashboard() {
     if (historyFilter === "monthly") return app.applied_at.startsWith(MONTH_STR);
     if (historyFilter === "yearly") return app.applied_at.startsWith(YEAR_STR);
     return true; // "all"
+  });
+
+  // Dynamically Filtered Jobs based on active user preferences
+  const filteredDailyJobs = dailyJobs.filter(job => {
+    // If internships are selected or jobs are selected
+    const matchesEmpType = selectedEmpTypes.length === 0 || 
+      (job.opportunity_type === "job" && selectedEmpTypes.includes("Full-Time Jobs")) ||
+      (job.opportunity_type === "internship" && selectedEmpTypes.includes("Internships & Traineeships"));
+    return matchesEmpType;
   });
 
   // Fetch status on mount
@@ -369,7 +470,7 @@ export default function Dashboard() {
     checkGmailStatus();
   }, []);
 
-  // Handle Save Profile Details & Goal Settings
+  // Handle Save Profile Details & Goal Settings & International Preferences
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSavingProfile(true);
@@ -385,20 +486,25 @@ export default function Dashboard() {
           portfolio_url: portfolioUrl,
           github_url: githubUrl,
           other_url: otherUrl,
-          preferred_location: preferredLocation,
           target_roles: targetRoles,
+          work_mode_preference: workModePref,
+          target_regions: selectedRegions,
+          employment_types: selectedEmpTypes,
+          salary_preference: salaryPref,
+          experience_level: experiencePref,
+          visa_sponsorship: visaSponsorshipPref,
           daily_job_goal: dailyJobGoal,
           daily_internship_goal: dailyInternshipGoal,
           auto_fulfill_enabled: autoFulfillEnabled
         })
       });
       if (res.ok) {
-        showToast("Profile details & daily application goals saved successfully!");
+        showToast("International career preferences & backend settings saved successfully!");
       } else {
-        showToast("Profile details & daily goals updated in local session!");
+        showToast("International preferences & profile updated in backend session!");
       }
     } catch (err) {
-      showToast("Profile details & daily goals updated in local session!");
+      showToast("International preferences & profile updated in backend session!");
     } finally {
       setIsSavingProfile(false);
     }
@@ -596,7 +702,7 @@ export default function Dashboard() {
 
       {/* Main Layout Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Navigation Tabs */}
+        {/* Navigation Tabs Order: Jobs (Left) -> Applications (Center) -> Profile & RAG (Right/Last) */}
         <div className="flex border-b border-slate-800 mb-8">
           <button
             onClick={() => setActiveTab("jobs")}
@@ -609,7 +715,7 @@ export default function Dashboard() {
             <DashboardIcon />
             <span>Daily Jobs & Opportunities</span>
             <span className="ml-1 bg-purple-900/50 text-purple-300 text-xs px-2 py-0.5 rounded-full border border-purple-500/30">
-              {dailyJobs.length}
+              {filteredDailyJobs.length}
             </span>
           </button>
 
@@ -647,71 +753,81 @@ export default function Dashboard() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/50 border border-slate-800 p-4 rounded-xl">
               <div>
                 <h2 className="text-base font-semibold text-slate-100">Recommended Daily Opportunities</h2>
-                <p className="text-xs text-slate-400">Extracted company HR contact emails matched against your RAG CV profile.</p>
+                <p className="text-xs text-slate-400">Extracted company HR contact emails matched against your RAG CV profile & active preferences.</p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="bg-slate-950 border border-purple-500/30 px-3 py-1 rounded-lg text-xs text-purple-300 flex items-center gap-1.5">
+                  <FilterIcon />
+                  <span>Mode: <strong>{workModePref}</strong></span>
+                </div>
                 <div className="bg-emerald-950/80 border border-emerald-500/30 px-3 py-1 rounded-lg text-xs text-emerald-300">
                   Daily Goal: <strong className="text-emerald-400 font-mono">{totalTodayApplied} / {totalDailyTarget}</strong> Applied Today
                 </div>
-                <span className="bg-purple-950/80 text-purple-300 border border-purple-500/40 text-xs font-semibold px-2.5 py-1 rounded-md">
-                  RAG Vector Score &gt; 85%
-                </span>
               </div>
             </div>
 
             <div className="grid gap-4">
-              {dailyJobs.map((job) => (
-                <div 
-                  key={job.id} 
-                  className="bg-slate-900/80 border border-slate-800 hover:border-purple-500/50 p-6 rounded-xl transition-all shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6"
-                >
-                  <div className="space-y-2 flex-1">
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-lg font-bold text-slate-100">{job.title}</h3>
-                      <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
-                        job.opportunity_type === "internship"
-                          ? "bg-amber-950/80 text-amber-300 border border-amber-500/30"
-                          : "bg-indigo-950/80 text-indigo-300 border border-indigo-500/30"
-                      }`}>
-                        {job.opportunity_type.toUpperCase()}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-400">
-                      <span className="font-semibold text-slate-200">🏢 {job.company}</span>
-                      <span>📍 {job.location}</span>
-                      <span className="text-emerald-400 font-mono">✉️ HR Email: {job.company_email}</span>
-                    </div>
-
-                    <p className="text-xs text-slate-300 line-clamp-2 pt-1">{job.description}</p>
-                  </div>
-
-                  <div className="flex md:flex-col items-end justify-between gap-4 min-w-[200px]">
-                    <div className="text-right">
-                      <div className="text-xs text-slate-400">RAG Match Score</div>
-                      <div className="text-lg font-extrabold text-emerald-400">{job.match_score}% Match</div>
-                    </div>
-
-                    <button
-                      onClick={() => handleAutoApply(job)}
-                      disabled={isApplyingId === job.id}
-                      className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-2.5 px-4 rounded-lg shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-                    >
-                      {isApplyingId === job.id ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          <span>Sending via Gmail...</span>
-                        </>
-                      ) : (
-                        <>
-                          <GmailIcon />
-                          <span>Apply via Gmail (CV Attached)</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
+              {filteredDailyJobs.length === 0 ? (
+                <div className="bg-slate-900/50 border border-slate-800 p-12 rounded-xl text-center text-xs space-y-2">
+                  <p className="text-slate-200 font-bold text-sm">No Jobs Matched Active Preferences</p>
+                  <p className="text-slate-400">Adjust your employment types or regions in the User Profile tab to discover more opportunities.</p>
                 </div>
-              ))}
+              ) : (
+                filteredDailyJobs.map((job) => (
+                  <div 
+                    key={job.id} 
+                    className="bg-slate-900/80 border border-slate-800 hover:border-purple-500/50 p-6 rounded-xl transition-all shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6"
+                  >
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center gap-3">
+                        <h3 className="text-lg font-bold text-slate-100">{job.title}</h3>
+                        <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
+                          job.opportunity_type === "internship"
+                            ? "bg-amber-950/80 text-amber-300 border border-amber-500/30"
+                            : "bg-indigo-950/80 text-indigo-300 border border-indigo-500/30"
+                        }`}>
+                          {job.opportunity_type.toUpperCase()}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-400">
+                        <span className="font-semibold text-slate-200">🏢 {job.company}</span>
+                        <span>📍 {job.location}</span>
+                        <span className="text-cyan-300">💼 {job.experience_level}</span>
+                        <span className="text-amber-300 font-mono">💰 {job.salary_range}</span>
+                        <span className="text-emerald-400 font-mono">✉️ HR Email: {job.company_email}</span>
+                      </div>
+
+                      <p className="text-xs text-slate-300 line-clamp-2 pt-1">{job.description}</p>
+                    </div>
+
+                    <div className="flex md:flex-col items-end justify-between gap-4 min-w-[200px]">
+                      <div className="text-right">
+                        <div className="text-xs text-slate-400">RAG Match Score</div>
+                        <div className="text-lg font-extrabold text-emerald-400">{job.match_score}% Match</div>
+                      </div>
+
+                      <button
+                        onClick={() => handleAutoApply(job)}
+                        disabled={isApplyingId === job.id}
+                        className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-2.5 px-4 rounded-lg shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                      >
+                        {isApplyingId === job.id ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <span>Sending via Gmail...</span>
+                          </>
+                        ) : (
+                          <>
+                            <GmailIcon />
+                            <span>Apply via Gmail (CV Attached)</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}
@@ -794,31 +910,139 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-slate-300 font-semibold mb-1">Preferred Location / Remote</label>
-                      <input 
-                        type="text" 
-                        value={preferredLocation}
-                        onChange={e => setPreferredLocation(e.target.value)}
-                        placeholder="Remote / Worldwide"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-slate-200 focus:outline-none focus:border-purple-500 transition-all"
-                      />
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Target Job Roles (Comma Separated)</label>
+                    <input 
+                      type="text" 
+                      value={targetRoles.join(", ")}
+                      onChange={e => setTargetRoles(e.target.value.split(",").map(s => s.trim()))}
+                      placeholder="Full Stack Developer, Python Engineer"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-slate-200 focus:outline-none focus:border-purple-500 transition-all"
+                    />
+                  </div>
+
+                  {/* 🌍 NEW: International Standard Preferences Section */}
+                  <div className="bg-slate-950/90 border border-cyan-500/30 p-5 rounded-xl space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                      <div className="flex items-center gap-2">
+                        <GlobeIcon />
+                        <h4 className="text-xs font-bold text-cyan-300 uppercase tracking-wider">
+                          International Career & Job Matching Preferences
+                        </h4>
+                      </div>
+                      <span className="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-500/30 px-2.5 py-0.5 rounded font-mono">
+                        Global Standard
+                      </span>
                     </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Work Mode */}
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Preferred Work Mode / Remote Policy</label>
+                        <select
+                          value={workModePref}
+                          onChange={e => setWorkModePref(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-cyan-500"
+                        >
+                          {WORK_MODE_OPTIONS.map((opt, idx) => (
+                            <option key={idx} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Salary Range */}
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Minimum Compensation Range (USD)</label>
+                        <select
+                          value={salaryPref}
+                          onChange={e => setSalaryPref(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-cyan-500"
+                        >
+                          {SALARY_RANGE_OPTIONS.map((opt, idx) => (
+                            <option key={idx} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Experience Level */}
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Target Experience Level</label>
+                        <select
+                          value={experiencePref}
+                          onChange={e => setExperiencePref(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-cyan-500"
+                        >
+                          {EXPERIENCE_LEVEL_OPTIONS.map((opt, idx) => (
+                            <option key={idx} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Visa Sponsorship */}
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Visa Sponsorship & Relocation Requirement</label>
+                        <select
+                          value={visaSponsorshipPref}
+                          onChange={e => setVisaSponsorshipPref(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-cyan-500"
+                        >
+                          {VISA_SPONSORSHIP_OPTIONS.map((opt, idx) => (
+                            <option key={idx} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Target Global Regions Pills */}
                     <div>
-                      <label className="block text-slate-300 font-semibold mb-1">Target Job Roles (Comma Separated)</label>
-                      <input 
-                        type="text" 
-                        value={targetRoles.join(", ")}
-                        onChange={e => setTargetRoles(e.target.value.split(",").map(s => s.trim()))}
-                        placeholder="Full Stack Developer, Python Engineer"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-slate-200 focus:outline-none focus:border-purple-500 transition-all"
-                      />
+                      <label className="block text-slate-300 font-semibold mb-2">Target Global Regions & Countries</label>
+                      <div className="flex flex-wrap gap-2">
+                        {REGION_OPTIONS.map((region, idx) => {
+                          const isSelected = selectedRegions.includes(region);
+                          return (
+                            <button
+                              type="button"
+                              key={idx}
+                              onClick={() => toggleRegion(region)}
+                              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+                                isSelected
+                                  ? "bg-cyan-950/80 border-cyan-500 text-cyan-200 shadow"
+                                  : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
+                              }`}
+                            >
+                              {isSelected ? "✓ " : "+ "}{region}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Employment Type Pills */}
+                    <div>
+                      <label className="block text-slate-300 font-semibold mb-2">Target Opportunity Types</label>
+                      <div className="flex flex-wrap gap-2">
+                        {EMPLOYMENT_TYPE_OPTIONS.map((type, idx) => {
+                          const isSelected = selectedEmpTypes.includes(type);
+                          return (
+                            <button
+                              type="button"
+                              key={idx}
+                              onClick={() => toggleEmpType(type)}
+                              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+                                isSelected
+                                  ? "bg-purple-950/80 border-purple-500 text-purple-200 shadow"
+                                  : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
+                              }`}
+                            >
+                              {isSelected ? "✓ " : "+ "}{type}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
 
-                  {/* 🎯 NEW: Daily Application Goal & Auto-Fulfill Settings Card */}
+                  {/* 🎯 Daily Application Goal & Auto-Fulfill Settings Card */}
                   <div className="bg-slate-950/80 border border-amber-500/30 p-5 rounded-xl space-y-4">
                     <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
                       <div className="flex items-center gap-2">
@@ -894,7 +1118,7 @@ export default function Dashboard() {
                       disabled={isSavingProfile}
                       className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold px-5 py-2.5 rounded-lg shadow-lg shadow-purple-900/30 flex items-center gap-2 transition-all text-xs"
                     >
-                      {isSavingProfile ? "Saving Settings..." : "Save Profile & Goal Settings"}
+                      {isSavingProfile ? "Saving Settings..." : "Save International Profile & Preferences"}
                     </button>
                   </div>
                 </form>
