@@ -587,7 +587,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-950 bg-grid-pattern bg-radial-glow text-slate-100 font-sans selection:bg-cyan-500 selection:text-slate-950">
+    <div className="min-h-screen bg-[#090a0f] bg-grid-omni bg-coral-glow text-slate-100 font-sans selection:bg-rose-500 selection:text-white">
       {/* Toast Notification */}
       {notification && (
         <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-2xl text-sm font-medium border flex items-center gap-2 backdrop-blur-md animate-bounce ${
@@ -600,43 +600,48 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Top Navbar */}
-      <header className="border-b border-white/10 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-40 shadow-2xl shadow-purple-950/20">
+      {/* Top Navbar - Exact OmniRoute Header Layout */}
+      <header className="border-b border-white/10 bg-[#090a0f]/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-1.5 bg-gradient-to-br from-cyan-500/20 via-purple-500/20 to-pink-500/20 rounded-xl border border-cyan-500/40 shadow-lg shadow-cyan-500/20">
-              <img src="/logo.png" alt="AutoApplyAI Logo" className="w-8 h-8 rounded-lg object-contain" />
-            </div>
-            <div>
-              <h1 className="text-lg font-extrabold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight">
-                Auto-Apply AI Platform
-              </h1>
-              <p className="text-xs text-slate-400 font-medium">Autonomous Multi-Agent RAG Search & Gmail Auto-Apply Engine</p>
-            </div>
+            {/* Red Diamond Logo Icon */}
+            <div className="w-4 h-4 bg-rose-500 transform rotate-45 rounded-sm shadow-[0_0_12px_rgba(244,63,94,0.8)]"></div>
+            <h1 className="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
+              AutoApply<span className="text-rose-500 font-normal">AI</span>
+            </h1>
           </div>
+
+          {/* Navigation Links */}
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+            <button onClick={() => setActiveTab("jobs")} className={`hover:text-white transition-colors ${activeTab === "jobs" ? "text-rose-400 font-semibold" : ""}`}>
+              Opportunities
+            </button>
+            <button onClick={() => setActiveTab("history")} className={`hover:text-white transition-colors ${activeTab === "history" ? "text-rose-400 font-semibold" : ""}`}>
+              Gmail Proofs
+            </button>
+            <button onClick={() => setActiveTab("profile")} className={`hover:text-white transition-colors ${activeTab === "profile" ? "text-rose-400 font-semibold" : ""}`}>
+              CV & Profile
+            </button>
+            <button onClick={() => setActiveTab("settings")} className={`hover:text-white transition-colors ${activeTab === "settings" ? "text-rose-400 font-semibold" : ""}`}>
+              API Vault
+            </button>
+          </nav>
 
           {/* Top Right Header Controls */}
           <div className="flex items-center gap-3">
             {isGmailConnected && (
-              <div className="flex items-center gap-2 bg-emerald-950/60 border border-emerald-500/40 px-3.5 py-1.5 rounded-full text-xs text-emerald-300 shadow-md shadow-emerald-500/10">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                <span>Gmail: <strong className="text-emerald-200">{gmailEmail}</strong></span>
-                <button 
-                  onClick={() => setIsGmailConnected(false)}
-                  className="hover:text-rose-400 ml-1.5 font-bold text-slate-400 transition-colors"
-                  title="Disconnect Gmail"
-                >
-                  ✕
-                </button>
+              <div className="hidden sm:flex items-center gap-2 bg-rose-950/40 border border-rose-500/30 px-3.5 py-1.5 rounded-full text-xs text-rose-300">
+                <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+                <span>Gmail: <strong className="text-rose-200">{gmailEmail}</strong></span>
               </div>
             )}
 
             <button
-              onClick={() => setActiveTab("settings")}
-              className="text-xs bg-slate-900/90 hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 px-4 py-2 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-cyan-500/10 font-semibold"
+              onClick={() => setShowGmailModal(true)}
+              className="btn-red-glow text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2"
             >
-              <KeyIcon />
-              <span>API Vault</span>
+              <span>Connect Gmail</span>
+              <span>→</span>
             </button>
           </div>
         </div>
@@ -742,7 +747,7 @@ export default function Dashboard() {
                   <button
                     onClick={handleTriggerSearchAgent}
                     disabled={isTriggeringSearch}
-                    className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold px-6 py-3 rounded-2xl text-xs shadow-xl shadow-cyan-500/20 inline-flex items-center gap-2 transition-all relative z-10"
+                    className="btn-red-glow text-white font-bold px-6 py-3 rounded-2xl text-xs inline-flex items-center gap-2 transition-all relative z-10"
                   >
                     <SparklesIcon />
                     <span>⚡ Run Smart Search Agent Now</span>
@@ -823,7 +828,7 @@ export default function Dashboard() {
                     </h3>
                     <p className="text-xs text-slate-400 mt-0.5">Manage your contact details, portfolio websites, GitHub, and job preferences.</p>
                   </div>
-                  <span className="bg-purple-950 text-purple-300 border border-purple-500/30 text-xs px-3 py-1 rounded-full font-mono">
+                  <span className="bg-rose-950/80 text-rose-300 border border-rose-500/30 text-xs px-3 py-1 rounded-full font-mono">
                     Profile Configured
                   </span>
                 </div>
@@ -837,7 +842,7 @@ export default function Dashboard() {
                         value={userEmail}
                         onChange={e => setUserEmail(e.target.value)}
                         placeholder="you@domain.com"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-slate-200 focus:outline-none focus:border-purple-500 transition-all"
+                        className="w-full omni-input rounded-xl px-3 py-2.5"
                         required
                       />
                     </div>
@@ -852,7 +857,7 @@ export default function Dashboard() {
                         value={portfolioUrl}
                         onChange={e => setPortfolioUrl(e.target.value)}
                         placeholder="https://yourportfolio.dev"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-slate-200 focus:outline-none focus:border-purple-500 transition-all"
+                        className="w-full omni-input rounded-xl px-3 py-2.5"
                       />
                     </div>
 
@@ -866,7 +871,7 @@ export default function Dashboard() {
                         value={githubUrl}
                         onChange={e => setGithubUrl(e.target.value)}
                         placeholder="https://github.com/username"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-slate-200 focus:outline-none focus:border-purple-500 transition-all"
+                        className="w-full omni-input rounded-xl px-3 py-2.5"
                       />
                     </div>
 
@@ -880,7 +885,7 @@ export default function Dashboard() {
                         value={otherUrl}
                         onChange={e => setOtherUrl(e.target.value)}
                         placeholder="https://linkedin.com/in/username"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-slate-200 focus:outline-none focus:border-purple-500 transition-all"
+                        className="w-full omni-input rounded-xl px-3 py-2.5"
                       />
                     </div>
                   </div>
@@ -892,20 +897,20 @@ export default function Dashboard() {
                       value={targetRoles.join(", ")}
                       onChange={e => setTargetRoles(e.target.value.split(",").map(s => s.trim()))}
                       placeholder="Full Stack Developer, Python Engineer"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-slate-200 focus:outline-none focus:border-purple-500 transition-all"
+                      className="w-full omni-input rounded-xl px-3 py-2.5"
                     />
                   </div>
 
                   {/* 🌍 Target Country Search Box & International Preferences Section */}
-                  <div className="bg-slate-950/90 border border-cyan-500/30 p-5 rounded-xl space-y-5">
-                    <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                  <div className="bg-[#12141d] border border-white/10 p-5 rounded-2xl space-y-5">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
                       <div className="flex items-center gap-2">
                         <GlobeIcon />
-                        <h4 className="text-xs font-bold text-cyan-300 uppercase tracking-wider">
+                        <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider">
                           International Career & Country Preferences
                         </h4>
                       </div>
-                      <span className="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-500/30 px-2.5 py-0.5 rounded font-mono">
+                      <span className="text-[10px] bg-rose-950/80 text-rose-300 border border-rose-500/30 px-2.5 py-0.5 rounded font-mono">
                         Global Search Box (1-10 Countries)
                       </span>
                     </div>
@@ -916,7 +921,7 @@ export default function Dashboard() {
                         <label className="block text-slate-300 font-semibold">
                           🌐 Search & Add Target Countries (Type country name, choose 1 to 10)
                         </label>
-                        <span className="text-xs font-mono bg-emerald-950 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded font-bold">
+                        <span className="text-xs font-mono bg-rose-950/80 text-rose-300 border border-rose-500/30 px-2.5 py-0.5 rounded font-bold">
                           Selected: {selectedCountries.length} / 10 Max
                         </span>
                       </div>
@@ -932,12 +937,12 @@ export default function Dashboard() {
                           }}
                           onFocus={() => setIsCountryDropdownOpen(true)}
                           placeholder="Type a country name (e.g. United States, Germany, Japan, UAE...)"
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 text-xs focus:outline-none focus:border-cyan-500 font-medium"
+                          className="w-full omni-input rounded-xl px-4 py-2.5 font-medium"
                         />
                         
                         {/* Dropdown Suggestions List */}
                         {isCountryDropdownOpen && (
-                          <div className="absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl max-h-56 overflow-y-auto z-50 divide-y divide-slate-800/60">
+                          <div className="absolute top-full left-0 right-0 mt-1 bg-[#12141d] border border-white/10 rounded-xl shadow-2xl max-h-56 overflow-y-auto z-50 divide-y divide-white/5">
                             {ALL_WORLD_COUNTRIES
                               .filter(c => c.toLowerCase().includes(countryQuery.toLowerCase()))
                               .map((country, idx) => {
@@ -949,14 +954,14 @@ export default function Dashboard() {
                                     className={`px-4 py-2.5 text-xs font-semibold cursor-pointer flex items-center justify-between transition-colors ${
                                       isAlreadySelected
                                         ? "bg-slate-950 text-slate-500 cursor-not-allowed"
-                                        : "hover:bg-cyan-950/60 text-slate-200 hover:text-cyan-300"
+                                        : "hover:bg-rose-950/40 text-slate-200 hover:text-rose-300"
                                     }`}
                                   >
                                     <span>{country}</span>
                                     {isAlreadySelected ? (
-                                      <span className="text-[10px] text-emerald-400 font-mono">Already Selected</span>
+                                      <span className="text-[10px] text-rose-400 font-mono">Already Selected</span>
                                     ) : (
-                                      <span className="text-[10px] text-cyan-400 font-mono">+ Click to Add</span>
+                                      <span className="text-[10px] text-rose-400 font-mono">+ Click to Add</span>
                                     )}
                                   </div>
                                 );
@@ -992,14 +997,14 @@ export default function Dashboard() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-800/80 pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-white/10 pt-4">
                       {/* Work Mode */}
                       <div>
                         <label className="block text-slate-300 font-semibold mb-1">Preferred Work Mode / Remote Policy</label>
                         <select
                           value={workModePref}
                           onChange={e => setWorkModePref(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-cyan-500"
+                          className="w-full omni-input rounded-xl px-3 py-2 text-xs"
                         >
                           {WORK_MODE_OPTIONS.map((opt, idx) => (
                             <option key={idx} value={opt}>{opt}</option>
@@ -1013,7 +1018,7 @@ export default function Dashboard() {
                         <select
                           value={salaryPref}
                           onChange={e => setSalaryPref(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-cyan-500"
+                          className="w-full omni-input rounded-xl px-3 py-2 text-xs"
                         >
                           {SALARY_RANGE_OPTIONS.map((opt, idx) => (
                             <option key={idx} value={opt}>{opt}</option>
@@ -1027,7 +1032,7 @@ export default function Dashboard() {
                         <select
                           value={experiencePref}
                           onChange={e => setExperiencePref(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-cyan-500"
+                          className="w-full omni-input rounded-xl px-3 py-2 text-xs"
                         >
                           {EXPERIENCE_LEVEL_OPTIONS.map((opt, idx) => (
                             <option key={idx} value={opt}>{opt}</option>
@@ -1041,7 +1046,7 @@ export default function Dashboard() {
                         <select
                           value={visaSponsorshipPref}
                           onChange={e => setVisaSponsorshipPref(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-cyan-500"
+                          className="w-full omni-input rounded-xl px-3 py-2 text-xs"
                         >
                           {VISA_SPONSORSHIP_OPTIONS.map((opt, idx) => (
                             <option key={idx} value={opt}>{opt}</option>
@@ -1063,8 +1068,8 @@ export default function Dashboard() {
                               onClick={() => toggleEmpType(type)}
                               className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
                                 isSelected
-                                  ? "bg-purple-950/80 border-purple-500 text-purple-200 shadow"
-                                  : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
+                                  ? "bg-rose-950/80 border-rose-500 text-rose-200 shadow"
+                                  : "bg-[#12141d] border-white/10 text-slate-400 hover:text-slate-200"
                               }`}
                             >
                               {isSelected ? "✓ " : "+ "}{type}
@@ -1076,15 +1081,15 @@ export default function Dashboard() {
                   </div>
 
                   {/* 🎯 Daily Application Goal & Auto-Fulfill Settings Card */}
-                  <div className="bg-slate-950/80 border border-amber-500/30 p-5 rounded-xl space-y-4">
-                    <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                  <div className="bg-[#12141d] border border-white/10 p-5 rounded-2xl space-y-4">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
                       <div className="flex items-center gap-2">
                         <TargetIcon />
-                        <h4 className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+                        <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider">
                           Daily Application Goals & Automation Targets
                         </h4>
                       </div>
-                      <span className="text-[10px] bg-amber-950 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded font-mono">
+                      <span className="text-[10px] bg-rose-950/80 text-rose-300 border border-rose-500/30 px-2.5 py-0.5 rounded font-mono">
                         Auto-Fulfill Active
                       </span>
                     </div>
@@ -1100,7 +1105,7 @@ export default function Dashboard() {
                           max="50"
                           value={dailyJobGoal}
                           onChange={e => setDailyJobGoal(parseInt(e.target.value) || 1)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono text-xs focus:outline-none focus:border-amber-500"
+                          className="w-full omni-input rounded-xl px-3 py-2 font-mono text-xs"
                         />
                         <p className="text-[10px] text-slate-400 mt-1">Set how many job applications the agent should apply for daily.</p>
                       </div>
@@ -1115,32 +1120,32 @@ export default function Dashboard() {
                           max="50"
                           value={dailyInternshipGoal}
                           onChange={e => setDailyInternshipGoal(parseInt(e.target.value) || 1)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 font-mono text-xs focus:outline-none focus:border-amber-500"
+                          className="w-full omni-input rounded-xl px-3 py-2 font-mono text-xs"
                         />
                         <p className="text-[10px] text-slate-400 mt-1">Set how many internship applications the agent should apply for daily.</p>
                       </div>
                     </div>
 
                     {/* Goal Progress Tracker Bar */}
-                    <div className="bg-slate-900 p-4 rounded-lg border border-slate-800/80 space-y-3">
+                    <div className="bg-[#090a0f] p-4 rounded-xl border border-white/10 space-y-3">
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-slate-200 font-semibold flex items-center gap-1.5">
                           <span>⚡ Today's Goal Progress:</span>
-                          <strong className="text-emerald-400 font-mono">{totalTodayApplied} / {totalDailyTarget} Applications</strong>
+                          <strong className="text-rose-400 font-mono">{totalTodayApplied} / {totalDailyTarget} Applications</strong>
                         </span>
-                        <span className="text-amber-400 font-mono font-bold">{overallGoalProgress}% Completed</span>
+                        <span className="text-rose-400 font-mono font-bold">{overallGoalProgress}% Completed</span>
                       </div>
 
-                      <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                      <div className="w-full bg-[#12141d] h-2.5 rounded-full overflow-hidden border border-white/10">
                         <div 
-                          className="bg-gradient-to-r from-amber-500 via-emerald-400 to-cyan-400 h-full rounded-full transition-all duration-500" 
+                          className="bg-gradient-to-r from-rose-600 via-rose-500 to-rose-400 h-full rounded-full transition-all duration-500" 
                           style={{ width: `${overallGoalProgress}%` }}
                         ></div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-400 pt-1">
-                        <div>• Jobs Applied Today: <strong className="text-indigo-300 font-mono">{todayJobsCount} / {dailyJobGoal}</strong></div>
-                        <div>• Internships Applied Today: <strong className="text-amber-300 font-mono">{todayInternshipsCount} / {dailyInternshipGoal}</strong></div>
+                        <div>• Jobs Applied Today: <strong className="text-rose-300 font-mono">{todayJobsCount} / {dailyJobGoal}</strong></div>
+                        <div>• Internships Applied Today: <strong className="text-rose-300 font-mono">{todayInternshipsCount} / {dailyInternshipGoal}</strong></div>
                       </div>
                     </div>
                   </div>
@@ -1522,8 +1527,8 @@ export default function Dashboard() {
         {/* ⚙️ API Keys & Integration Credentials Settings Hub */}
         {activeTab === "settings" && (
           <div className="space-y-8 max-w-5xl mx-auto">
-            <div className="bg-slate-900/80 border border-slate-800 p-8 rounded-2xl shadow-2xl space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-5">
+            <div className="omni-card p-8 rounded-3xl space-y-6 border border-white/10">
+              <div className="flex items-center justify-between border-b border-white/10 pb-5">
                 <div>
                   <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2.5">
                     <KeyIcon />
@@ -1533,7 +1538,7 @@ export default function Dashboard() {
                 </div>
                 <button
                   onClick={() => setShowApiKeys(!showApiKeys)}
-                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-300 transition-all flex items-center gap-1.5"
+                  className="btn-dark-outline text-xs font-semibold px-3.5 py-1.5 rounded-xl text-slate-300 transition-all flex items-center gap-1.5"
                 >
                   <LockIcon />
                   <span>{showApiKeys ? "Hide Keys" : "Show Keys"}</span>
@@ -1542,13 +1547,13 @@ export default function Dashboard() {
 
               <form onSubmit={handleSaveApiSettings} className="space-y-6 text-xs">
                 {/* Section 1: AI Model Provider & API Key Settings */}
-                <div className="bg-slate-950/80 border border-purple-500/30 p-5 rounded-xl space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-                    <h4 className="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-2">
+                <div className="bg-[#12141d] border border-white/10 p-5 rounded-2xl space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-2">
                       <SparklesIcon />
                       <span>🧠 AI Model Provider & Key Vault</span>
                     </h4>
-                    <span className="text-[10px] bg-purple-950 text-purple-300 border border-purple-500/30 px-2.5 py-0.5 rounded font-mono">
+                    <span className="text-[10px] bg-rose-950/80 text-rose-300 border border-rose-500/30 px-2.5 py-0.5 rounded font-mono">
                       Includes 100% Free Open-Source Models
                     </span>
                   </div>
@@ -1559,7 +1564,7 @@ export default function Dashboard() {
                       <select
                         value={llmProvider}
                         onChange={e => setLlmProvider(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 text-xs focus:outline-none focus:border-purple-500 font-medium"
+                        className="w-full omni-input rounded-xl px-3.5 py-2.5 text-xs font-medium"
                       >
                         <option value="openai">OpenAI (GPT-4o, GPT-4o-mini)</option>
                         <option value="ollama">Ollama / LM Studio (100% Free Local Offline Models)</option>
@@ -1578,7 +1583,7 @@ export default function Dashboard() {
                         value={llmModel}
                         onChange={e => setLlmModel(e.target.value)}
                         placeholder="gpt-4o, llama3, llama-3.1-70b, deepseek-chat..."
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-purple-500"
+                        className="w-full omni-input rounded-xl px-3.5 py-2.5 font-mono text-xs"
                       />
                     </div>
                   </div>
@@ -1591,7 +1596,7 @@ export default function Dashboard() {
                         value={customApiBase}
                         onChange={e => setCustomApiBase(e.target.value)}
                         placeholder="http://localhost:11434/v1 or http://localhost:1234/v1"
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-purple-500"
+                        className="w-full omni-input rounded-xl px-3.5 py-2.5 font-mono text-xs"
                       />
                       <p className="text-[10px] text-slate-400 mt-1">Default Ollama URL: http://localhost:11434/v1 (No paid API Key needed! Runs 100% offline & free).</p>
                     </div>
@@ -1604,20 +1609,20 @@ export default function Dashboard() {
                       value={openaiApiKey}
                       onChange={e => setOpenaiApiKey(e.target.value)}
                       placeholder="sk-proj-..., gsk_..., sk-or-v1-..."
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-purple-500"
+                      className="w-full omni-input rounded-xl px-3.5 py-2.5 font-mono text-xs"
                     />
                     <p className="text-[10px] text-slate-400 mt-1">Supports free Groq keys (gsk_), free OpenRouter keys (sk-or-v1-), OpenAI keys, or free local Ollama endpoints!</p>
                   </div>
                 </div>
 
                 {/* Section 2: Google OAuth 2.0 Credentials */}
-                <div className="bg-slate-950/80 border border-cyan-500/30 p-5 rounded-xl space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-                    <h4 className="text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
+                <div className="bg-[#12141d] border border-white/10 p-5 rounded-2xl space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-2">
                       <GmailIcon />
                       <span>🌐 Google OAuth 2.0 Credentials</span>
                     </h4>
-                    <span className="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-500/30 px-2.5 py-0.5 rounded font-mono">
+                    <span className="text-[10px] bg-rose-950/80 text-rose-300 border border-rose-500/30 px-2.5 py-0.5 rounded font-mono">
                       Official Gmail API
                     </span>
                   </div>
@@ -1630,7 +1635,7 @@ export default function Dashboard() {
                         value={googleClientId}
                         onChange={e => setGoogleClientId(e.target.value)}
                         placeholder="123456789-xxx.apps.googleusercontent.com"
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-cyan-500"
+                        className="w-full omni-input rounded-xl px-3.5 py-2.5 font-mono text-xs"
                       />
                     </div>
 
@@ -1641,23 +1646,23 @@ export default function Dashboard() {
                         value={googleClientSecret}
                         onChange={e => setGoogleClientSecret(e.target.value)}
                         placeholder="GOCSPX-..."
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-cyan-500"
+                        className="w-full omni-input rounded-xl px-3.5 py-2.5 font-mono text-xs"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Section 3: Gmail Connection Hub */}
-                <div className="bg-slate-950/80 border border-emerald-500/30 p-5 rounded-xl space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-                    <h4 className="text-xs font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-2">
+                <div className="bg-[#12141d] border border-white/10 p-5 rounded-2xl space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-2">
                       <GmailIcon />
                       <span>✉️ Connected Gmail Account</span>
                     </h4>
                     <span className={`text-[10px] px-2.5 py-0.5 rounded font-mono ${
                       isGmailConnected 
-                        ? "bg-emerald-950 text-emerald-300 border border-emerald-500/30" 
-                        : "bg-red-950 text-red-300 border border-red-500/30"
+                        ? "bg-rose-950/80 text-rose-300 border border-rose-500/30" 
+                        : "bg-red-950/80 text-red-300 border border-red-500/30"
                     }`}>
                       {isGmailConnected ? "Connected" : "Disconnected"}
                     </span>
@@ -1672,7 +1677,7 @@ export default function Dashboard() {
                     <button
                       type="button"
                       onClick={() => setShowGmailModal(true)}
-                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-lg text-xs transition-all shadow-md shadow-emerald-900/30 whitespace-nowrap"
+                      className="btn-red-glow text-white font-bold px-4 py-2 rounded-xl text-xs whitespace-nowrap"
                     >
                       {isGmailConnected ? "Re-Configure Gmail" : "Connect Gmail Account"}
                     </button>
@@ -1680,13 +1685,13 @@ export default function Dashboard() {
                 </div>
 
                 {/* Section 4: Multi-Country Job Search Provider API Keys */}
-                <div className="bg-slate-950/80 border border-indigo-500/30 p-5 rounded-xl space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-                    <h4 className="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-2">
+                <div className="bg-[#12141d] border border-white/10 p-5 rounded-2xl space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-2">
                       <GlobeIcon />
                       <span>🔍 Job Search Provider API Keys</span>
                     </h4>
-                    <span className="text-[10px] bg-indigo-950 text-indigo-300 border border-indigo-500/30 px-2.5 py-0.5 rounded font-mono">
+                    <span className="text-[10px] bg-rose-950/80 text-rose-300 border border-rose-500/30 px-2.5 py-0.5 rounded font-mono">
                       Multi-Country Scrapers
                     </span>
                   </div>
@@ -1699,7 +1704,7 @@ export default function Dashboard() {
                         value={adzunaAppId}
                         onChange={e => setAdzunaAppId(e.target.value)}
                         placeholder="Adzuna App ID"
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500"
+                        className="w-full omni-input rounded-xl px-3.5 py-2.5 font-mono text-xs"
                       />
                     </div>
 
@@ -1710,7 +1715,7 @@ export default function Dashboard() {
                         value={adzunaAppKey}
                         onChange={e => setAdzunaAppKey(e.target.value)}
                         placeholder="Adzuna App Key"
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500"
+                        className="w-full omni-input rounded-xl px-3.5 py-2.5 font-mono text-xs"
                       />
                     </div>
 
@@ -1721,7 +1726,7 @@ export default function Dashboard() {
                         value={joobleApiKey}
                         onChange={e => setJoobleApiKey(e.target.value)}
                         placeholder="Jooble API Key"
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2.5 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500"
+                        className="w-full omni-input rounded-xl px-3.5 py-2.5 font-mono text-xs"
                       />
                     </div>
                   </div>
@@ -1731,7 +1736,7 @@ export default function Dashboard() {
                   <button
                     type="submit"
                     disabled={isSavingApiSettings}
-                    className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold px-6 py-2.5 rounded-lg shadow-lg shadow-amber-900/30 flex items-center gap-2 transition-all text-xs"
+                    className="btn-red-glow text-white font-bold px-6 py-3 rounded-xl text-xs"
                   >
                     {isSavingApiSettings ? "Saving API Vault..." : "Save All API Keys & Integration Credentials"}
                   </button>

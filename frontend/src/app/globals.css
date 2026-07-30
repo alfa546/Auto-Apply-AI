@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #030712;
-  --foreground: #f9fafb;
+  --background: #090a0f;
+  --foreground: #f3f4f6;
 }
 
 @theme inline {
@@ -12,51 +12,98 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Sharp, High-Contrast Grid Background on Full Screen */
 body {
-  background-color: #030712;
+  background-color: #090a0f !important;
   color: var(--foreground);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
   min-height: 100vh;
-}
-
-/* Custom Grid Pattern Background */
-.bg-grid-pattern {
-  background-size: 36px 36px;
+  background-size: 32px 32px !important;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px) !important;
+  background-attachment: fixed !important;
 }
 
-.bg-radial-glow {
-  background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.08) 35%, transparent 70%);
+/* Bright Visible Grid Pattern Class */
+.bg-grid-omni {
+  background-size: 32px 32px !important;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px) !important;
+  background-attachment: fixed !important;
 }
 
-/* Glassmorphism utility card */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+/* Red Glow Top Backdrop (OmniRoute screenshot) */
+.bg-coral-glow {
+  background: radial-gradient(circle at 50% -10%, rgba(244, 63, 94, 0.22) 0%, rgba(225, 29, 72, 0.08) 40%, transparent 75%) !important;
 }
 
-.glass-panel-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Glowing Red Primary Button (Exact match to 'Start Free' in screenshot) */
+.btn-red-glow {
+  background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%) !important;
+  box-shadow: 0 0 25px rgba(244, 63, 94, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.glass-panel-hover:hover {
-  border-color: rgba(168, 85, 247, 0.4);
-  box-shadow: 0 0 25px -5px rgba(168, 85, 247, 0.25), 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-  transform: translateY(-2px);
+.btn-red-glow:hover {
+  background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%) !important;
+  box-shadow: 0 0 35px rgba(244, 63, 94, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  transform: translateY(-1px) !important;
 }
 
-/* Glowing Neon Text & Accent utilities */
-.text-glow-cyan {
-  text-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
+/* Secondary dark button (like GitHub button in screenshot) */
+.btn-dark-outline {
+  background: rgba(15, 17, 23, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+  transition: all 0.2s ease !important;
 }
 
-.text-glow-violet {
-  text-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
+.btn-dark-outline:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Dark Terminal Code Box (Matching right box in screenshot) */
+.dark-terminal-box {
+  background: #10121a !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85) !important;
+}
+
+/* Glassmorphic Omni Panel */
+.omni-card {
+  background: rgba(15, 17, 23, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+.omni-card-hover {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.omni-card-hover:hover {
+  border-color: rgba(244, 63, 94, 0.5) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(244, 63, 94, 0.25) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Inputs styling */
+.omni-input {
+  background: #11131c !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #f3f4f6 !important;
+  transition: all 0.2s ease !important;
+}
+
+.omni-input:focus {
+  outline: none !important;
+  border-color: #f43f5e !important;
+  box-shadow: 0 0 15px rgba(244, 63, 94, 0.3) !important;
 }
 
 /* Smooth custom scrollbars */
@@ -65,7 +112,7 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #030712;
+  background: #090a0f;
 }
 ::-webkit-scrollbar-thumb {
   background: #1f2937;
