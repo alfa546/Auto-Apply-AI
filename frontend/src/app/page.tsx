@@ -26,7 +26,7 @@ const UploadIcon = () => (
 );
 
 const CheckCircleIcon = () => (
-  <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+  <svg className="w-5 h-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
@@ -38,7 +38,7 @@ const UserIcon = () => (
 );
 
 const GlobeIcon = () => (
-  <svg className="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+  <svg className="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM3.6 9h16.8M3.6 15h16.8M12 3a15.3 15.3 0 014 9 15.3 15.3 0 01-4 9 15.3 15.3 0 01-4-9 15.3 15.3 0 014-9z" />
   </svg>
 );
@@ -50,19 +50,19 @@ const GithubIcon = () => (
 );
 
 const LinkedinIcon = () => (
-  <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+  <svg className="w-4 h-4 text-rose-400" fill="currentColor" viewBox="0 0 24 24">
     <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.25V10.9H6.46M7.86 6.74a1.65 1.65 0 1 0 0 3.3 1.65 1.65 0 0 0 0-3.3z"/>
   </svg>
 );
 
 const BriefcaseIcon = () => (
-  <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+  <svg className="w-5 h-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
   </svg>
 );
 
 const AcademicIcon = () => (
-  <svg className="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+  <svg className="w-5 h-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
   </svg>
@@ -76,7 +76,7 @@ const TargetIcon = () => (
 );
 
 const CalendarIcon = () => (
-  <svg className="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+  <svg className="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
   </svg>
 );
@@ -88,7 +88,7 @@ const KeyIcon = () => (
 );
 
 const LockIcon = () => (
-  <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+  <svg className="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
   </svg>
 );
@@ -592,8 +592,8 @@ export default function Dashboard() {
       {notification && (
         <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-2xl text-sm font-medium border flex items-center gap-2 backdrop-blur-md animate-bounce ${
           notification.type === "success" 
-            ? "bg-emerald-950/90 text-emerald-300 border-emerald-500/50 shadow-emerald-500/20" 
-            : "bg-rose-950/90 text-rose-300 border-rose-500/50 shadow-rose-500/20"
+            ? "bg-rose-950/90 text-rose-300 border-rose-500/50 shadow-rose-500/20" 
+            : "bg-red-950/90 text-red-300 border-red-500/50 shadow-red-500/20"
         }`}>
           <CheckCircleIcon />
           <span>{notification.message}</span>
@@ -655,13 +655,13 @@ export default function Dashboard() {
             onClick={() => setActiveTab("jobs")}
             className={`pb-3.5 px-6 font-semibold text-sm border-b-2 whitespace-nowrap transition-all flex items-center gap-2.5 rounded-t-xl ${
               activeTab === "jobs"
-                ? "border-cyan-400 text-cyan-300 bg-cyan-950/20 shadow-[0_4px_20px_-4px_rgba(6,182,212,0.3)]"
+                ? "border-rose-400 text-rose-300 bg-rose-950/20 shadow-[0_4px_20px_-4px_rgba(244,63,94,0.3)]"
                 : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
             }`}
           >
             <DashboardIcon />
             <span>Daily Opportunities</span>
-            <span className="ml-1 bg-cyan-950/80 text-cyan-300 text-xs px-2.5 py-0.5 rounded-full border border-cyan-500/30 font-mono">
+            <span className="ml-1 bg-rose-950/80 text-rose-300 text-xs px-2.5 py-0.5 rounded-full border border-rose-500/30 font-mono">
               {filteredDailyJobs.length}
             </span>
           </button>
@@ -670,13 +670,13 @@ export default function Dashboard() {
             onClick={() => setActiveTab("history")}
             className={`pb-3.5 px-6 font-semibold text-sm border-b-2 whitespace-nowrap transition-all flex items-center gap-2.5 rounded-t-xl ${
               activeTab === "history"
-                ? "border-purple-400 text-purple-300 bg-purple-950/20 shadow-[0_4px_20px_-4px_rgba(168,85,247,0.3)]"
+                ? "border-rose-400 text-rose-300 bg-rose-950/20 shadow-[0_4px_20px_-4px_rgba(244,63,94,0.3)]"
                 : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
             }`}
           >
             <GmailIcon />
             <span>Applications & Gmail Proofs</span>
-            <span className="ml-1 bg-purple-950/80 text-purple-300 border border-purple-500/30 text-xs px-2.5 py-0.5 rounded-full font-mono">
+            <span className="ml-1 bg-rose-950/80 text-rose-300 border border-rose-500/30 text-xs px-2.5 py-0.5 rounded-full font-mono">
               {applications.length}
             </span>
           </button>
@@ -685,7 +685,7 @@ export default function Dashboard() {
             onClick={() => setActiveTab("profile")}
             className={`pb-3.5 px-6 font-semibold text-sm border-b-2 whitespace-nowrap transition-all flex items-center gap-2.5 rounded-t-xl ${
               activeTab === "profile"
-                ? "border-pink-400 text-pink-300 bg-pink-950/20 shadow-[0_4px_20px_-4px_rgba(236,72,153,0.3)]"
+                ? "border-rose-400 text-rose-300 bg-rose-950/20 shadow-[0_4px_20px_-4px_rgba(244,63,94,0.3)]"
                 : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
             }`}
           >
@@ -701,7 +701,7 @@ export default function Dashboard() {
               <div>
                 <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
                   <span>Recommended Opportunities</span>
-                  <span className="bg-cyan-950/80 text-cyan-300 border border-cyan-500/30 text-[10px] uppercase font-bold px-2 py-0.5 rounded">Live Scan</span>
+                  <span className="bg-rose-950/80 text-rose-300 border border-rose-500/30 text-[10px] uppercase font-bold px-2 py-0.5 rounded">Live Scan</span>
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">Extracted HR emails matched against your candidate skills & selected target countries.</p>
               </div>
@@ -709,7 +709,7 @@ export default function Dashboard() {
                 <button
                   onClick={handleTriggerSearchAgent}
                   disabled={isTriggeringSearch}
-                  className="bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-600 hover:from-cyan-400 hover:via-indigo-400 hover:to-purple-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-lg shadow-cyan-500/20 flex items-center gap-2 transition-all disabled:opacity-50"
+                  className="btn-red-glow text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-lg flex items-center gap-2 transition-all disabled:opacity-50"
                 >
                   {isTriggeringSearch ? (
                     <>
@@ -724,9 +724,9 @@ export default function Dashboard() {
                   )}
                 </button>
 
-                <div className="bg-slate-950/80 border border-emerald-500/40 px-3.5 py-1.5 rounded-xl text-xs text-emerald-300 flex items-center gap-2 shadow-inner">
+                <div className="bg-slate-950/80 border border-rose-500/40 px-3.5 py-1.5 rounded-xl text-xs text-rose-300 flex items-center gap-2 shadow-inner">
                   <GlobeIcon />
-                  <span>Target Countries: <strong className="text-emerald-200 font-mono">{selectedCountries.length} Active</strong></span>
+                  <span>Target Countries: <strong className="text-rose-200 font-mono">{selectedCountries.length} Active</strong></span>
                 </div>
               </div>
             </div>
@@ -734,8 +734,8 @@ export default function Dashboard() {
             <div className="grid gap-4">
               {filteredDailyJobs.length === 0 ? (
                 <div className="glass-panel p-12 rounded-3xl text-center space-y-5 shadow-2xl border border-white/10 relative overflow-hidden">
-                  <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
-                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/40 rounded-2xl flex items-center justify-center mx-auto text-cyan-300 shadow-lg shadow-cyan-500/10">
+                  <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                  <div className="w-16 h-16 bg-gradient-to-br from-rose-500/20 to-red-500/20 border border-rose-500/40 rounded-2xl flex items-center justify-center mx-auto text-rose-300 shadow-lg shadow-rose-500/10">
                     <SparklesIcon />
                   </div>
                   <div className="space-y-1.5 max-w-md mx-auto relative z-10">
@@ -757,7 +757,7 @@ export default function Dashboard() {
                 filteredDailyJobs.map((job) => (
                   <div 
                     key={job.id} 
-                    className="bg-slate-900/80 border border-slate-800 hover:border-purple-500/50 p-6 rounded-xl transition-all shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6"
+                    className="bg-slate-900/80 border border-slate-800 hover:border-rose-500/50 p-6 rounded-xl transition-all shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6"
                   >
                     <div className="space-y-2 flex-1">
                       <div className="flex items-center gap-3">
@@ -765,7 +765,7 @@ export default function Dashboard() {
                         <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
                           job.opportunity_type === "internship"
                             ? "bg-amber-950/80 text-amber-300 border border-amber-500/30"
-                            : "bg-indigo-950/80 text-indigo-300 border border-indigo-500/30"
+                            : "bg-rose-950/80 text-rose-300 border border-rose-500/30"
                         }`}>
                           {(job.opportunity_type || "job").toUpperCase()}
                         </span>
@@ -775,7 +775,7 @@ export default function Dashboard() {
                         <span className="font-semibold text-slate-200">🏢 {job.company}</span>
                         {job.location && <span>📍 {job.location}</span>}
                         {job.salary && <span className="text-amber-300 font-mono">💰 {job.salary}</span>}
-                        {job.company_email && <span className="text-emerald-400 font-mono">✉️ HR Email: {job.company_email}</span>}
+                        {job.company_email && <span className="text-rose-400 font-mono">✉️ HR Email: {job.company_email}</span>}
                       </div>
 
                       {job.description && <p className="text-xs text-slate-300 line-clamp-2 pt-1">{job.description}</p>}
@@ -784,13 +784,13 @@ export default function Dashboard() {
                     <div className="flex md:flex-col items-end justify-between gap-4 min-w-[200px]">
                       <div className="text-right">
                         <div className="text-xs text-slate-400">AI Match Score</div>
-                        <div className="text-lg font-extrabold text-emerald-400">{job.match_score || 92}% Match</div>
+                        <div className="text-lg font-extrabold text-rose-400">{job.match_score || 92}% Match</div>
                       </div>
 
                       <button
                         onClick={() => handleAutoApply(job)}
                         disabled={isApplyingId === job.id}
-                        className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-2.5 px-4 rounded-lg shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                        className="w-full btn-red-glow text-white font-semibold text-xs py-2.5 px-4 rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all disabled:opacity-50"
                       >
                         {isApplyingId === job.id ? (
                           <>
@@ -980,7 +980,7 @@ export default function Dashboard() {
                           {selectedCountries.map((country, idx) => (
                             <span 
                               key={idx}
-                              className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-200 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm"
+                              className="bg-rose-950/90 border border-rose-500/50 text-rose-200 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm"
                             >
                               <span>{country}</span>
                               <button
@@ -1154,7 +1154,7 @@ export default function Dashboard() {
                     <button
                       type="submit"
                       disabled={isSavingProfile}
-                      className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold px-5 py-2.5 rounded-lg shadow-lg shadow-purple-900/30 flex items-center gap-2 transition-all text-xs"
+                      className="btn-red-glow text-white font-semibold px-5 py-2.5 rounded-lg shadow-lg flex items-center gap-2 transition-all text-xs"
                     >
                       {isSavingProfile ? "Saving Settings..." : `Save ${selectedCountries.length} Target Countries & Profile Preferences`}
                     </button>
@@ -1173,19 +1173,19 @@ export default function Dashboard() {
                         <UploadIcon />
                         <span>PDF Resume Upload</span>
                       </h3>
-                      <span className="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded font-mono">
+                      <span className="text-[10px] bg-rose-950 text-rose-400 border border-rose-500/30 px-2.5 py-0.5 rounded font-mono">
                         AI Parsing Engine
                       </span>
                     </div>
 
-                    <div className="border-2 border-dashed border-slate-700 hover:border-purple-500 p-6 rounded-xl text-center bg-slate-950/60 cursor-pointer relative transition-all group">
+                    <div className="border-2 border-dashed border-slate-700 hover:border-rose-500 p-6 rounded-xl text-center bg-slate-950/60 cursor-pointer relative transition-all group">
                       <input 
                         type="file" 
                         accept=".pdf,.doc,.docx"
                         onChange={handleResumeUpload}
                         className="absolute inset-0 opacity-0 cursor-pointer z-10"
                       />
-                      <div className="w-12 h-12 bg-purple-950/60 border border-purple-500/30 rounded-xl flex items-center justify-center mx-auto text-purple-400 group-hover:scale-110 transition-transform">
+                      <div className="w-12 h-12 bg-rose-950/60 border border-rose-500/30 rounded-xl flex items-center justify-center mx-auto text-rose-400 group-hover:scale-110 transition-transform">
                         <UploadIcon />
                       </div>
                       <p className="text-xs font-semibold text-slate-200 mt-3">
@@ -1199,13 +1199,13 @@ export default function Dashboard() {
                     <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
                       <div className="flex items-center justify-between">
                         <span className="text-slate-200 font-semibold truncate">📄 {uploadedResume}</span>
-                        <span className="bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-mono">
+                        <span className="bg-rose-950 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded text-[10px] font-mono">
                           Active PDF
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/60">
                         <span>AI Processed Status:</span>
-                        <strong className="text-purple-300 font-mono">Profile Ready</strong>
+                        <strong className="text-rose-300 font-mono">Profile Ready</strong>
                       </div>
                     </div>
                   ) : (
@@ -1223,14 +1223,14 @@ export default function Dashboard() {
                       <SparklesIcon />
                       <span>Extracted Candidate Profile Breakdown</span>
                     </h3>
-                    <span className="text-[10px] bg-purple-950 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded font-mono">
+                    <span className="text-[10px] bg-rose-950 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded font-mono">
                       AI Live Summary
                     </span>
                   </div>
 
                   {/* Candidate Executive Summary */}
                   <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
-                    <h4 className="text-[11px] font-bold text-purple-400 uppercase tracking-wider">Executive Summary</h4>
+                    <h4 className="text-[11px] font-bold text-rose-400 uppercase tracking-wider">Executive Summary</h4>
                     <p className="text-xs text-slate-300 leading-relaxed">{extractedProfile.summary}</p>
                   </div>
 
@@ -1242,7 +1242,7 @@ export default function Dashboard() {
                     ) : (
                       <div className="flex flex-wrap gap-1.5">
                         {extractedProfile.skills.map((skill, idx) => (
-                          <span key={idx} className="bg-purple-950/60 border border-purple-500/40 text-purple-200 text-xs font-semibold px-2.5 py-1 rounded-lg shadow-sm">
+                          <span key={idx} className="bg-rose-950/60 border border-rose-500/40 text-rose-200 text-xs font-semibold px-2.5 py-1 rounded-lg shadow-sm">
                             {skill}
                           </span>
                         ))}
@@ -1268,7 +1268,7 @@ export default function Dashboard() {
                 <button
                   onClick={handleRunAtsCheck}
                   disabled={isAnalyzingATS}
-                  className="bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 text-purple-200 text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition-all self-start sm:self-auto"
+                  className="bg-rose-950/80 hover:bg-rose-900 border border-rose-500/40 text-rose-200 text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition-all self-start sm:self-auto"
                 >
                   {isAnalyzingATS ? "Running ATS Audit..." : "⚡ Re-Run Real-Time ATS Check"}
                 </button>
@@ -1279,13 +1279,13 @@ export default function Dashboard() {
                 
                 {/* Score Gauge Card */}
                 <div className="md:col-span-1 bg-slate-950 border border-slate-800 p-6 rounded-xl text-center flex flex-col justify-center items-center space-y-2">
-                  <div className="relative w-28 h-28 flex items-center justify-center rounded-full bg-gradient-to-tr from-emerald-500/20 via-teal-500/20 to-cyan-500/20 border-4 border-emerald-500/50 shadow-lg shadow-emerald-500/10">
+                  <div className="relative w-28 h-28 flex items-center justify-center rounded-full bg-gradient-to-tr from-rose-500/20 via-red-500/20 to-orange-500/20 border-4 border-rose-500/50 shadow-lg shadow-rose-500/10">
                     <div className="text-center">
-                      <span className="text-3xl font-extrabold text-emerald-400">{atsMetrics.overall_score || 0}</span>
+                      <span className="text-3xl font-extrabold text-rose-400">{atsMetrics.overall_score || 0}</span>
                       <span className="text-xs text-slate-400 block font-semibold">/ 100</span>
                     </div>
                   </div>
-                  <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider pt-2">
+                  <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider pt-2">
                     {atsMetrics.overall_score > 0 ? "ATS Score Ready" : "Awaiting Resume Upload"}
                   </h4>
                   <p className="text-[11px] text-slate-400">{atsMetrics.summary}</p>
@@ -1298,10 +1298,10 @@ export default function Dashboard() {
                   <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                     <div className="flex justify-between text-xs">
                       <span className="text-slate-300 font-semibold">🎨 Formatting & Structure</span>
-                      <span className="text-emerald-400 font-mono font-bold">{atsMetrics.formatting_score}%</span>
+                      <span className="text-rose-400 font-mono font-bold">{atsMetrics.formatting_score}%</span>
                     </div>
                     <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
-                      <div className="bg-emerald-400 h-full rounded-full" style={{ width: `${atsMetrics.formatting_score}%` }}></div>
+                      <div className="bg-rose-400 h-full rounded-full" style={{ width: `${atsMetrics.formatting_score}%` }}></div>
                     </div>
                     <p className="text-[10px] text-slate-400">Clean font sizing, standard section headings & standard PDF encoding.</p>
                   </div>
@@ -1310,10 +1310,10 @@ export default function Dashboard() {
                   <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                     <div className="flex justify-between text-xs">
                       <span className="text-slate-300 font-semibold">🔑 Technical Skill Density</span>
-                      <span className="text-purple-400 font-mono font-bold">{atsMetrics.keyword_density_score}%</span>
+                      <span className="text-rose-400 font-mono font-bold">{atsMetrics.keyword_density_score}%</span>
                     </div>
                     <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
-                      <div className="bg-purple-400 h-full rounded-full" style={{ width: `${atsMetrics.keyword_density_score}%` }}></div>
+                      <div className="bg-rose-400 h-full rounded-full" style={{ width: `${atsMetrics.keyword_density_score}%` }}></div>
                     </div>
                     <p className="text-[10px] text-slate-400">High frequency of core technical & job keywords.</p>
                   </div>
@@ -1322,10 +1322,10 @@ export default function Dashboard() {
                   <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                     <div className="flex justify-between text-xs">
                       <span className="text-slate-300 font-semibold">⚡ Impact & Action Verbs</span>
-                      <span className="text-cyan-400 font-mono font-bold">{atsMetrics.action_verbs_score}%</span>
+                      <span className="text-rose-400 font-mono font-bold">{atsMetrics.action_verbs_score}%</span>
                     </div>
                     <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
-                      <div className="bg-cyan-400 h-full rounded-full" style={{ width: `${atsMetrics.action_verbs_score}%` }}></div>
+                      <div className="bg-rose-400 h-full rounded-full" style={{ width: `${atsMetrics.action_verbs_score}%` }}></div>
                     </div>
                     <p className="text-[10px] text-slate-400">Includes strong verbs: 'Architected', 'Engineered', 'Optimized'.</p>
                   </div>
@@ -1334,10 +1334,10 @@ export default function Dashboard() {
                   <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                     <div className="flex justify-between text-xs">
                       <span className="text-slate-300 font-semibold">📋 Section Completeness</span>
-                      <span className="text-teal-400 font-mono font-bold">{atsMetrics.section_completeness_score}%</span>
+                      <span className="text-rose-400 font-mono font-bold">{atsMetrics.section_completeness_score}%</span>
                     </div>
                     <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
-                      <div className="bg-teal-400 h-full rounded-full" style={{ width: `${atsMetrics.section_completeness_score}%` }}></div>
+                      <div className="bg-rose-400 h-full rounded-full" style={{ width: `${atsMetrics.section_completeness_score}%` }}></div>
                     </div>
                     <p className="text-[10px] text-slate-400">Education, experience, skills & contact links present.</p>
                   </div>
@@ -1357,20 +1357,20 @@ export default function Dashboard() {
                 onClick={() => setHistoryFilter("today")}
                 className={`p-5 rounded-2xl border cursor-pointer transition-all shadow-lg ${
                   historyFilter === "today"
-                    ? "bg-purple-950/40 border-purple-500/80 ring-2 ring-purple-500/30"
+                    ? "bg-rose-950/40 border-rose-500/80 ring-2 ring-rose-500/30"
                     : "bg-slate-900/80 border-slate-800 hover:border-slate-700"
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
                     <CalendarIcon />
                     <span>Today's Submissions</span>
                   </span>
-                  <span className="bg-purple-950 text-purple-300 border border-purple-500/30 text-[10px] px-2 py-0.5 rounded font-mono">
+                  <span className="bg-rose-950 text-rose-300 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded font-mono">
                     24 Hours
                   </span>
                 </div>
-                <div className="text-2xl font-extrabold text-purple-400 font-mono">{todayApps.length} Applications</div>
+                <div className="text-2xl font-extrabold text-rose-400 font-mono">{todayApps.length} Applications</div>
                 <div className="text-[11px] text-slate-400 mt-1 flex justify-between">
                   <span>Jobs: <strong className="text-slate-200 font-mono">{todayJobsCount}</strong></span>
                   <span>Internships: <strong className="text-amber-300 font-mono">{todayInternshipsCount}</strong></span>
@@ -1382,20 +1382,20 @@ export default function Dashboard() {
                 onClick={() => setHistoryFilter("monthly")}
                 className={`p-5 rounded-2xl border cursor-pointer transition-all shadow-lg ${
                   historyFilter === "monthly"
-                    ? "bg-indigo-950/40 border-indigo-500/80 ring-2 ring-indigo-500/30"
+                    ? "bg-rose-950/40 border-rose-500/80 ring-2 ring-rose-500/30"
                     : "bg-slate-900/80 border-slate-800 hover:border-slate-700"
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
                     <CalendarIcon />
                     <span>Monthly</span>
                   </span>
-                  <span className="bg-indigo-950 text-indigo-300 border border-indigo-500/30 text-[10px] px-2 py-0.5 rounded font-mono">
+                  <span className="bg-rose-950 text-rose-300 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded font-mono">
                     This Month
                   </span>
                 </div>
-                <div className="text-2xl font-extrabold text-indigo-400 font-mono">{monthlyApps.length} Applications</div>
+                <div className="text-2xl font-extrabold text-rose-400 font-mono">{monthlyApps.length} Applications</div>
                 <p className="text-[11px] text-slate-400 mt-1">Total applications submitted during current billing period.</p>
               </div>
 
@@ -1404,20 +1404,20 @@ export default function Dashboard() {
                 onClick={() => setHistoryFilter("yearly")}
                 className={`p-5 rounded-2xl border cursor-pointer transition-all shadow-lg ${
                   historyFilter === "yearly"
-                    ? "bg-cyan-950/40 border-cyan-500/80 ring-2 ring-cyan-500/30"
+                    ? "bg-rose-950/40 border-rose-500/80 ring-2 ring-rose-500/30"
                     : "bg-slate-900/80 border-slate-800 hover:border-slate-700"
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
                     <CalendarIcon />
                     <span>Yearly</span>
                   </span>
-                  <span className="bg-cyan-950 text-cyan-300 border border-cyan-500/30 text-[10px] px-2 py-0.5 rounded font-mono">
+                  <span className="bg-rose-950 text-rose-300 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded font-mono">
                     Year to Date
                   </span>
                 </div>
-                <div className="text-2xl font-extrabold text-cyan-400 font-mono">{yearlyApps.length} Applications</div>
+                <div className="text-2xl font-extrabold text-rose-400 font-mono">{yearlyApps.length} Applications</div>
                 <p className="text-[11px] text-slate-400 mt-1">Lifetime total application deliveries in current year.</p>
               </div>
             </div>
@@ -1439,7 +1439,7 @@ export default function Dashboard() {
                     onClick={() => setHistoryFilter("today")}
                     className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
                       historyFilter === "today"
-                        ? "bg-purple-600 text-white shadow"
+                        ? "bg-rose-600 text-white shadow"
                         : "text-slate-400 hover:text-slate-200"
                     }`}
                   >
@@ -1449,7 +1449,7 @@ export default function Dashboard() {
                     onClick={() => setHistoryFilter("monthly")}
                     className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
                       historyFilter === "monthly"
-                        ? "bg-indigo-600 text-white shadow"
+                        ? "bg-rose-600 text-white shadow"
                         : "text-slate-400 hover:text-slate-200"
                     }`}
                   >
@@ -1459,7 +1459,7 @@ export default function Dashboard() {
                     onClick={() => setHistoryFilter("yearly")}
                     className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
                       historyFilter === "yearly"
-                        ? "bg-cyan-600 text-white shadow"
+                        ? "bg-rose-600 text-white shadow"
                         : "text-slate-400 hover:text-slate-200"
                     }`}
                   >
@@ -1493,11 +1493,11 @@ export default function Dashboard() {
                           <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
                             app.opportunity_type === "internship"
                               ? "bg-amber-950/80 text-amber-300 border border-amber-500/30"
-                              : "bg-indigo-950/80 text-indigo-300 border border-indigo-500/30"
+                              : "bg-rose-950/80 text-rose-300 border border-rose-500/30"
                           }`}>
                             {(app.opportunity_type || "job").toUpperCase()}
                           </span>
-                          <span className="bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-full font-semibold">
+                          <span className="bg-rose-950/80 text-rose-300 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded-full font-semibold">
                             {app.status}
                           </span>
                         </div>
@@ -1512,7 +1512,7 @@ export default function Dashboard() {
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <span className="text-xs text-emerald-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 font-mono">
+                        <span className="text-xs text-rose-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 font-mono">
                           ✓ Appears in Gmail "Sent" folder
                         </span>
                       </div>
@@ -1779,7 +1779,7 @@ export default function Dashboard() {
               <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-slate-200">Option 1: Google OAuth 2.0 (Fast 1-Click)</span>
-                  <span className="bg-emerald-950 text-emerald-300 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded font-semibold">Recommended</span>
+                  <span className="bg-rose-950 text-rose-300 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded font-semibold">Recommended</span>
                 </div>
                 <button
                   onClick={async () => {
