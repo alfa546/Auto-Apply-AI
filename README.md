@@ -22,6 +22,16 @@
 
 ---
 
+<p align="center">
+  <img src="docs/images/dashboard-preview.png" alt="Auto Apply AI Dashboard Preview" width="900" />
+</p>
+
+<p align="center">
+  <i>🖥️ AutoApply AI — Dark Grid Interface with Coral-Red Accent Theme, Real-Time Job Scanning & Gmail Auto-Apply</i>
+</p>
+
+---
+
 ## 📌 Table of Contents
 
 - [Overview](#-overview)
