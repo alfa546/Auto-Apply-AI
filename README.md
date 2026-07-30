@@ -385,6 +385,12 @@ pytest -v
 
 ---
 
+## 🤝 Contributing
+
+Contributions are welcome! Please check out [CONTRIBUTING.md](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/CONTRIBUTING.md) for details on setting up the project locally, guidelines, and how to find **Good First Issues**.
+
+---
+
 ## 📄 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
