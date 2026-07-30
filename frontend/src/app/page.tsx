@@ -790,10 +790,11 @@ export default function Dashboard() {
             )}
 
             <button
-              onClick={() => setShowGmailModal(true)}
+              onClick={() => setActiveTab("settings")}
               className="btn-red-glow text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2"
             >
-              <span>Connect Gmail</span>
+              <KeyIcon />
+              <span>API Vault</span>
               <span>→</span>
             </button>
           </div>
