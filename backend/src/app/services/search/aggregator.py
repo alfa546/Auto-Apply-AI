@@ -135,6 +135,9 @@ class SearchAggregator:
             top_skills = " ".join(rag_skills[:2]) if rag_skills else ""
             search_queries.append(f"{role} {top_skills}".strip())
 
+        if profile and profile.employment_types and any("internship" in et.lower() for et in profile.employment_types):
+            search_queries.append(f"{target_roles[0] if target_roles else 'Developer'} Internship")
+
         total_new_opportunities = 0
         for country in target_countries[:3]:
             for query in search_queries:

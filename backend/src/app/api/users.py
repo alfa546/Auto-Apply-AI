@@ -85,6 +85,10 @@ def get_user_settings(current_user: dict = Depends(get_current_user), db: Sessio
         db.commit()
         db.refresh(settings)
 
+    profile = db.query(Profile).filter(Profile.user_id == uid).first()
+    
+    user = db.query(User).filter(User.id == uid).first()
+
     # Return masked secret keys for security
     def mask_key(k: Optional[str]):
         if not k or len(k) < 6:
@@ -100,9 +104,23 @@ def get_user_settings(current_user: dict = Depends(get_current_user), db: Sessio
         "google_client_secret": mask_key(settings.google_client_secret),
         "adzuna_app_id": settings.adzuna_app_id or "",
         "adzuna_app_key": mask_key(settings.adzuna_app_key),
-        "jooble_api_key": settings.jooble_api_key or "",
+        "jooble_api_key": mask_key(settings.jooble_api_key),
         "is_gmail_connected": settings.is_gmail_connected,
-        "gmail_email_address": settings.gmail_email_address or ""
+        "gmail_email_address": settings.gmail_email_address or "",
+        "target_roles": settings.target_roles or [],
+        "target_countries": settings.preferred_countries or [],
+        "work_mode_preference": settings.work_mode_preference or "Fully Remote (Worldwide)",
+        "salary_preference": settings.min_salary_preference or "$90,000 - $130,000 / year",
+        "experience_level": settings.experience_level or "Mid-Level (2 - 5 Yrs)",
+        "visa_sponsorship": settings.visa_sponsorship_required,
+        "daily_job_goal": settings.daily_job_goal,
+        "daily_internship_goal": settings.daily_internship_goal,
+        "auto_fulfill_enabled": settings.auto_fulfill_enabled,
+        "email": user.email if user else "",
+        "portfolio_url": profile.portfolio_url if profile else "",
+        "github_url": profile.github_url if profile else "",
+        "other_url": profile.other_url if profile else "",
+        "employment_types": profile.employment_types if profile else []
     }
 
 @router.put("/settings")
@@ -126,17 +144,17 @@ def update_user_settings(
         settings.llm_model = payload.llm_model
     if payload.custom_api_base is not None:
         settings.custom_api_base = payload.custom_api_base
-    if payload.openai_api_key is not None and not payload.openai_api_key.startswith("••"):
+    if payload.openai_api_key is not None and "••••••••" not in payload.openai_api_key:
         settings.openai_api_key = payload.openai_api_key
     if payload.google_client_id is not None:
         settings.google_client_id = payload.google_client_id
-    if payload.google_client_secret is not None and not payload.google_client_secret.startswith("••"):
+    if payload.google_client_secret is not None and "••••••••" not in payload.google_client_secret:
         settings.google_client_secret = payload.google_client_secret
     if payload.adzuna_app_id is not None:
         settings.adzuna_app_id = payload.adzuna_app_id
-    if payload.adzuna_app_key is not None and not payload.adzuna_app_key.startswith("••"):
+    if payload.adzuna_app_key is not None and "••••••••" not in payload.adzuna_app_key:
         settings.adzuna_app_key = payload.adzuna_app_key
-    if payload.jooble_api_key is not None and not payload.jooble_api_key.startswith("••"):
+    if payload.jooble_api_key is not None and "••••••••" not in payload.jooble_api_key:
         settings.jooble_api_key = payload.jooble_api_key
     if payload.target_countries is not None:
         settings.preferred_countries = payload.target_countries

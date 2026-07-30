@@ -74,6 +74,6 @@ class LeverProvider(BaseSearchProvider):
                                     "raw_data": posting
                                 })
                 except Exception as e:
-                    logger.warning(f"Failed to fetch Lever board for {company}: {e}")
+                    logger.info(f"Failed to fetch Lever board for {company} (might not exist or API error).")
 
         return results
