@@ -5,7 +5,7 @@
 <h1 align="center">🚀 Auto Apply AI</h1>
 
 <p align="center">
-  <b>Autonomous Multi-Agent AI Platform for Resume Optimization, Multi-Country Target Search, RAG Semantic Matching, Playwright Browser Auto-Apply, and Gmail Email Tracking.</b>
+  <b>Autonomous Multi-Agent AI Platform for PDF & DOCX Resume Parsing, Multi-Model LLM Support (Ollama/OpenAI/Gemini), RAG Semantic Matching, Multi-Country Job Scraping, and Gmail Tracking.</b>
 </p>
 
 <p align="center">
@@ -13,8 +13,8 @@
   <a href="#-key-features"><img src="https://img.shields.io/badge/Next.js_16-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js"></a>
   <a href="#-key-features"><img src="https://img.shields.io/badge/Python_3.12+-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python"></a>
   <a href="#-key-features"><img src="https://img.shields.io/badge/Tailwind_CSS_v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind"></a>
-  <a href="#-key-features"><img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL"></a>
-  <a href="#-key-features"><img src="https://img.shields.io/badge/Redis_7-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis"></a>
+  <a href="#-key-features"><img src="https://img.shields.io/badge/SQLite_%2F_PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL"></a>
+  <a href="#-key-features"><img src="https://img.shields.io/badge/Ollama_%2F_Local_LLM-000000?style=flat-square&logo=ollama&logoColor=white" alt="Ollama"></a>
   <a href="#-key-features"><img src="https://img.shields.io/badge/ChromaDB-FF6F00?style=flat-square&logo=database&logoColor=white" alt="ChromaDB"></a>
   <a href="#-key-features"><img src="https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white" alt="Playwright"></a>
   <a href="#-license"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License"></a>
@@ -27,7 +27,7 @@
 </p>
 
 <p align="center">
-  <i>🖥️ AutoApply AI — Dark Grid Interface with Coral-Red Accent Theme, Real-Time Job Scanning & Gmail Auto-Apply</i>
+  <i>🖥️ AutoApply AI — Dark Grid Interface with Coral-Red Accent Theme, Real-Time RAG Agent Thinking UI & Gmail Auto-Apply</i>
 </p>
 
 ---
@@ -41,60 +41,52 @@
 - [Repository Structure](#-repository-structure)
 - [Getting Started](#-getting-started)
   - [Prerequisites](#prerequisites)
-  - [Infrastructure (Docker Compose)](#1-infrastructure-docker-compose)
-  - [Backend Setup (FastAPI)](#2-backend-setup-fastapi)
-  - [Frontend Setup (Next.js)](#3-frontend-setup-nextjs)
-  - [Connecting Gmail on Localhost](#4-connecting-gmail-on-localhost)
+  - [Backend Setup (FastAPI)](#1-backend-setup-fastapi)
+  - [Frontend Setup (Next.js)](#2-frontend-setup-nextjs)
+  - [Connecting Gmail Account](#3-connecting-gmail-account)
 - [Environment Variables](#-environment-variables)
 - [API Documentation](#-api-documentation)
-- [Testing & Verification](#-testing--verification)
-- [Roadmap](#-roadmap)
 - [License](#-license)
 
 ---
 
 ## 💡 Overview
 
-**Auto Apply AI** is an enterprise-grade, end-to-end autonomous multi-agent platform designed to streamline and automate the entire career application lifecycle. 
+**Auto Apply AI** is an end-to-end, multi-agent AI platform designed to completely automate and optimize the modern job hunting process.
 
-Instead of spending hours manually browsing multiple job portals, tailoring resumes, filling repetitive forms, and tracking application emails, **Auto Apply AI** automates:
-1. **Resume Ingestion & RAG Parsing**: Extracts sections, skills, work experience, and calculates authentic ATS compatibility scores (0-100%).
-2. **Interactive Searchable Country Box**: Search and add up to **10 target destination countries** (e.g., United States 🇺🇸, Canada 🇨🇦, UK 🇬🇧, Germany 🇩🇪, UAE 🇦🇪, Japan 🇯🇵) with live removable tag badges.
-3. **Multi-Agent RAG Search Aggregator**: Combines candidate RAG vector skills from ChromaDB + user target roles + selected target countries to execute targeted multi-country opportunity scraping.
-4. **Daily Application Goals & Automation Targets**: Allows users to set custom daily job and internship application targets with live percentage completion bars.
-5. **Gmail Email Auto-Apply Proofs**: Sends candidate CVs directly to company hiring emails with message IDs delivered to the user's Gmail "Sent" folder, complete with **Today / Monthly / Yearly** period history filters.
+Instead of manually editing CVs, searching across multiple job portals, and writing repetitive emails, **Auto Apply AI** provides:
+1. **PDF & DOCX AI Resume Parsing**: Reads both PDF and Word (`.docx`) files natively to extract executive summary, work experience, education, and tech skills.
+2. **Real-Time RAG Agent Thinking UI**: Interactive terminal-style progress log displaying real-time RAG context chunking, skill extraction, and ATS match scoring.
+3. **Multi-Model LLM Vault (Free & Paid)**: Native support for 100% Free Local Offline LLMs (Ollama / LM Studio), Groq, OpenRouter, Google Gemini, DeepSeek, and OpenAI.
+4. **Interactive Target Country Selection (1-10 Countries)**: Filter jobs by up to 10 destination countries simultaneously (e.g. 🇺🇸 US, 🇨🇦 Canada, 🇬🇧 UK, 🇩🇪 Germany, 🇦🇪 UAE).
+5. **Direct Gmail Auto-Apply & Tracking**: Delivers custom cover letters and candidate CVs directly to company hiring emails with message IDs tracked in the candidate's Gmail "Sent" folder.
 
 ---
 
 ## 🔥 Key Features
 
-### 🔍 1. Interactive Country Autocomplete Search Box (1-10 Countries)
-- **Real-Time Autocomplete Dropdown**: Search from 50+ global destination countries by typing in the search box.
-- **Dynamic Tag Badges**: Selected countries appear below the search box as removable badges (`✓ Country ✕`).
-- **Strict 1-10 Limit Enforcement**: Allows candidates to target multiple international markets simultaneously with toast notifications for boundary limits.
+### 📄 1. PDF & Word (`.docx`) Resume Parsing Engine
+- **Multi-Format Extraction**: Parses both `.pdf` and Word `.docx` documents natively without external C library dependencies.
+- **RAG Profile Breakdown**: Extracts structured executive summaries, skills, work experience entries, and education details.
+- **Automated Fallback**: Gracefully switches to rule-based tech stack parsing if an external LLM key is unconfigured or out of quota.
 
-### 🌐 2. International Career & Preference Center
-- **Work Mode / Remote Policies**: `Fully Remote (Worldwide)`, `Remote (Americas)`, `Remote (EMEA)`, `Remote (APAC)`, `Hybrid`, `On-site`.
-- **Compensation & Experience**: Standardized USD salary bands ($40,000 - $180,000+ / yr) and experience tiers (Entry-Level to Staff/Principal).
-- **Visa & Relocation Settings**: Filter roles based on visa sponsorship and relocation support needs.
+### 🧠 2. Real-Time RAG Agent Thinking UI
+- **Live Visual Log Window**: Watch the AI agent initialize context windows, chunk text, extract competencies, and score ATS metrics in real-time.
+- **Glowing UI Box**: Replaces the upload area with a dynamic progress bar and animated agent status indicators.
 
-### 🎯 3. Multi-Agent RAG Search & Match Engine
-- **RAG-Guided Search**: Merges vector embeddings of candidate CV skills from ChromaDB + user preferences to discover high-relevance opportunities.
-- **Semantic Compatibility Scoring**: Computes composite match percentages (e.g. 96.5% Match) based on cosine similarity and technical skill density.
-- **Hiring HR Email Extractor**: Automatically parses company HR contact emails (`careers@company.com`, `hr@...`) for direct email application delivery.
+### 🌐 3. Interactive Multi-Country Autocomplete Search (1-10 Countries)
+- **Autocomplete Dropdown**: Search and select target destination countries with dynamic tag badges (`✓ Country ✕`).
+- **Target Preferences**: Set remote work preferences (`Fully Remote`, `Hybrid`, `On-site`), USD salary bands, and experience tiers.
 
-### 🎯 4. Daily Application Goals & Progress Tracker
-- **Customizable Targets**: Set independent daily application targets for Jobs and Internships.
-- **Live Progress Bar**: Visual completion percentage tracker (`Today's Goal Progress: X / Y Applications`).
+### 🔑 4. Multi-LLM Provider & API Keys Vault
+- **Free Local LLMs**: Built-in support for Ollama / LM Studio running 100% offline and free at `http://localhost:11434/v1`.
+- **Cloud LLM Providers**: Support for OpenAI, Groq, DeepSeek, OpenRouter, and Google Gemini.
+- **Secure Key Masking**: All stored secret keys are securely masked in the UI.
 
 ### 📧 5. Gmail Proofs & History Hub (Today / Monthly / Yearly)
-- **Direct Gmail Integration**: Connects via Google OAuth2 or 16-character App Password (SMTP).
-- **Time-Period Filters**: Filter applications by **Today** (24 hours), **Monthly** (current month), **Yearly** (2026), or **All**.
-- **Delivery Proof**: Displays Gmail Message IDs verifying that applications are sent from the candidate's personal Gmail account.
-
-### 📄 6. Authentic ATS Resume Scoring & RAG Deep Hub
-- **ATS Metrics Dashboard**: Evaluates formatting, skill density, impact action verbs, and section completeness.
-- **Actionable Recommendations**: Generates missing keyword suggestions and formatting feedback.
+- **Flexible Connection**: Connect via Google OAuth2 or 16-character Gmail App Password (SMTP).
+- **Time-Period Filters**: Track application deliveries by **Today** (24 Hours), **Monthly**, **Yearly**, or **All**.
+- **Sent Folder Proofs**: Every application email appears directly in the candidate's official Gmail "Sent" folder.
 
 ---
 
@@ -106,25 +98,22 @@ graph TD
     Dashboard <--> REST[FastAPI REST API Server]
     
     subgraph Core Storage & Data Layer
-        REST <--> Postgres[(PostgreSQL 16\nRelational DB)]
-        REST <--> Redis[(Redis 7\nQueue / Cache)]
+        REST <--> SQLite[(SQLite / PostgreSQL\nLocal DB)]
         REST <--> VectorDB[(ChromaDB\nVector Embeddings)]
     end
 
     subgraph Multi-Agent Processing Engine
         REST <--> ResumeAgent[Resume & ATS Parser]
-        REST <--> SearchAgent[RAG & Country Guided Search Aggregator]
+        REST <--> SearchAgent[Multi-Country Search Aggregator]
         REST <--> MatchAgent[RAG Semantic Matcher]
-        REST <--> ApplyAgent[Playwright Application Bot]
         REST <--> EmailAgent[Gmail & Email Tracking Engine]
     end
 
-    subgraph External Integrations & Services
-        ResumeAgent --> LocalEmbeddings[SentenceTransformer\nall-MiniLM-L6-v2]
-        ResumeAgent --> OpenAI[OpenAI API / LLM]
-        ApplyAgent --> Playwright[Playwright Headless Browser]
-        EmailAgent --> Gmail[Gmail API / OAuth2 / SMTP]
-        SearchAgent --> ExternalAPIs[Multi-Country Job Scrapers / Adzuna / Jooble / RSS]
+    subgraph External LLM & Service Providers
+        ResumeAgent --> LocalLLM[Ollama / LM Studio\n(100% Free Offline)]
+        ResumeAgent --> CloudLLMs[OpenAI / Gemini / Groq / DeepSeek]
+        EmailAgent --> Gmail[Gmail API / SMTP Client]
+        SearchAgent --> JobAPIs[Adzuna / Jooble / Multi-Country Scrapers]
     end
 ```
 
@@ -134,16 +123,14 @@ graph TD
 
 | Domain | Technology | Description |
 | :--- | :--- | :--- |
-| **Frontend Framework** | Next.js 16 (App Router) | React 19, TypeScript, Client-side State & Components |
-| **Styling** | Tailwind CSS v4 | Responsive dark-themed UI with glassmorphism |
-| **Backend Framework** | FastAPI (Python 3.12+) | Asynchronous RESTful API services |
-| **Database (Relational)** | PostgreSQL 16 | ORM via SQLAlchemy 2.0 & Alembic Migrations |
-| **Vector Database** | ChromaDB | Vector storage for candidate RAG resume embeddings |
-| **Caching & Queues** | Redis 7 | Background task queues and rate limiting |
-| **Browser Automation**| Playwright Python | Automated browser form submission and interactions |
-| **Embeddings & AI** | SentenceTransformers | `all-MiniLM-L6-v2` local embeddings + OpenAI LLM support |
-| **Authentication** | Firebase Admin / JWT / SMTP | Secure auth verification and email credentials |
-| **Containerization** | Docker & Docker Compose | Multi-container orchestration |
+| **Frontend Framework** | Next.js 16 (App Router) | React 19, TypeScript, Client State Management |
+| **Styling** | Tailwind CSS v4 | Dark-grid theme with coral-red glow accents |
+| **Backend Framework** | FastAPI | Asynchronous Python 3.12+ REST API |
+| **Database** | SQLite / PostgreSQL | Automatic schema synchronization via SQLAlchemy 2.0 |
+| **Vector DB** | ChromaDB | Local vector store for candidate CV embeddings |
+| **Resume Parser** | PyPDF2, pdfplumber, ElementTree | PDF & DOCX native text extraction |
+| **LLM Integrations** | Ollama, Groq, OpenAI, Gemini | Multi-provider AI text analysis |
+| **Email Service** | Gmail API & SMTP | Direct email delivery with message ID tracking |
 
 ---
 
@@ -152,49 +139,34 @@ graph TD
 ```
 Auto-Apply-AI/
 ├── backend/                        # FastAPI Backend Application
-│   ├── alembic/                    # Database migration scripts
 │   ├── src/
 │   │   └── app/
 │   │       ├── api/                # API Route Handlers
 │   │       │   ├── applications.py # Application tracking endpoints
-│   │       │   ├── auto_apply.py   # Playwright application triggers
-│   │       │   ├── emails.py       # General email endpoints
-│   │       │   ├── gmail.py        # Gmail OAuth & inbox tracking
+│   │       │   ├── emails.py       # Email endpoints
+│   │       │   ├── gmail.py        # Gmail OAuth & SMTP authentication
 │   │       │   ├── matching.py     # RAG matching & compatibility scores
 │   │       │   ├── resumes.py      # Resume parsing & ATS endpoints
-│   │       │   ├── search.py       # RAG & Country search endpoints
+│   │       │   ├── search.py       # Multi-country search endpoints
 │   │       │   └── users.py        # User profile & settings management
 │   │       ├── services/           # Core Business Logic & Agents
-│   │       │   ├── application/    # Application submission logic
-│   │       │   ├── email/          # Email parsers & drafting
-│   │       │   ├── matching/       # RAG ranking algorithms
-│   │       │   ├── search/         # Search Aggregator with RAG + Preferences
-│   │       │   ├── ats_checker.py  # ATS grading & recommendations
-│   │       │   ├── embeddings.py   # Vector embedding generators
-│   │       │   ├── gmail_client.py # Gmail API / SMTP integration client
-│   │       │   ├── pdf_parser.py   # PDF text extraction utilities
+│   │       │   ├── ats_checker.py  # ATS grading & rule-based fallbacks
+│   │       │   ├── pdf_parser.py   # PDF & DOCX native text extraction
 │   │       │   ├── rag_service.py  # Vector search & RAG retriever
-│   │       │   └── resume_parser.py# Structured resume extractor
-│   │       ├── auth.py             # Authentication middleware
-│   │       ├── config.py           # App settings & env configurations
-│   │       ├── database.py         # SQLAlchemy DB engine session setup
+│   │       │   └── search/         # Multi-country search aggregator
+│   │       ├── database.py         # SQLAlchemy engine & SQLite auto-sync
 │   │       ├── main.py             # FastAPI entry point & CORS
-│   │       ├── models.py           # Database Models
-│   │       └── vector_db.py        # ChromaDB client initialization
-│   ├── tests/                      # Pytest suite
-│   ├── pyproject.toml              # Backend dependencies (Poetry)
-│   ├── requirements.txt            # Pip requirements list
-│   └── Dockerfile                  # Backend container build spec
+│   │       └── models.py           # Database Schemas
+│   ├── requirements.txt            # Python dependencies
+│   └── pyproject.toml              # Backend project configuration
 ├── frontend/                       # Next.js Frontend Application
 │   ├── src/
-│   │   └── app/                    # Next.js App Router Pages
-│   │       ├── page.tsx            # Unified Dashboard (Jobs -> Proofs -> Profile/RAG)
-│   │       ├── layout.tsx          # Root Layout & Provider Wrapper
-│   │       └── globals.css         # Tailwind CSS imports & theme rules
-│   ├── package.json                # Frontend dependencies
-│   └── next.config.ts              # Next.js configuration
-├── docker-compose.yml              # Services orchestration (PostgreSQL, Redis, ChromaDB)
-└── README.md                       # Main Project Documentation
+│   │   └── app/
+│   │       ├── page.tsx            # Unified Dashboard & Agent Thinking UI
+│   │       ├── layout.tsx          # Root Layout & Theme Providers
+│   │       └── globals.css         # Tailwind CSS styles & animations
+│   └── package.json                # Node.js dependencies
+└── README.md                       # Project Documentation
 ```
 
 ---
@@ -203,37 +175,20 @@ Auto-Apply-AI/
 
 ### Prerequisites
 
-Ensure you have the following installed on your machine:
-- **Node.js**: v20.x or higher
-- **Python**: v3.12 or higher
-- **Docker & Docker Compose**: For running PostgreSQL, Redis, and ChromaDB services
-- **Git**: For version control
+- **Python**: v3.10 or higher
+- **Node.js**: v18.x or higher
+- **Git**
 
 ---
 
-### 1. Infrastructure (Docker Compose)
-
-Start PostgreSQL, Redis, and ChromaDB containers:
-
-```bash
-docker compose up -d
-```
-
-Verify services are running:
-- **PostgreSQL**: `localhost:5432`
-- **Redis**: `localhost:6379`
-- **ChromaDB**: `localhost:8000`
-
----
-
-### 2. Backend Setup (FastAPI)
+### 1. Backend Setup (FastAPI)
 
 1. Navigate to the `backend` directory:
    ```bash
    cd backend
    ```
 
-2. Create a virtual environment and activate it:
+2. Create and activate a virtual environment:
    ```bash
    python -m venv venv
    # On Windows (PowerShell):
@@ -242,39 +197,22 @@ Verify services are running:
    source venv/bin/activate
    ```
 
-3. Install backend dependencies:
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
-   # OR using Poetry:
-   poetry install
    ```
 
-4. Install Playwright browser dependencies:
+4. Start the FastAPI server:
    ```bash
-   playwright install chromium
+   python -m uvicorn src.app.main:app --reload --port 8000
    ```
-
-5. Set up your `.env` file (copy from `.env.example`):
-   ```bash
-   cp .env.example .env
-   ```
-
-6. Run database migrations:
-   ```bash
-   alembic upgrade head
-   ```
-
-7. Start the FastAPI development server:
-   ```bash
-   uvicorn src.app.main:app --reload --port 8000
-   ```
-   The backend API will be available at **`http://localhost:8000`** (Swagger docs at `http://localhost:8000/docs`).
+   The backend API will run at **`http://localhost:8000`** (API documentation available at `http://localhost:8000/docs`).
 
 ---
 
-### 3. Frontend Setup (Next.js)
+### 2. Frontend Setup (Next.js)
 
-1. Open a new terminal and navigate to the `frontend` directory:
+1. Open a second terminal and navigate to `frontend`:
    ```bash
    cd frontend
    ```
@@ -288,32 +226,17 @@ Verify services are running:
    ```bash
    npm run dev
    ```
-   The web application will be accessible at **`http://localhost:3000`**.
+   Access the dashboard in your browser at **`http://localhost:3000`**.
 
 ---
 
-### 4. Connecting Gmail on Localhost (2 Easy Methods)
+### 3. Connecting Gmail Account
 
-When running the application locally on localhost (`http://localhost:3000`), a candidate can connect their Gmail account so that the AI Agent can send application emails with custom cover letters and PDF CVs directly to company HR emails.
-
-#### Method A: Gmail App Password (SMTP) - Fast 1-Minute Setup (Recommended for Localhost)
-No Google Cloud Console configuration required!
-1. Go to your **Google Account** (`https://myaccount.google.com/`).
-2. Go to **Security** → Enable **2-Step Verification** (if not already enabled).
-3. Search for **App Passwords** or visit `https://myaccount.google.com/apppasswords`.
-4. Create a new App Password (e.g., App Name: `Auto-Apply AI`).
-5. Google will generate a **16-character password** (e.g., `abcd efgh ijkl mnop`).
-6. In the dashboard top bar, click **"Connect Gmail Account"** → Select **Option 2: Gmail App Password (SMTP)**.
-7. Enter your Gmail address, paste your 16-character App Password, and click **Connect via App Password**.
-8. **Result**: All job applications sent by the agent will be sent directly through your Gmail account and will appear in your official **Gmail "Sent"** folder!
-
-#### Method B: Google OAuth 2.0 Client ID
-1. Open the [Google Cloud Console](https://console.cloud.google.com/).
-2. Create a Project and enable the **Gmail API**.
-3. Create an **OAuth 2.0 Client ID** (Application type: *Web application*).
-4. Add the Authorized Redirect URI: `http://localhost:8000/api/v1/auth/gmail/callback`.
-5. Add `GMAIL_CLIENT_ID` and `GMAIL_CLIENT_SECRET` to your `backend/.env` file.
-6. In the dashboard top bar, click **Connect with Google OAuth**!
+To let the AI Agent send job applications directly from your email:
+1. In the dashboard top navigation bar, click **`🔑 API Vault`** or open the **Settings** tab.
+2. Under **Connected Gmail Account**, select **Gmail App Password (SMTP)**.
+3. Enter your Gmail address and a **16-character App Password** (generated via *Google Account > Security > 2-Step Verification > App Passwords*).
+4. Click **Connect via App Password**. All sent application emails will now appear directly in your official **Gmail "Sent"** folder!
 
 ---
 
@@ -322,82 +245,36 @@ No Google Cloud Console configuration required!
 ### Backend (`backend/.env`)
 
 ```env
-# Database Settings
-DATABASE_URL=postgresql://postgres:postgres_development_secure_pass@localhost:5432/auto_apply_db
+# Database Settings (Defaults to local SQLite auto_apply_local.db if empty)
+DATABASE_URL=sqlite:///./auto_apply_local.db
 
-# Redis & Cache Settings
-REDIS_URL=redis://localhost:6379/0
-
-# Vector Database
-CHROMADB_HOST=localhost
-CHROMADB_PORT=8000
-
-# AI Models & LLM Setup
+# AI Models & LLM Setup (Optional: Leave empty if using local Ollama)
 OPENAI_API_KEY=your_openai_api_key_here
-OPENAI_MODEL=gpt-4o-mini
-EMBEDDING_MODEL=all-MiniLM-L6-v2
+LLM_PROVIDER=openai
+LLM_MODEL=gpt-4o-mini
 
-# Gmail Integration (Optional)
+# Gmail OAuth Setup (Optional)
 GMAIL_CLIENT_ID=your_google_client_id
 GMAIL_CLIENT_SECRET=your_google_client_secret
-GMAIL_REDIRECT_URI=http://localhost:8000/api/v1/gmail/callback
 
-# Secret Key & Security
+# Security Secret Key
 SECRET_KEY=super_secret_jwt_key_change_in_production
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=1440
 ```
 
 ---
 
 ## 📡 API Documentation
 
-FastAPI provides an interactive OpenAPI / Swagger UI out of the box at `http://localhost:8000/docs`.
+Interactive Swagger documentation is automatically generated at `http://localhost:8000/docs`.
 
-### Core Endpoint Summary
-
-| Category | Endpoint | Method | Description |
-| :--- | :--- | :--- | :--- |
-| **System** | `/api/v1/health` | `GET` | Health check endpoint |
-| **Resumes** | `/api/v1/resumes/upload` | `POST` | Upload PDF resume, extract text, run ATS check & embed in ChromaDB |
-| **Resumes** | `/api/v1/resumes/ats-check` | `POST` | Evaluate ATS compatibility score & get recommendations |
-| **Search** | `/api/v1/search/trigger` | `POST` | Run RAG & Preferences guided multi-country opportunity search |
-| **Search** | `/api/v1/search/opportunities`| `GET` | Fetch aggregated jobs, internships, and scholarships |
-| **Matching**| `/api/v1/matching/evaluate` | `POST` | Compute vector RAG semantic match between resume & job |
-| **Applications**| `/api/v1/applications` | `GET` / `POST` | List and track active user job applications |
-| **Auto Apply**| `/api/v1/auto-apply/send-email`| `POST` | Send CV directly via connected Gmail with message ID tracking |
-| **Gmail** | `/api/v1/auth/gmail/status` | `GET` | Get Gmail connection status & connected email |
-| **Gmail** | `/api/v1/auth/gmail/setup-smtp` | `POST` | Configure 16-character App Password SMTP credentials |
-| **Users** | `/api/v1/users/profile` | `PUT` | Save user profile, social links, target countries, & preferences |
-
----
-
-## 🧪 Testing & Verification
-
-Run backend unit and integration tests using `pytest`:
-
-```bash
-cd backend
-pytest -v
-```
-
----
-
-## 🗺️ Roadmap
-
-- [x] **Phase 1**: Core FastAPI backend architecture, database schemas, and Next.js UI integration.
-- [x] **Phase 2**: PDF parser engine, authentic ATS checker, and vector embeddings in ChromaDB.
-- [x] **Phase 3**: RAG & Preferences guided multi-country search aggregator & semantic matching engine.
-- [x] **Phase 4**: Interactive Country Autocomplete Search Box (1-10 Countries Max).
-- [x] **Phase 5**: Daily Application Goals Tracker & Gmail Auto-Apply email delivery proofs.
-- [x] **Phase 6**: Time-based history filters (Today / Monthly / Yearly).
-- [ ] **Phase 7**: Chrome / Firefox Extension for one-click job scraping directly from browser tabs.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please check out [CONTRIBUTING.md](file:///c:/Users/Personal/OneDrive/Desktop/Auto-Apply-AI/CONTRIBUTING.md) for details on setting up the project locally, guidelines, and how to find **Good First Issues**.
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/v1/resumes/upload` | `POST` | Upload PDF or DOCX resume file, extract text, run ATS check & save profile |
+| `/api/v1/resumes/profile` | `GET` | Retrieve stored candidate profile, summary, experience, & ATS metrics |
+| `/api/v1/search/trigger` | `POST` | Run multi-country opportunity search scan |
+| `/api/v1/search/opportunities`| `GET` | Fetch aggregated job and internship opportunities |
+| `/api/v1/users/settings` | `GET` / `PUT` | Manage API keys, LLM providers, and target preferences |
+| `/api/v1/applications` | `GET` / `POST` | Track and log submitted job application proofs |
 
 ---
 
