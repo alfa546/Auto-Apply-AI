@@ -281,7 +281,7 @@ export default function Dashboard() {
     async function checkGmailStatus() {
       try {
         const res = await fetch(`${API_BASE}/api/v1/auth/gmail/status`, {
-          headers: { "Authorization": "Bearer dev-mock-matcher_test_uid" }
+          headers: { "Authorization": "Bearer dev-mock-" }
         });
         if (res.ok) {
           const data = await res.json();
@@ -296,7 +296,7 @@ export default function Dashboard() {
     async function fetchUserSettings() {
       try {
         const res = await fetch(`${API_BASE}/api/v1/users/settings`, {
-          headers: { "Authorization": "Bearer dev-mock-matcher_test_uid" }
+          headers: { "Authorization": "Bearer dev-mock-" }
         });
         if (res.ok) {
           const data = await res.json();
@@ -329,7 +329,7 @@ export default function Dashboard() {
     async function fetchOpportunities() {
       try {
         const res = await fetch(`${API_BASE}/api/v1/search/opportunities?limit=50`, {
-          headers: { "Authorization": "Bearer dev-mock-matcher_test_uid" }
+          headers: { "Authorization": "Bearer dev-mock-" }
         });
         if (res.ok) {
           const data = await res.json();
@@ -343,7 +343,7 @@ export default function Dashboard() {
     async function fetchApplications() {
       try {
         const res = await fetch(`${API_BASE}/api/v1/applications`, {
-          headers: { "Authorization": "Bearer dev-mock-matcher_test_uid" }
+          headers: { "Authorization": "Bearer dev-mock-" }
         });
         if (res.ok) {
           const data = await res.json();
@@ -368,7 +368,7 @@ export default function Dashboard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer dev-mock-matcher_test_uid"
+          "Authorization": "Bearer dev-mock-"
         },
         body: JSON.stringify({})
       });
@@ -376,7 +376,7 @@ export default function Dashboard() {
         const data = await res.json();
         showToast(data.message || "Smart Job Search Agent completed multi-country scan!");
         const oppRes = await fetch(`${API_BASE}/api/v1/search/opportunities?limit=50`, {
-          headers: { "Authorization": "Bearer dev-mock-matcher_test_uid" }
+          headers: { "Authorization": "Bearer dev-mock-" }
         });
         if (oppRes.ok) {
           const oppData = await oppRes.json();
@@ -401,7 +401,7 @@ export default function Dashboard() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer dev-mock-matcher_test_uid"
+          "Authorization": "Bearer dev-mock-"
         },
         body: JSON.stringify({
           llm_provider: llmProvider,
@@ -437,7 +437,7 @@ export default function Dashboard() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer dev-mock-matcher_test_uid"
+          "Authorization": "Bearer dev-mock-"
         },
         body: JSON.stringify({
           email: userEmail,
@@ -480,7 +480,7 @@ export default function Dashboard() {
     try {
       const res = await fetch(`${API_BASE}/api/v1/resumes/upload`, {
         method: "POST",
-        headers: { "Authorization": "Bearer dev-mock-matcher_test_uid" },
+        headers: { "Authorization": "Bearer dev-mock-" },
         body: formData
       });
       if (res.ok) {
@@ -519,7 +519,7 @@ export default function Dashboard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer dev-mock-matcher_test_uid"
+          "Authorization": "Bearer dev-mock-"
         },
         body: JSON.stringify({ target_role: targetRoles[0] || "Full Stack Developer" })
       });
@@ -553,7 +553,7 @@ export default function Dashboard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer dev-mock-matcher_test_uid"
+          "Authorization": "Bearer dev-mock-"
         },
         body: JSON.stringify({ job_id: job.id })
       });
@@ -1855,7 +1855,7 @@ export default function Dashboard() {
                   onClick={async () => {
                     try {
                       const res = await fetch(`${API_BASE}/api/v1/auth/gmail/url`, {
-                        headers: { "Authorization": "Bearer dev-mock-matcher_test_uid" }
+                        headers: { "Authorization": "Bearer dev-mock-" }
                       });
                       if (res.ok) {
                         const data = await res.json();
@@ -1906,7 +1906,7 @@ export default function Dashboard() {
                         method: "POST",
                         headers: {
                           "Content-Type": "application/json",
-                          "Authorization": "Bearer dev-mock-matcher_test_uid"
+                          "Authorization": "Bearer dev-mock-"
                         },
                         body: JSON.stringify({ email: gmailEmail, app_password: smtpPassword })
                       });
