@@ -1,6 +1,7 @@
 import json
 import logging
 import httpx
+from fastapi import HTTPException, status
 from src.app.config import settings
 from src.app.services.llm_client import get_llm_headers_and_url, is_llm_configured
 
@@ -17,6 +18,8 @@ def evaluate_resume_ats(profile_data: dict, target_role: str = None) -> dict:
             feedback = evaluate_with_openai(profile_data, target_role)
             if feedback and "ats_score" in feedback:
                 return feedback
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(f"Failed to check ATS with LLM: {e}. Falling back to rule-based ATS.")
 
@@ -71,8 +74,9 @@ def evaluate_with_openai(profile_data: dict, target_role: str = None) -> dict:
                 content = content.replace("```", "").strip()
             return json.loads(content)
         else:
-            if response.status_code == 401:
-                logger.warning("LLM API key is invalid or unauthorized. Please check your settings.")
+            if response.status_code == 401 or response.status_code == 429:
+                logger.warning(f"LLM API key is invalid or quota reached (status {response.status_code}). Please check your settings.")
+                raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="API Limit Reached")
             else:
                 logger.warning(f"LLM ATS check failed with status code {response.status_code}.")
             raise Exception("LLM API error")

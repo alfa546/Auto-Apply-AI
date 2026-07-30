@@ -2,6 +2,7 @@ import re
 import json
 import logging
 import httpx
+from fastapi import HTTPException, status
 from src.app.config import settings
 from src.app.services.llm_client import get_llm_headers_and_url, is_llm_configured
 
@@ -20,6 +21,8 @@ def parse_resume_text(text: str) -> dict:
                 links_data = extract_contact_and_links(text)
                 parsed_data.update(links_data)
                 return parsed_data
+        except HTTPException:
+            raise
         except Exception as e:
             logger.error(f"Failed to parse resume with LLM: {e}. Falling back to rule-based parser.")
             
@@ -141,6 +144,9 @@ def parse_resume_with_openai(text: str) -> dict:
             content = result["choices"][0]["message"]["content"]
             return json.loads(content)
         else:
+            if response.status_code in [401, 429]:
+                logger.error(f"LLM API quota reached or invalid (status {response.status_code})")
+                raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="API Limit Reached")
             logger.error(f"LLM API call failed with status code {response.status_code}: {response.text}")
             raise Exception("LLM API error")
 

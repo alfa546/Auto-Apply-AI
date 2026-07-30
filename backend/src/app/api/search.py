@@ -47,6 +47,8 @@ async def trigger_search(
             "message": f"RAG & Preferences guided search completed. Discovered {new_jobs} new opportunities.",
             "new_opportunities_found": new_jobs
         }
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Search aggregation trigger failed: {e}", exc_info=True)
         raise HTTPException(
