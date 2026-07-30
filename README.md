@@ -236,7 +236,7 @@ To let the AI Agent send job applications directly from your email:
 1. In the dashboard top navigation bar, click **`🔑 API Vault`** or open the **Settings** tab.
 2. Under **Connected Gmail Account**, select **Gmail App Password (SMTP)**.
 3. Enter your Gmail address and a **16-character App Password** (generated via *Google Account > Security > 2-Step Verification > App Passwords*).
-4. Click **Connect via App Password**. All sent application emails will now appear directly in your official **Gmail "Sent"** folder!
+4. Click **Connect via App Password**. All sent application emails will now appear directly in your official **Gmail "Sent"** folder
 
 ---
 
