@@ -358,10 +358,39 @@ export default function Dashboard() {
       }
     }
 
+    async function fetchResumeProfile() {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/resumes/profile`, {
+          headers: { "Authorization": `Bearer dev-mock-${username}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.resume_url) setUploadedResume("Active Resume (Saved)");
+          setExtractedProfile(prev => ({
+            ...prev,
+            summary: data.summary || prev.summary,
+            skills: data.skills || prev.skills,
+            experience: data.experience || prev.experience,
+            education: data.education || prev.education,
+            projects: data.projects || prev.projects
+          }));
+          if (data.ats_score) {
+            setAtsMetrics(prev => ({
+              ...prev,
+              overall_score: data.ats_score
+            }));
+          }
+        }
+      } catch (err) {
+        console.log("No stored resume profile fetched.");
+      }
+    }
+
     checkGmailStatus();
     fetchUserSettings();
     fetchOpportunities();
     fetchApplications();
+    fetchResumeProfile();
   }, [isLoggedIn, username]);
 
   // Trigger Smart Job Search Agent

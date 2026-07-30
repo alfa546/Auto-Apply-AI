@@ -18,10 +18,8 @@ def evaluate_resume_ats(profile_data: dict, target_role: str = None) -> dict:
             feedback = evaluate_with_openai(profile_data, target_role)
             if feedback and "ats_score" in feedback:
                 return feedback
-        except HTTPException:
-            raise
         except Exception as e:
-            logger.error(f"Failed to check ATS with LLM: {e}. Falling back to rule-based ATS.")
+            logger.warning(f"LLM ATS check warning ({e}). Falling back to rule-based ATS evaluation.")
 
     return rule_based_ats(profile_data, target_role)
 
@@ -74,12 +72,8 @@ def evaluate_with_openai(profile_data: dict, target_role: str = None) -> dict:
                 content = content.replace("```", "").strip()
             return json.loads(content)
         else:
-            if response.status_code == 401 or response.status_code == 429:
-                logger.warning(f"LLM API key is invalid or quota reached (status {response.status_code}). Please check your settings.")
-                raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="API Limit Reached")
-            else:
-                logger.warning(f"LLM ATS check failed with status code {response.status_code}.")
-            raise Exception("LLM API error")
+            logger.warning(f"LLM ATS check returned status code {response.status_code}.")
+            return None
 
 def extract_skills_and_summary_from_text(raw_text: str) -> dict:
     """

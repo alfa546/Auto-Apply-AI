@@ -58,6 +58,7 @@ async def upload_resume(
         db.add(profile)
     
     profile.resume_url = file_url
+    profile.summary = parsed_info["summary"]
     profile.skills = parsed_info["skills"]
     profile.experience = parsed_info["experience"]
     profile.education = parsed_info["education"]
@@ -72,7 +73,7 @@ async def upload_resume(
         "filename": file.filename,
         "resume_url": file_url,
         "skills": profile.skills,
-        "summary": parsed_info["summary"],
+        "summary": profile.summary,
         "ats_score": profile.ats_score,
         "ats_suggestions": profile.ats_suggestions
     }
@@ -96,6 +97,7 @@ def get_resume_profile(
         
     return {
         "resume_url": profile.resume_url,
+        "summary": profile.summary,
         "skills": profile.skills,
         "experience": profile.experience,
         "education": profile.education,

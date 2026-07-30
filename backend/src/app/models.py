@@ -22,6 +22,7 @@ class Profile(Base):
     user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), unique=True, index=True)
     
     resume_url = Column(String, nullable=True) # Firebase Storage URL
+    summary = Column(String, nullable=True) # Executive Summary
     portfolio_url = Column(String, nullable=True)
     github_url = Column(String, nullable=True)
     other_url = Column(String, nullable=True)
@@ -93,6 +94,7 @@ class JobFound(Base):
     description = Column(String, nullable=True)
     url = Column(String, unique=True, index=True, nullable=False)
     company_email = Column(String, nullable=True) # Extracted HR Email
+    extracted_emails = Column(JSON, default=list) # List of all extracted emails
     salary = Column(String, nullable=True)
     source = Column(String, default="Adzuna") # "Adzuna", "Jooble", "Scraper", "Direct"
     opportunity_type = Column(String, default="job") # "job", "internship", "scholarship", "hackathon"
