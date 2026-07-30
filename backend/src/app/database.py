@@ -18,28 +18,30 @@ else:
 
 sqlite_url = "sqlite:///./auto_apply_local.db"
 
+engine = None
 fallback_to_sqlite = False
-if database_url:
-    SQLALCHEMY_DATABASE_URL = postgres_url
-    connect_args = {}
-else:
-    try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.settimeout(1.0)
-            s.connect((settings.POSTGRES_SERVER, int(settings.POSTGRES_PORT)))
-        SQLALCHEMY_DATABASE_URL = postgres_url
-        connect_args = {}
-    except Exception:
-        print("PostgreSQL is offline. Falling back to local SQLite database: auto_apply_local.db")
-        SQLALCHEMY_DATABASE_URL = sqlite_url
-        connect_args = {"check_same_thread": False}
-        fallback_to_sqlite = True
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    pool_pre_ping=True,
-    connect_args=connect_args
-)
+# Try connecting to PostgreSQL
+if database_url or (settings.POSTGRES_SERVER and settings.POSTGRES_SERVER != "localhost"):
+    try:
+        connect_args = {}
+        # Heroku Postgres requires sslmode=require for secure cloud connections
+        if "postgresql" in postgres_url and "localhost" not in postgres_url and "127.0.0.1" not in postgres_url:
+            connect_args = {"sslmode": "require"}
+            
+        test_engine = create_engine(postgres_url, pool_pre_ping=True, connect_args=connect_args)
+        with test_engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        engine = test_engine
+        SQLALCHEMY_DATABASE_URL = postgres_url
+        logger.info("Successfully connected to PostgreSQL database!")
+    except Exception as e:
+        logger.warning(f"PostgreSQL connection test failed ({e}). Falling back to local SQLite database.")
+
+if not engine:
+    SQLALCHEMY_DATABASE_URL = sqlite_url
+    engine = create_engine(sqlite_url, pool_pre_ping=True, connect_args={"check_same_thread": False})
+    fallback_to_sqlite = True
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

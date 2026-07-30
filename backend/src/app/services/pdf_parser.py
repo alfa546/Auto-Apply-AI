@@ -1,14 +1,30 @@
 import io
 import logging
+import zipfile
+import xml.etree.ElementTree as ET
 
 logger = logging.getLogger(__name__)
 
 def extract_text_from_pdf(pdf_bytes: bytes) -> str:
     """
-    Extracts text content from PDF binary data.
-    Uses pdfplumber primary and PyPDF2/pypdf as fallback.
+    Extracts text content from PDF or DOCX binary data.
+    Uses pdfplumber primary, PyPDF2 as fallback, and zipfile XML for DOCX.
     """
     text = ""
+    
+    # 0. Check if file is DOCX (ZIP format starting with PK magic bytes)
+    if pdf_bytes.startswith(b"PK"):
+        try:
+            with zipfile.ZipFile(io.BytesIO(pdf_bytes)) as z:
+                if "word/document.xml" in z.namelist():
+                    xml_content = z.read("word/document.xml")
+                    tree = ET.fromstring(xml_content)
+                    texts = [elem.text for elem in tree.iter() if elem.tag.endswith("}t") and elem.text]
+                    text = " ".join(texts).strip()
+                    if text:
+                        return text
+        except Exception as e:
+            logger.warning(f"DOCX extraction warning: {e}")
     
     # 1. Try pdfplumber
     try:
