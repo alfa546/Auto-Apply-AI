@@ -151,7 +151,12 @@ export default function Dashboard() {
   const [dailyJobs, setDailyJobs] = useState<any[]>([]);
   const [applications, setApplications] = useState<any[]>([]);
   const [isTriggeringSearch, setIsTriggeringSearch] = useState(false);
-  
+
+  // Mock Login State
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [mockLoginInput, setMockLoginInput] = useState("");
+
   // Time-based History Filter State ("today" | "monthly" | "yearly" | "all")
   const [historyFilter, setHistoryFilter] = useState<"today" | "monthly" | "yearly" | "all">("today");
 
@@ -261,8 +266,18 @@ export default function Dashboard() {
     );
   };
 
-  // Fetch status & live data from backend APIs on mount
   useEffect(() => {
+    const storedUsername = localStorage.getItem("mock_username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  // Fetch status & live data from backend APIs on mount or when logged in
+  useEffect(() => {
+    if (!isLoggedIn || !username) return;
+
     async function checkGmailStatus() {
       try {
         const res = await fetch(`${API_BASE}/api/v1/auth/gmail/status`, {
@@ -343,7 +358,7 @@ export default function Dashboard() {
     fetchUserSettings();
     fetchOpportunities();
     fetchApplications();
-  }, []);
+  }, [isLoggedIn, username]);
 
   // Trigger Smart Job Search Agent
   const handleTriggerSearchAgent = async () => {
@@ -599,6 +614,47 @@ export default function Dashboard() {
       (job.opportunity_type === "internship" && selectedEmpTypes.includes("Internships & Traineeships"));
     return matchesEmpType;
   });
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-[#090a0f] bg-grid-omni bg-coral-glow text-slate-100 font-sans flex items-center justify-center p-4">
+        <div className="glass-panel p-8 rounded-2xl max-w-md w-full text-center space-y-6 border border-white/10 shadow-2xl relative overflow-hidden">
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="relative z-10">
+            <SparklesIcon className="w-16 h-16 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-2">Login to AutoApply AI</h2>
+            <p className="text-slate-400 text-sm mb-6">Enter a unique username to access your isolated workspace. This keeps your API keys and data private.</p>
+            <input
+              type="text"
+              value={mockLoginInput}
+              onChange={(e) => setMockLoginInput(e.target.value)}
+              className="w-full bg-slate-900/80 border border-slate-700/50 focus:border-rose-500/50 focus:ring-1 focus:ring-rose-500/50 outline-none text-white rounded-xl px-4 py-3 mb-4 transition-all placeholder:text-slate-500"
+              placeholder="Username (e.g. ali123)"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && mockLoginInput.trim()) {
+                  localStorage.setItem("mock_username", mockLoginInput.trim());
+                  setUsername(mockLoginInput.trim());
+                  setIsLoggedIn(true);
+                }
+              }}
+            />
+            <button
+              onClick={() => {
+                if (mockLoginInput.trim()) {
+                  localStorage.setItem("mock_username", mockLoginInput.trim());
+                  setUsername(mockLoginInput.trim());
+                  setIsLoggedIn(true);
+                }
+              }}
+              className="w-full btn-red-glow text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all"
+            >
+              Enter Workspace
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#090a0f] bg-grid-omni bg-coral-glow text-slate-100 font-sans selection:bg-rose-500 selection:text-white">
