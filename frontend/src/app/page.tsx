@@ -291,6 +291,20 @@ export default function Dashboard() {
           if (data.adzuna_app_id) setAdzunaAppId(data.adzuna_app_id);
           if (data.adzuna_app_key) setAdzunaAppKey(data.adzuna_app_key);
           if (data.jooble_api_key) setJoobleApiKey(data.jooble_api_key);
+          if (data.target_roles?.length) setTargetRoles(data.target_roles);
+          if (data.target_countries?.length) setSelectedCountries(data.target_countries);
+          if (data.work_mode_preference) setWorkModePref(data.work_mode_preference);
+          if (data.employment_types?.length) setSelectedEmpTypes(data.employment_types);
+          if (data.salary_preference) setSalaryPref(data.salary_preference);
+          if (data.experience_level) setExperiencePref(data.experience_level);
+          if (data.visa_sponsorship !== undefined) setVisaSponsorshipPref(data.visa_sponsorship ? "Visa Sponsorship Required" : "No Visa Needed (Authorized Work Permit)");
+          if (data.daily_job_goal) setDailyJobGoal(data.daily_job_goal);
+          if (data.daily_internship_goal) setDailyInternshipGoal(data.daily_internship_goal);
+          if (data.auto_fulfill_enabled !== undefined) setAutoFulfillEnabled(data.auto_fulfill_enabled);
+          if (data.email) setUserEmail(data.email);
+          if (data.portfolio_url) setPortfolioUrl(data.portfolio_url);
+          if (data.github_url) setGithubUrl(data.github_url);
+          if (data.other_url) setOtherUrl(data.other_url);
         }
       } catch (err) {
         console.log("Local API settings initialized.");
