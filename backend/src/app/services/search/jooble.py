@@ -14,8 +14,8 @@ class JoobleProvider(BaseSearchProvider):
         api_key = settings.JOOBLE_API_KEY
 
         if not api_key or api_key == "mock":
-            logger.info("Jooble API key not configured. Returning fallback mock jobs.")
-            return self._get_mock_jobs(query, country)
+            logger.info("Jooble API key not configured.")
+            return []
 
         url = f"https://jooble.org/api/{api_key}"
         payload = {
@@ -47,8 +47,7 @@ class JoobleProvider(BaseSearchProvider):
         except Exception as e:
             logger.error(f"Jooble API request failed: {e}")
 
-        # Fallback to mock on API error
-        return self._get_mock_jobs(query, country)
+        return []
 
     def _get_mock_jobs(self, query: str, country: str) -> List[Dict]:
         """

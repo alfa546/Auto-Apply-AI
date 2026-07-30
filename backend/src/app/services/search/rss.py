@@ -31,14 +31,7 @@ class RSSProvider(BaseSearchProvider):
                     if response.status_code == 200:
                         results.extend(self._parse_rss_content(response.text, query, feed["opportunity_type"], feed["source"]))
                 except Exception as e:
-                    logger.warning(f"Failed to fetch RSS feed {feed['url']}: {e}. Using fallback mock listings.")
-                    # Return mock data on failure to keep local execution alive and green
-                    results.extend(self._get_mock_opportunities(query, feed["opportunity_type"], feed["source"]))
-
-        # If no results (e.g. offline/no match), fill in with mock data
-        if not results:
-            for feed in self.feeds:
-                results.extend(self._get_mock_opportunities(query, feed["opportunity_type"], feed["source"]))
+                    logger.warning(f"Failed to fetch RSS feed {feed['url']}: {e}.")
 
         return results
 

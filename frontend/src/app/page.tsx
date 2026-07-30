@@ -179,16 +179,12 @@ export default function Dashboard() {
   const [portfolioUrl, setPortfolioUrl] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [otherUrl, setOtherUrl] = useState("");
-  const [targetRoles, setTargetRoles] = useState(["Full Stack Developer", "Python AI Engineer"]);
+  const [targetRoles, setTargetRoles] = useState<string[]>([]);
 
   // Country Search Box & Selected Target Countries State
   const [countryQuery, setCountryQuery] = useState("");
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
-  const [selectedCountries, setSelectedCountries] = useState<string[]>([
-    "United States 🇺🇸",
-    "Canada 🇨🇦",
-    "Germany 🇩🇪"
-  ]);
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
 
   // International Career Preferences State
   const [workModePref, setWorkModePref] = useState<string>("Fully Remote (Worldwide)");
@@ -591,13 +587,13 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
+    <div className="min-h-screen bg-slate-950 bg-grid-pattern bg-radial-glow text-slate-100 font-sans selection:bg-cyan-500 selection:text-slate-950">
       {/* Toast Notification */}
       {notification && (
-        <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-lg shadow-xl text-sm font-medium border flex items-center gap-2 ${
+        <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-2xl text-sm font-medium border flex items-center gap-2 backdrop-blur-md animate-bounce ${
           notification.type === "success" 
-            ? "bg-emerald-950/90 text-emerald-200 border-emerald-500/50" 
-            : "bg-red-950/90 text-red-200 border-red-500/50"
+            ? "bg-emerald-950/90 text-emerald-300 border-emerald-500/50 shadow-emerald-500/20" 
+            : "bg-rose-950/90 text-rose-300 border-rose-500/50 shadow-rose-500/20"
         }`}>
           <CheckCircleIcon />
           <span>{notification.message}</span>
@@ -605,29 +601,29 @@ export default function Dashboard() {
       )}
 
       {/* Top Navbar */}
-      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-40">
+      <header className="border-b border-white/10 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-40 shadow-2xl shadow-purple-950/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-1.5 bg-slate-900 rounded-xl border border-sky-500/30 shadow-lg shadow-sky-500/10">
+            <div className="p-1.5 bg-gradient-to-br from-cyan-500/20 via-purple-500/20 to-pink-500/20 rounded-xl border border-cyan-500/40 shadow-lg shadow-cyan-500/20">
               <img src="/logo.png" alt="AutoApplyAI Logo" className="w-8 h-8 rounded-lg object-contain" />
             </div>
             <div>
-              <h1 className="text-lg font-bold bg-gradient-to-r from-sky-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent">
+              <h1 className="text-lg font-extrabold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight">
                 Auto-Apply AI Platform
               </h1>
-              <p className="text-xs text-slate-400">AI Job Matcher, ATS Evaluator & Direct Gmail Auto-Apply Engine</p>
+              <p className="text-xs text-slate-400 font-medium">Autonomous Multi-Agent RAG Search & Gmail Auto-Apply Engine</p>
             </div>
           </div>
 
           {/* Top Right Header Controls */}
           <div className="flex items-center gap-3">
             {isGmailConnected && (
-              <div className="flex items-center gap-2 bg-emerald-950/40 border border-emerald-500/30 px-3 py-1.5 rounded-full text-xs text-emerald-300">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Gmail: <strong>{gmailEmail}</strong></span>
+              <div className="flex items-center gap-2 bg-emerald-950/60 border border-emerald-500/40 px-3.5 py-1.5 rounded-full text-xs text-emerald-300 shadow-md shadow-emerald-500/10">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>Gmail: <strong className="text-emerald-200">{gmailEmail}</strong></span>
                 <button 
                   onClick={() => setIsGmailConnected(false)}
-                  className="hover:text-red-400 ml-1 font-semibold text-slate-400"
+                  className="hover:text-rose-400 ml-1.5 font-bold text-slate-400 transition-colors"
                   title="Disconnect Gmail"
                 >
                   ✕
@@ -637,10 +633,10 @@ export default function Dashboard() {
 
             <button
               onClick={() => setActiveTab("settings")}
-              className="text-xs bg-slate-900 hover:bg-slate-800 border border-amber-500/30 text-amber-300 px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition-all shadow-md font-semibold"
+              className="text-xs bg-slate-900/90 hover:bg-slate-800 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 px-4 py-2 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-cyan-500/10 font-semibold"
             >
               <KeyIcon />
-              <span>API Settings</span>
+              <span>API Vault</span>
             </button>
           </div>
         </div>
@@ -649,43 +645,43 @@ export default function Dashboard() {
       {/* Main Layout Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation Tabs */}
-        <div className="flex border-b border-slate-800 mb-8 overflow-x-auto">
+        <div className="flex border-b border-white/10 mb-8 overflow-x-auto gap-2">
           <button
             onClick={() => setActiveTab("jobs")}
-            className={`pb-4 px-6 font-medium text-sm border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
+            className={`pb-3.5 px-6 font-semibold text-sm border-b-2 whitespace-nowrap transition-all flex items-center gap-2.5 rounded-t-xl ${
               activeTab === "jobs"
-                ? "border-purple-500 text-purple-400"
-                : "border-transparent text-slate-400 hover:text-slate-200"
+                ? "border-cyan-400 text-cyan-300 bg-cyan-950/20 shadow-[0_4px_20px_-4px_rgba(6,182,212,0.3)]"
+                : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
             }`}
           >
             <DashboardIcon />
-            <span>Daily Jobs & Opportunities</span>
-            <span className="ml-1 bg-purple-900/50 text-purple-300 text-xs px-2 py-0.5 rounded-full border border-purple-500/30">
+            <span>Daily Opportunities</span>
+            <span className="ml-1 bg-cyan-950/80 text-cyan-300 text-xs px-2.5 py-0.5 rounded-full border border-cyan-500/30 font-mono">
               {filteredDailyJobs.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveTab("history")}
-            className={`pb-4 px-6 font-medium text-sm border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
+            className={`pb-3.5 px-6 font-semibold text-sm border-b-2 whitespace-nowrap transition-all flex items-center gap-2.5 rounded-t-xl ${
               activeTab === "history"
-                ? "border-purple-500 text-purple-400"
-                : "border-transparent text-slate-400 hover:text-slate-200"
+                ? "border-purple-400 text-purple-300 bg-purple-950/20 shadow-[0_4px_20px_-4px_rgba(168,85,247,0.3)]"
+                : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
             }`}
           >
             <GmailIcon />
             <span>Applications & Gmail Proofs</span>
-            <span className="ml-1 bg-emerald-900/50 text-emerald-300 border border-emerald-500/30 text-xs px-2 py-0.5 rounded-full font-mono">
+            <span className="ml-1 bg-purple-950/80 text-purple-300 border border-purple-500/30 text-xs px-2.5 py-0.5 rounded-full font-mono">
               {applications.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveTab("profile")}
-            className={`pb-4 px-6 font-medium text-sm border-b-2 whitespace-nowrap transition-all flex items-center gap-2 ${
+            className={`pb-3.5 px-6 font-semibold text-sm border-b-2 whitespace-nowrap transition-all flex items-center gap-2.5 rounded-t-xl ${
               activeTab === "profile"
-                ? "border-purple-500 text-purple-400"
-                : "border-transparent text-slate-400 hover:text-slate-200"
+                ? "border-pink-400 text-pink-300 bg-pink-950/20 shadow-[0_4px_20px_-4px_rgba(236,72,153,0.3)]"
+                : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
             }`}
           >
             <UserIcon />
@@ -696,16 +692,19 @@ export default function Dashboard() {
         {/* Tab 1: Daily Jobs & Opportunities Feed */}
         {activeTab === "jobs" && (
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/50 border border-slate-800 p-4 rounded-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-5 rounded-2xl border border-white/10">
               <div>
-                <h2 className="text-base font-semibold text-slate-100">Recommended Daily Opportunities</h2>
-                <p className="text-xs text-slate-400">Extracted company HR contact emails matched against your candidate profile & active preferences.</p>
+                <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
+                  <span>Recommended Opportunities</span>
+                  <span className="bg-cyan-950/80 text-cyan-300 border border-cyan-500/30 text-[10px] uppercase font-bold px-2 py-0.5 rounded">Live Scan</span>
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">Extracted HR emails matched against your candidate skills & selected target countries.</p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={handleTriggerSearchAgent}
                   disabled={isTriggeringSearch}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-xs py-2 px-3.5 rounded-lg shadow-md flex items-center gap-1.5 transition-all disabled:opacity-50"
+                  className="bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-600 hover:from-cyan-400 hover:via-indigo-400 hover:to-purple-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-lg shadow-cyan-500/20 flex items-center gap-2 transition-all disabled:opacity-50"
                 >
                   {isTriggeringSearch ? (
                     <>
@@ -720,29 +719,30 @@ export default function Dashboard() {
                   )}
                 </button>
 
-                <div className="bg-slate-950 border border-emerald-500/30 px-3 py-1 rounded-lg text-xs text-emerald-300 flex items-center gap-1.5">
+                <div className="bg-slate-950/80 border border-emerald-500/40 px-3.5 py-1.5 rounded-xl text-xs text-emerald-300 flex items-center gap-2 shadow-inner">
                   <GlobeIcon />
-                  <span>Target Countries: <strong>{selectedCountries.length} Active</strong></span>
+                  <span>Target Countries: <strong className="text-emerald-200 font-mono">{selectedCountries.length} Active</strong></span>
                 </div>
               </div>
             </div>
 
             <div className="grid gap-4">
               {filteredDailyJobs.length === 0 ? (
-                <div className="bg-slate-900/50 border border-slate-800 p-12 rounded-2xl text-center space-y-4 shadow-xl">
-                  <div className="w-14 h-14 bg-purple-950/60 border border-purple-500/30 rounded-2xl flex items-center justify-center mx-auto text-purple-400">
+                <div className="glass-panel p-12 rounded-3xl text-center space-y-5 shadow-2xl border border-white/10 relative overflow-hidden">
+                  <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/40 rounded-2xl flex items-center justify-center mx-auto text-cyan-300 shadow-lg shadow-cyan-500/10">
                     <SparklesIcon />
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="text-base font-bold text-slate-100">No Opportunities Fetched Yet</h3>
-                    <p className="text-xs text-slate-400 max-w-md mx-auto">
-                      Click <strong>"Run Search Agent"</strong> or upload your PDF resume to start scanning your target countries for matching roles!
+                  <div className="space-y-1.5 max-w-md mx-auto relative z-10">
+                    <h3 className="text-lg font-bold text-slate-100">No Opportunities Fetched Yet</h3>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Click <strong>"Run Search Agent"</strong> or upload your PDF resume to start scanning target countries for matching roles in real time!
                     </p>
                   </div>
                   <button
                     onClick={handleTriggerSearchAgent}
                     disabled={isTriggeringSearch}
-                    className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-purple-900/30 inline-flex items-center gap-2 transition-all"
+                    className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold px-6 py-3 rounded-2xl text-xs shadow-xl shadow-cyan-500/20 inline-flex items-center gap-2 transition-all relative z-10"
                   >
                     <SparklesIcon />
                     <span>⚡ Run Smart Search Agent Now</span>

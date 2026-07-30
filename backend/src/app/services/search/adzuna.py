@@ -15,8 +15,8 @@ class AdzunaProvider(BaseSearchProvider):
         app_key = settings.ADZUNA_APP_KEY
 
         if not app_id or not app_key or app_id == "mock" or app_key == "mock":
-            logger.info("Adzuna API credentials not configured. Returning fallback mock jobs.")
-            return self._get_mock_jobs(query, country)
+            logger.info("Adzuna API credentials not configured.")
+            return []
 
         url = f"https://api.adzuna.com/v1/api/jobs/{country.lower()}/search/1"
         params = {
@@ -55,8 +55,7 @@ class AdzunaProvider(BaseSearchProvider):
         except Exception as e:
             logger.error(f"Adzuna API request failed: {e}")
 
-        # Fallback to mock on API error
-        return self._get_mock_jobs(query, country)
+        return []
 
     def _get_mock_jobs(self, query: str, country: str) -> List[Dict]:
         """
