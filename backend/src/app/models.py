@@ -99,6 +99,7 @@ class JobFound(Base):
     source = Column(String, default="Adzuna") # "Adzuna", "Jooble", "Scraper", "Direct"
     opportunity_type = Column(String, default="job") # "job", "internship", "scholarship", "hackathon"
     match_score = Column(Integer, default=85)
+    raw_data = Column(JSON, default=dict) # Raw scraper payload
     found_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
