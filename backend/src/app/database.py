@@ -19,17 +19,21 @@ else:
 sqlite_url = "sqlite:///./auto_apply_local.db"
 
 fallback_to_sqlite = False
-try:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.settimeout(1.0)
-        s.connect((settings.POSTGRES_SERVER, int(settings.POSTGRES_PORT)))
+if database_url:
     SQLALCHEMY_DATABASE_URL = postgres_url
     connect_args = {}
-except Exception:
-    print("PostgreSQL is offline. Falling back to local SQLite database: auto_apply_local.db")
-    SQLALCHEMY_DATABASE_URL = sqlite_url
-    connect_args = {"check_same_thread": False}
-    fallback_to_sqlite = True
+else:
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(1.0)
+            s.connect((settings.POSTGRES_SERVER, int(settings.POSTGRES_PORT)))
+        SQLALCHEMY_DATABASE_URL = postgres_url
+        connect_args = {}
+    except Exception:
+        print("PostgreSQL is offline. Falling back to local SQLite database: auto_apply_local.db")
+        SQLALCHEMY_DATABASE_URL = sqlite_url
+        connect_args = {"check_same_thread": False}
+        fallback_to_sqlite = True
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
@@ -78,10 +82,11 @@ def sync_sqlite_schema(db_engine):
     except Exception as e:
         logger.warning(f"SQLite dynamic schema sync warning: {e}")
 
+from src.app.models import User, Profile, UserSettings, JobFound, Application, EmailInteraction, CustomCoverLetter
+Base.metadata.create_all(bind=engine)
+
 # If using SQLite fallback, ensure tables are created & synced automatically on startup
 if fallback_to_sqlite:
-    from src.app.models import User, Profile, UserSettings, JobFound, Application, EmailInteraction, CustomCoverLetter
-    Base.metadata.create_all(bind=engine)
     sync_sqlite_schema(engine)
 
 def get_db():
