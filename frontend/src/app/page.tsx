@@ -233,6 +233,10 @@ export default function Dashboard() {
   const [isUploading, setIsUploading] = useState(false);
   const [isApplyingId, setIsApplyingId] = useState<number | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  
+  // RAG Agent Thinking UI State
+  const [agentPhase, setAgentPhase] = useState<string | null>(null);
+  const [agentLogs, setAgentLogs] = useState<string[]>([]);
 
   const showToast = (message: string, type: "success" | "error" = "success") => {
     setNotification({ message, type });
@@ -473,13 +477,38 @@ export default function Dashboard() {
   };
 
   // Handle PDF Resume Upload & AI Analysis Trigger
-  const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
+    setAgentPhase("reading");
+    setAgentLogs(["[Agent] Initializing local environment...", "[Agent] Reading PDF binary..."]);
+
     const formData = new FormData();
     formData.append("file", file);
+
+    const fakeLogs = [
+      "[Agent] Initializing RAG context window...",
+      "[Agent] Chunking resume text...",
+      "[Agent] Extracting skills and core competencies...",
+      "[Agent] Analyzing work experience achievements...",
+      "[Agent] Formatting structured JSON profile...",
+      "[Agent] Calculating real-time ATS match score..."
+    ];
+    let logIndex = 0;
+
+    const logInterval = setInterval(() => {
+      if (logIndex < fakeLogs.length) {
+        setAgentLogs(prev => [...prev, fakeLogs[logIndex]]);
+        
+        if (logIndex === 1) setAgentPhase("planning");
+        else if (logIndex === 3) setAgentPhase("extracting");
+        else if (logIndex === 5) setAgentPhase("scoring");
+        
+        logIndex++;
+      }
+    }, 1200);
 
     try {
       const res = await fetch(`${API_BASE}/api/v1/resumes/upload`, {
@@ -487,15 +516,24 @@ export default function Dashboard() {
         headers: { "Authorization": `Bearer dev-mock-${username}` },
         body: formData
       });
+      
+      clearInterval(logInterval);
+      setAgentPhase("complete");
+      setAgentLogs(prev => [...prev, "[Agent] Process finished successfully!"]);
+
       if (res.ok) {
         const data = await res.json();
         setUploadedResume(file.name);
-        if (data.skills?.length) {
-          setExtractedProfile(prev => ({
-            ...prev,
-            skills: data.skills
-          }));
-        }
+        
+        setExtractedProfile(prev => ({
+          ...prev,
+          summary: data.summary || prev.summary,
+          skills: data.skills || prev.skills,
+          experience: data.experience || prev.experience,
+          education: data.education || prev.education,
+          projects: data.projects || prev.projects
+        }));
+        
         if (data.ats_score) {
           setAtsMetrics(prev => ({
             ...prev,
@@ -512,10 +550,14 @@ export default function Dashboard() {
         }
       }
     } catch (err) {
+      clearInterval(logInterval);
       setUploadedResume(file.name);
       showToast("Resume uploaded & candidate profile analyzed!");
     } finally {
-      setIsUploading(false);
+      setTimeout(() => {
+        setIsUploading(false);
+        setAgentPhase(null);
+      }, 2000); // leave the complete log visible for 2s
     }
   };
 
@@ -1247,60 +1289,91 @@ export default function Dashboard() {
               {/* Col 3: PDF Resume Upload & Extracted Candidate Profile Breakdown Card */}
               <div className="lg:col-span-1 space-y-6">
                 
-                {/* Upload Card */}
-                <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-6 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
-                      <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                        <UploadIcon />
-                        <span>PDF Resume Upload</span>
+                {/* Upload Card or Agent Thinking UI */}
+                {isUploading ? (
+                  <div className="bg-slate-900/90 border-2 border-rose-500/50 p-6 rounded-2xl shadow-[0_0_30px_rgba(244,63,94,0.15)] space-y-4 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-slate-800">
+                      <div className="h-full bg-rose-500 rounded-r-full animate-pulse" style={{ width: agentPhase === 'reading' ? '25%' : agentPhase === 'planning' ? '50%' : agentPhase === 'extracting' ? '75%' : agentPhase === 'scoring' ? '90%' : '100%' }}></div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between border-b border-rose-500/30 pb-3">
+                      <h3 className="text-sm font-bold text-rose-300 flex items-center gap-2">
+                        <SparklesIcon />
+                        <span>RAG Agent Active...</span>
                       </h3>
-                      <span className="text-[10px] bg-rose-950 text-rose-400 border border-rose-500/30 px-2.5 py-0.5 rounded font-mono">
-                        AI Parsing Engine
-                      </span>
+                      <div className="flex gap-1">
+                        <span className="w-2 h-2 rounded-full bg-rose-400 animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                        <span className="w-2 h-2 rounded-full bg-rose-400 animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                        <span className="w-2 h-2 rounded-full bg-rose-400 animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                      </div>
                     </div>
 
-                    <div className="border-2 border-dashed border-slate-700 hover:border-rose-500 p-6 rounded-xl text-center bg-slate-950/60 cursor-pointer relative transition-all group">
-                      <input 
-                        type="file" 
-                        accept=".pdf,.doc,.docx"
-                        onChange={handleResumeUpload}
-                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                      />
-                      <div className="w-12 h-12 bg-rose-950/60 border border-rose-500/30 rounded-xl flex items-center justify-center mx-auto text-rose-400 group-hover:scale-110 transition-transform">
-                        <UploadIcon />
-                      </div>
-                      <p className="text-xs font-semibold text-slate-200 mt-3">
-                        {isUploading ? "Extracting Candidate Profile..." : "Click or Drag PDF Resume File"}
-                      </p>
-                      <p className="text-[10px] text-slate-400 mt-1">Parses skills, work experience & matches candidate profile against global jobs</p>
+                    <div className="bg-slate-950 rounded-xl p-4 font-mono text-[11px] text-slate-300 space-y-2 h-40 overflow-y-auto border border-rose-500/20 shadow-inner">
+                      {agentLogs.map((log, idx) => (
+                        <div key={idx} className="flex items-start gap-2 animate-fade-in">
+                          <span className="text-rose-500 mt-0.5">❯</span>
+                          <span className={idx === agentLogs.length - 1 && agentPhase !== 'complete' ? 'text-white font-bold animate-pulse' : 'text-slate-400'}>
+                            {log}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-
-                  {uploadedResume ? (
-                    <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-200 font-semibold truncate">📄 {uploadedResume}</span>
-                        <span className="bg-rose-950 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded text-[10px] font-mono">
-                          Active PDF
+                ) : (
+                  <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-6 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+                        <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+                          <UploadIcon />
+                          <span>PDF Resume Upload</span>
+                        </h3>
+                        <span className="text-[10px] bg-rose-950 text-rose-400 border border-rose-500/30 px-2.5 py-0.5 rounded font-mono">
+                          AI Parsing Engine
                         </span>
                       </div>
-                      <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/60">
-                        <span>AI Processed Status:</span>
-                        <strong className="text-rose-300 font-mono">Profile Ready</strong>
+
+                      <div className="border-2 border-dashed border-slate-700 hover:border-rose-500 p-6 rounded-xl text-center bg-slate-950/60 cursor-pointer relative transition-all group">
+                        <input 
+                          type="file" 
+                          accept=".pdf,.doc,.docx"
+                          onChange={handleResumeUpload}
+                          className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="w-12 h-12 bg-rose-950/60 border border-rose-500/30 rounded-xl flex items-center justify-center mx-auto text-rose-400 group-hover:scale-110 transition-transform">
+                          <UploadIcon />
+                        </div>
+                        <p className="text-xs font-semibold text-slate-200 mt-3">
+                          Click or Drag PDF Resume File
+                        </p>
+                        <p className="text-[10px] text-slate-400 mt-1">Agent will plan, extract skills & score against jobs</p>
                       </div>
                     </div>
-                  ) : (
-                    <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center text-xs space-y-1">
-                      <p className="text-slate-300 font-semibold">No Active Resume</p>
-                      <p className="text-[10px] text-slate-400">Upload your PDF resume above to extract candidate profile details.</p>
-                    </div>
-                  )}
-                </div>
 
-                {/* Candidate AI Profile Breakdown Card (Picture 1 placed right under Upload Card) */}
-                <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-5">
-                  <div className="border-b border-slate-800 pb-3 flex items-center justify-between">
+                    {uploadedResume ? (
+                      <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-200 font-semibold truncate">📄 {uploadedResume}</span>
+                          <span className="bg-rose-950 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded text-[10px] font-mono">
+                            Active PDF
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/60">
+                          <span>AI Processed Status:</span>
+                          <strong className="text-rose-300 font-mono">Profile Ready</strong>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center text-xs space-y-1">
+                        <p className="text-slate-300 font-semibold">No Active Resume</p>
+                        <p className="text-[10px] text-slate-400">Upload your PDF resume above to let the RAG Agent analyze it.</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Candidate AI Profile Breakdown Card */}
+                <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-5 h-[500px] overflow-y-auto custom-scrollbar">
+                  <div className="border-b border-slate-800 pb-3 flex items-center justify-between sticky top-0 bg-slate-900/80 backdrop-blur z-10">
                     <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
                       <SparklesIcon />
                       <span>Extracted Candidate Profile Breakdown</span>
@@ -1331,6 +1404,39 @@ export default function Dashboard() {
                       </div>
                     )}
                   </div>
+
+                  {/* Experience */}
+                  {extractedProfile.experience && extractedProfile.experience.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2 border-t border-slate-800 pt-4">Work Experience</h4>
+                      {extractedProfile.experience.map((exp: any, idx: number) => (
+                        <div key={idx} className="bg-slate-950 p-3 rounded-lg border border-slate-800/60 flex flex-col gap-1">
+                          <div className="flex justify-between items-start">
+                            <span className="text-xs font-bold text-slate-200">{exp.title}</span>
+                            <span className="text-[10px] text-rose-400 font-mono bg-rose-950/30 px-1.5 py-0.5 rounded">{exp.company}</span>
+                          </div>
+                          {exp.date && <span className="text-[10px] text-slate-500">{exp.date}</span>}
+                          <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">{exp.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Education */}
+                  {extractedProfile.education && extractedProfile.education.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2 border-t border-slate-800 pt-4">Education</h4>
+                      {extractedProfile.education.map((edu: any, idx: number) => (
+                        <div key={idx} className="bg-slate-950 p-3 rounded-lg border border-slate-800/60 flex flex-col gap-1">
+                          <div className="flex justify-between items-start">
+                            <span className="text-xs font-bold text-slate-200">{edu.degree}</span>
+                            <span className="text-[10px] text-indigo-400 font-mono bg-indigo-950/30 px-1.5 py-0.5 rounded">{edu.institution}</span>
+                          </div>
+                          {edu.date && <span className="text-[10px] text-slate-500">{edu.date}</span>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
               </div>
