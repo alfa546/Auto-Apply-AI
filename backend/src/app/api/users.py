@@ -30,6 +30,22 @@ class SettingsUpdateRequest(BaseModel):
     jooble_api_key: Optional[str] = None
     target_countries: Optional[List[str]] = None
 
+class ProfileUpdateRequest(BaseModel):
+    email: Optional[str] = None
+    portfolio_url: Optional[str] = None
+    github_url: Optional[str] = None
+    other_url: Optional[str] = None
+    target_roles: Optional[List[str]] = None
+    target_countries: Optional[List[str]] = None
+    work_mode_preference: Optional[str] = None
+    employment_types: Optional[List[str]] = None
+    salary_preference: Optional[str] = None
+    experience_level: Optional[str] = None
+    visa_sponsorship: Optional[bool] = None
+    daily_job_goal: Optional[int] = None
+    daily_internship_goal: Optional[int] = None
+    auto_fulfill_enabled: Optional[bool] = None
+
 @router.get("/me")
 def get_me(current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
     """
@@ -127,6 +143,60 @@ def update_user_settings(
 
     db.commit()
     return {"status": "success", "message": "API keys and integration settings saved successfully!"}
+
+@router.put("/profile")
+def update_user_profile(
+    payload: ProfileUpdateRequest,
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Update and save user profile and career preferences.
+    """
+    uid = current_user.get("uid", "dev-mock-matcher_test_uid")
+    
+    # Update User Profile
+    profile = db.query(Profile).filter(Profile.user_id == uid).first()
+    if not profile:
+        profile = Profile(user_id=uid)
+        db.add(profile)
+        
+    if payload.portfolio_url is not None:
+        profile.portfolio_url = payload.portfolio_url
+    if payload.github_url is not None:
+        profile.github_url = payload.github_url
+    if payload.other_url is not None:
+        profile.other_url = payload.other_url
+    if payload.employment_types is not None:
+        profile.employment_types = payload.employment_types
+
+    # Update User Settings
+    settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
+    if not settings:
+        settings = UserSettings(user_id=uid)
+        db.add(settings)
+        
+    if payload.target_roles is not None:
+        settings.target_roles = payload.target_roles
+    if payload.target_countries is not None:
+        settings.preferred_countries = payload.target_countries
+    if payload.work_mode_preference is not None:
+        settings.work_mode_preference = payload.work_mode_preference
+    if payload.salary_preference is not None:
+        settings.min_salary_preference = payload.salary_preference
+    if payload.experience_level is not None:
+        settings.experience_level = payload.experience_level
+    if payload.visa_sponsorship is not None:
+        settings.visa_sponsorship_required = payload.visa_sponsorship
+    if payload.daily_job_goal is not None:
+        settings.daily_job_goal = payload.daily_job_goal
+    if payload.daily_internship_goal is not None:
+        settings.daily_internship_goal = payload.daily_internship_goal
+    if payload.auto_fulfill_enabled is not None:
+        settings.auto_fulfill_enabled = payload.auto_fulfill_enabled
+
+    db.commit()
+    return {"status": "success", "message": "Profile and preferences updated successfully!"}
 
 @router.post("/resume")
 async def upload_resume(

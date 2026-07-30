@@ -71,7 +71,10 @@ def evaluate_with_openai(profile_data: dict, target_role: str = None) -> dict:
                 content = content.replace("```", "").strip()
             return json.loads(content)
         else:
-            logger.error(f"LLM ATS check failed with status code {response.status_code}: {response.text}")
+            if response.status_code == 401:
+                logger.warning("LLM API key is invalid or unauthorized. Please check your settings.")
+            else:
+                logger.warning(f"LLM ATS check failed with status code {response.status_code}.")
             raise Exception("LLM API error")
 
 def extract_skills_and_summary_from_text(raw_text: str) -> dict:

@@ -22,6 +22,10 @@ class Profile(Base):
     user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), unique=True, index=True)
     
     resume_url = Column(String, nullable=True) # Firebase Storage URL
+    portfolio_url = Column(String, nullable=True)
+    github_url = Column(String, nullable=True)
+    other_url = Column(String, nullable=True)
+    employment_types = Column(JSON, default=list)
     skills = Column(JSON, default=list) # e.g. ["Python", "FastAPI", "React"]
     experience = Column(JSON, default=list) # List of dicts describing past roles
     education = Column(JSON, default=list)
@@ -47,6 +51,9 @@ class UserSettings(Base):
     experience_level = Column(String, nullable=True) # Entry, Mid, Senior
     visa_sponsorship_required = Column(Boolean, default=False)
     daily_apply_limit = Column(Integer, default=20)
+    daily_job_goal = Column(Integer, default=10)
+    daily_internship_goal = Column(Integer, default=5)
+    auto_fulfill_enabled = Column(Boolean, default=False)
     
     # 🔑 API Keys & AI Provider Configuration
     llm_provider = Column(String, default="openai") # "openai", "gemini", "deepseek", "groq", "openrouter", "ollama", "custom"

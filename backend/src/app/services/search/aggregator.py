@@ -127,7 +127,7 @@ class SearchAggregator:
 
         # Extract RAG resume skills & target roles
         rag_skills = (profile.skills if profile and profile.skills else ["Python", "FastAPI", "React", "Next.js"])
-        target_roles = (user_settings.target_job_titles if user_settings and user_settings.target_job_titles else ["Full Stack Developer", "AI Engineer"])
+        target_roles = (user_settings.target_roles if user_settings and user_settings.target_roles else ["Full Stack Developer", "AI Engineer"])
 
         # Formulate RAG search queries
         search_queries = []
