@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
 
+from src.app.api.auth import router as auth_router
 from src.app.api.users import router as users_router
 from src.app.api.resumes import router as resumes_router
 from src.app.api.search import router as search_router
@@ -42,6 +43,7 @@ os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Include Routers
+app.include_router(auth_router, prefix="/api/v1")
 app.include_router(users_router, prefix="/api/v1")
 app.include_router(resumes_router, prefix="/api/v1")
 app.include_router(search_router, prefix="/api/v1")

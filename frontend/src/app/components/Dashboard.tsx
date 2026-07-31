@@ -456,7 +456,9 @@ export default function Dashboard() {
     try {
       const res = await fetch(`${API_BASE}/api/v1/resumes/upload`, {
         method: "POST",
-        headers: { "Authorization": `Bearer dev-mock-${username}` },
+        headers: {
+          "Authorization": `Bearer ${token}`
+        },
         body: formData
       });
       

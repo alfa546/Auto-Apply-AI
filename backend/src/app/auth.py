@@ -1,46 +1,21 @@
 import logging
-try:
-    import firebase_admin
-    from firebase_admin import credentials, auth
-    HAS_FIREBASE = True
-except ImportError:
-    firebase_admin = None
-    auth = None
-    HAS_FIREBASE = False
+import jwt
 from fastapi import HTTPException, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from src.app.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Initialize Firebase App
-firebase_initialized = False
-if HAS_FIREBASE and settings.FIREBASE_PROJECT_ID and settings.FIREBASE_PROJECT_ID != "your-firebase-project-id":
-    try:
-        firebase_admin.get_app()
-        firebase_initialized = True
-    except ValueError:
-        try:
-            firebase_admin.initialize_app(options={
-                'projectId': settings.FIREBASE_PROJECT_ID,
-                'storageBucket': settings.FIREBASE_STORAGE_BUCKET
-            })
-            firebase_initialized = True
-            logger.info("Firebase Admin SDK initialized successfully.")
-        except Exception as e:
-            logger.warning(f"Failed to initialize Firebase Admin: {e}. Falling back to Mock Auth.")
-
 security_scheme = HTTPBearer(auto_error=False)
+
+SECRET_KEY = "local_dev_secret_key_auto_apply_ai_2026"
+ALGORITHM = "HS256"
 
 async def get_current_user(token_creds: HTTPAuthorizationCredentials = Security(security_scheme)):
     """
-    FastAPI dependency to extract and verify the Firebase ID token.
-    Falls back to a mock user context if Firebase is not initialized or if a mock token is passed.
+    FastAPI dependency to extract and verify the JWT token.
     """
     if not token_creds:
-        if not firebase_initialized:
-            # Under development mode (no Firebase), fallback to default mock user
-            return {"uid": "mock-user-123", "email": "mock-user-123@example.com"}
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Missing authentication credentials.",
@@ -48,19 +23,19 @@ async def get_current_user(token_creds: HTTPAuthorizationCredentials = Security(
     
     token = token_creds.credentials
 
-    # If it is a mock token (e.g. "dev-mock-123") or Firebase is not active
-    if not firebase_initialized or token.startswith("dev-mock-"):
-        uid = token.replace("dev-mock-", "") if token.startswith("dev-mock-") else "mock-user-123"
-        return {"uid": uid, "email": f"{uid}@example.com"}
-
     try:
-        decoded_token = auth.verify_id_token(token)
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return {
-            "uid": decoded_token.get("uid"),
-            "email": decoded_token.get("email")
+            "uid": payload.get("uid"),
+            "email": payload.get("sub")
         }
-    except Exception as e:
+    except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid or expired token: {str(e)}",
+            detail="Token has expired",
+        )
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
         )
