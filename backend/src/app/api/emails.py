@@ -22,7 +22,24 @@ async def run_email_check_pipeline(db: Session, user_id: str):
     classifies received emails, and drafts professional responses.
     """
     logger.info(f"Triggering email check pipeline for user: {user_id}")
-    watcher = EmailInboxWatcher()
+    from src.app.models import UserSettings
+    user_settings = db.query(UserSettings).filter(UserSettings.user_id == user_id).first()
+    
+    if user_settings and user_settings.is_gmail_connected and user_settings.gmail_email_address:
+        if user_settings.gmail_access_token:
+            watcher = EmailInboxWatcher(
+                user_email=user_settings.gmail_email_address,
+                access_token=user_settings.gmail_access_token,
+                use_oauth=True
+            )
+        else:
+            watcher = EmailInboxWatcher(
+                user_email=user_settings.gmail_email_address,
+                user_password=user_settings.smtp_app_password,
+                use_oauth=False
+            )
+    else:
+        watcher = EmailInboxWatcher()
     
     # 1. Fetch matching unseen emails
     email_items = await watcher.check_inbox(db, user_id)

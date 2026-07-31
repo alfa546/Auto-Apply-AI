@@ -14,18 +14,28 @@ class EmailInboxWatcher:
     Watches the user's email inbox using IMAP.
     Identifies emails from companies where the user has active applications.
     """
-    def __init__(self):
+    def __init__(self, user_email: str = None, user_password: str = None, access_token: str = None, use_oauth: bool = False):
         self.server = settings.EMAIL_IMAP_SERVER
-        self.username = settings.EMAIL_ADDRESS
-        self.password = settings.EMAIL_PASSWORD
+        self.username = user_email or settings.EMAIL_ADDRESS
+        self.password = user_password or settings.EMAIL_PASSWORD
+        self.access_token = access_token
+        self.use_oauth = use_oauth
 
     def _get_imap_connection(self) -> imaplib.IMAP4_SSL:
-        if not self.server or not self.username or not self.password:
+        if not self.server or not self.username:
             raise ValueError("IMAP email credentials are not fully configured in settings.")
         
         logger.info(f"Connecting to IMAP server: {self.server}")
         mail = imaplib.IMAP4_SSL(self.server)
-        mail.login(self.username, self.password)
+        
+        if self.use_oauth and self.access_token:
+            auth_string = f"user={self.username}\x01auth=Bearer {self.access_token}\x01\x01"
+            mail.authenticate('XOAUTH2', lambda x: auth_string.encode('utf-8'))
+        else:
+            if not self.password:
+                raise ValueError("IMAP password is required for non-OAuth login.")
+            mail.login(self.username, self.password)
+            
         return mail
 
     def _decode_string(self, value) -> str:
