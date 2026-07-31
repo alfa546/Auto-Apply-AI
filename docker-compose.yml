@@ -21,21 +21,9 @@ services:
     volumes:
       - redis_data:/data
 
-  chromadb:
-    image: chromadb/chroma:latest
-    container_name: auto_apply_chromadb
-    restart: always
-    environment:
-      - IS_PERSISTENT=TRUE
-    ports:
-      - "8000:8000"
-    volumes:
-      - chromadb_data:/chroma/data
 
 volumes:
   postgres_data:
     driver: local
   redis_data:
-    driver: local
-  chromadb_data:
     driver: local
