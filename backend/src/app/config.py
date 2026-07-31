@@ -22,10 +22,9 @@ class Settings(BaseSettings):
     FIREBASE_PROJECT_ID: Optional[str] = None
     FIREBASE_STORAGE_BUCKET: Optional[str] = None
     
-    # OpenAI & Embeddings Configurations
+    # OpenAI Configurations
     OPENAI_API_KEY: Optional[str] = None
     OPENAI_MODEL: str = "gpt-4o-mini"
-    EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
     
     # Gemini Configurations
     GEMINI_API_KEY: Optional[str] = None
