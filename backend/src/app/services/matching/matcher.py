@@ -59,7 +59,7 @@ class MatchingEngine:
         job_text = f"{job.title} {job.location} {job.description}".lower()
         is_remote_job = any(w in job_text for w in ["remote", "work from home", "wfh", "telecommute"])
         
-        if user_settings.remote_preference == "remote" and not is_remote_job:
+        if user_settings.work_mode_preference and "remote" in user_settings.work_mode_preference.lower() and not is_remote_job:
             # Reject if job is strictly onsite
             if "onsite" in job_text or "in-office" in job_text or "in person" in job_text:
                 return {
@@ -67,7 +67,7 @@ class MatchingEngine:
                     "score": 0.0,
                     "reasons": ["User prefers remote roles, but this opportunity requires onsite work."]
                 }
-        elif user_settings.remote_preference == "onsite" and is_remote_job:
+        elif user_settings.work_mode_preference and "onsite" in user_settings.work_mode_preference.lower() and is_remote_job:
             # Check if strictly remote (no hybrid or onsite option mentioned)
             if "100% remote" in job_text or "fully remote" in job_text:
                 return {
@@ -96,8 +96,10 @@ class MatchingEngine:
                 }
 
         # D. Salary Constraint
-        if user_settings.min_salary:
-            min_sal = float(user_settings.min_salary)
+        if user_settings.min_salary_preference:
+            min_sal_str = re.sub(r'[^\d.]', '', user_settings.min_salary_preference)
+            if min_sal_str:
+                min_sal = float(min_sal_str)
             job_salary_text = (job.salary or "").lower()
             # Extract numbers from salary text
             salary_numbers = [float(s) for s in re.findall(r"\d+[\d,]*", job_salary_text.replace(",", ""))]
