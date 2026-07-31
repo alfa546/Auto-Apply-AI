@@ -3,9 +3,25 @@ import logging
 import httpx
 from fastapi import HTTPException, status
 from src.app.config import settings
-from src.app.services.llm_client import get_llm_headers_and_url, is_llm_configured
+from src.app.services.llm_client import get_llm_headers_and_url, is_llm_configured, detect_llm_provider
 
 logger = logging.getLogger(__name__)
+
+def parse_llm_response(response: dict, provider: str) -> str:
+    """
+    Extracts the text content from LLM API responses across various providers.
+    """
+    try:
+        if provider == "gemini" and "candidates" in response:
+            return response["candidates"][0]["content"]["parts"][0]["text"]
+        elif provider == "anthropic" and "content" in response and isinstance(response["content"], list):
+            return response["content"][0]["text"]
+        
+        # Default / OpenAI / Groq / DeepSeek format
+        return response["choices"][0]["message"]["content"]
+    except (KeyError, IndexError, TypeError) as e:
+        logger.error(f"Failed to parse LLM response for provider {provider}: {e}")
+        return ""
 
 def evaluate_resume_ats(profile_data: dict, target_role: str = None) -> dict:
     """
@@ -29,6 +45,8 @@ def evaluate_with_openai(profile_data: dict, target_role: str = None) -> dict:
     Works across OpenAI, Gemini, Groq, DeepSeek, Ollama, and OpenRouter without json_schema errors!
     """
     headers, url, model = get_llm_headers_and_url()
+    key = settings.OPENAI_API_KEY or settings.GEMINI_API_KEY or "free-local"
+    provider = detect_llm_provider(key)
     
     role_info = f"target role: '{target_role}'" if target_role else "general industry standards"
     
@@ -65,7 +83,9 @@ def evaluate_with_openai(profile_data: dict, target_role: str = None) -> dict:
         response = client.post(url, json=payload, headers=headers)
         if response.status_code == 200:
             result = response.json()
-            content = result["choices"][0]["message"]["content"].strip()
+            content = parse_llm_response(result, provider).strip()
+            if not content:
+                return None
             if content.startswith("```json"):
                 content = content.replace("```json", "").replace("```", "").strip()
             elif content.startswith("```"):
@@ -101,6 +121,8 @@ def extract_skills_and_summary_from_text(raw_text: str) -> dict:
     if is_llm_configured():
         try:
             headers, url, model = get_llm_headers_and_url()
+            key = settings.OPENAI_API_KEY or settings.GEMINI_API_KEY or "free-local"
+            provider = detect_llm_provider(key)
             prompt = f"Extract candidate skills (as a JSON array of strings) and a 2-sentence executive summary from this resume text:\n{raw_text[:2000]}\nReturn ONLY valid JSON: {{\"skills\": [\"Python\", \"React\"], \"summary\": \"Executive summary...\"}}"
             payload = {
                 "model": model,
@@ -112,7 +134,8 @@ def extract_skills_and_summary_from_text(raw_text: str) -> dict:
             with httpx.Client(timeout=20.0) as client:
                 res = client.post(url, json=payload, headers=headers)
                 if res.status_code == 200:
-                    content = res.json()["choices"][0]["message"]["content"].strip()
+                    result = res.json()
+                    content = parse_llm_response(result, provider).strip()
                     if content.startswith("```json"):
                         content = content.replace("```json", "").replace("```", "").strip()
                     elif content.startswith("```"):
