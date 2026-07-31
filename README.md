@@ -5,7 +5,7 @@
 <h1 align="center">🚀 Auto Apply AI</h1>
 
 <p align="center">
-  <b>Autonomous Multi-Agent AI Platform for PDF & DOCX Resume Parsing, Multi-Model LLM Support (Ollama/OpenAI/Gemini), RAG Semantic Matching, Multi-Country Job Scraping, and Gmail Tracking.</b>
+  <b>Autonomous Multi-Agent AI Platform for PDF & DOCX Resume Parsing, Multi-Model LLM Support (Ollama/OpenAI/Gemini), LLM-Based Opportunity Matching, Multi-Country Job Scraping, and Gmail Tracking.</b>
 </p>
 
 <p align="center">
@@ -15,7 +15,6 @@
   <a href="#-key-features"><img src="https://img.shields.io/badge/Tailwind_CSS_v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind"></a>
   <a href="#-key-features"><img src="https://img.shields.io/badge/SQLite_%2F_PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL"></a>
   <a href="#-key-features"><img src="https://img.shields.io/badge/Ollama_%2F_Local_LLM-000000?style=flat-square&logo=ollama&logoColor=white" alt="Ollama"></a>
-  <a href="#-key-features"><img src="https://img.shields.io/badge/ChromaDB-FF6F00?style=flat-square&logo=database&logoColor=white" alt="ChromaDB"></a>
   <a href="#-key-features"><img src="https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white" alt="Playwright"></a>
   <a href="#-license"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License"></a>
 </p>
@@ -27,7 +26,7 @@
 </p>
 
 <p align="center">
-  <i>🖥️ AutoApply AI — Dark Grid Interface with Coral-Red Accent Theme, Real-Time RAG Agent Thinking UI & Gmail Auto-Apply</i>
+  <i>🖥️ AutoApply AI — Dark Grid Interface with Coral-Red Accent Theme, Real-Time LLM Agent Thinking UI & Gmail Auto-Apply</i>
 </p>
 
 ---
@@ -56,7 +55,7 @@
 
 Instead of manually editing CVs, searching across multiple job portals, and writing repetitive emails, **Auto Apply AI** provides:
 1. **PDF & DOCX AI Resume Parsing**: Reads both PDF and Word (`.docx`) files natively to extract executive summary, work experience, education, and tech skills.
-2. **Real-Time RAG Agent Thinking UI**: Interactive terminal-style progress log displaying real-time RAG context chunking, skill extraction, and ATS match scoring.
+2. **Real-Time LLM Agent Thinking UI**: Interactive terminal-style progress log displaying real-time AI evaluation context, skill extraction, and ATS match scoring.
 3. **Multi-Model LLM Vault (Free & Paid)**: Native support for 100% Free Local Offline LLMs (Ollama / LM Studio), Groq, OpenRouter, Google Gemini, DeepSeek, and OpenAI.
 4. **Interactive Target Country Selection (1-10 Countries)**: Filter jobs by up to 10 destination countries simultaneously (e.g. 🇺🇸 US, 🇨🇦 Canada, 🇬🇧 UK, 🇩🇪 Germany, 🇦🇪 UAE).
 5. **Direct Gmail Auto-Apply & Tracking**: Delivers custom cover letters and candidate CVs directly to company hiring emails with message IDs tracked in the candidate's Gmail "Sent" folder.
@@ -67,11 +66,11 @@ Instead of manually editing CVs, searching across multiple job portals, and writ
 
 ### 📄 1. PDF & Word (`.docx`) Resume Parsing Engine
 - **Multi-Format Extraction**: Parses both `.pdf` and Word `.docx` documents natively without external C library dependencies.
-- **RAG Profile Breakdown**: Extracts structured executive summaries, skills, work experience entries, and education details.
+- **AI Profile Breakdown**: Extracts structured executive summaries, skills, work experience entries, and education details.
 - **Automated Fallback**: Gracefully switches to rule-based tech stack parsing if an external LLM key is unconfigured or out of quota.
 
-### 🧠 2. Real-Time RAG Agent Thinking UI
-- **Live Visual Log Window**: Watch the AI agent initialize context windows, chunk text, extract competencies, and score ATS metrics in real-time.
+### 🧠 2. Real-Time LLM Agent Thinking UI
+- **Live Visual Log Window**: Watch the AI agent initialize context windows, extract competencies, and score ATS metrics in real-time.
 - **Glowing UI Box**: Replaces the upload area with a dynamic progress bar and animated agent status indicators.
 
 ### 🌐 3. Interactive Multi-Country Autocomplete Search (1-10 Countries)
@@ -99,19 +98,20 @@ graph TD
     
     subgraph Core Storage & Data Layer
         REST <--> SQLite[(SQLite / PostgreSQL\nLocal DB)]
-        REST <--> VectorDB[(ChromaDB\nVector Embeddings)]
     end
 
     subgraph Multi-Agent Processing Engine
         REST <--> ResumeAgent[Resume & ATS Parser]
         REST <--> SearchAgent[Multi-Country Search Aggregator]
-        REST <--> MatchAgent[RAG Semantic Matcher]
+        REST <--> MatchAgent[LLM Evaluator & Matcher]
         REST <--> EmailAgent[Gmail & Email Tracking Engine]
     end
 
     subgraph External LLM & Service Providers
         ResumeAgent --> LocalLLM[Ollama / LM Studio\n(100% Free Offline)]
         ResumeAgent --> CloudLLMs[OpenAI / Gemini / Groq / DeepSeek]
+        MatchAgent --> LocalLLM
+        MatchAgent --> CloudLLMs
         EmailAgent --> Gmail[Gmail API / SMTP Client]
         SearchAgent --> JobAPIs[Adzuna / Jooble / Multi-Country Scrapers]
     end
@@ -127,9 +127,8 @@ graph TD
 | **Styling** | Tailwind CSS v4 | Dark-grid theme with coral-red glow accents |
 | **Backend Framework** | FastAPI | Asynchronous Python 3.12+ REST API |
 | **Database** | SQLite / PostgreSQL | Automatic schema synchronization via SQLAlchemy 2.0 |
-| **Vector DB** | ChromaDB | Local vector store for candidate CV embeddings |
 | **Resume Parser** | PyPDF2, pdfplumber, ElementTree | PDF & DOCX native text extraction |
-| **LLM Integrations** | Ollama, Groq, OpenAI, Gemini | Multi-provider AI text analysis |
+| **LLM Integrations** | Ollama, Groq, OpenAI, Gemini | Multi-provider AI text analysis & opportunity matching |
 | **Email Service** | Gmail API & SMTP | Direct email delivery with message ID tracking |
 
 ---
@@ -145,14 +144,13 @@ Auto-Apply-AI/
 │   │       │   ├── applications.py # Application tracking endpoints
 │   │       │   ├── emails.py       # Email endpoints
 │   │       │   ├── gmail.py        # Gmail OAuth & SMTP authentication
-│   │       │   ├── matching.py     # RAG matching & compatibility scores
+│   │       │   ├── matching.py     # LLM evaluation & compatibility scores
 │   │       │   ├── resumes.py      # Resume parsing & ATS endpoints
 │   │       │   ├── search.py       # Multi-country search endpoints
 │   │       │   └── users.py        # User profile & settings management
 │   │       ├── services/           # Core Business Logic & Agents
 │   │       │   ├── ats_checker.py  # ATS grading & rule-based fallbacks
 │   │       │   ├── pdf_parser.py   # PDF & DOCX native text extraction
-│   │       │   ├── rag_service.py  # Vector search & RAG retriever
 │   │       │   └── search/         # Multi-country search aggregator
 │   │       ├── database.py         # SQLAlchemy engine & SQLite auto-sync
 │   │       ├── main.py             # FastAPI entry point & CORS
@@ -236,7 +234,7 @@ To let the AI Agent send job applications directly from your email:
 1. In the dashboard top navigation bar, click **`🔑 API Vault`** or open the **Settings** tab.
 2. Under **Connected Gmail Account**, select **Gmail App Password (SMTP)**.
 3. Enter your Gmail address and a **16-character App Password** (generated via *Google Account > Security > 2-Step Verification > App Passwords*).
-4. Click **Connect via App Password**. All sent application emails will now appear directly in your official **Gmail "Sent"** folder!
+4. Click **Connect via App Password**. All sent application emails will now appear directly in your official **Gmail "Sent"** folder
 
 ---
 
