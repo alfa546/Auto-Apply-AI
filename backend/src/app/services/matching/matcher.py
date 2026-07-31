@@ -2,9 +2,10 @@ import re
 import logging
 from sqlalchemy.orm import Session
 from src.app.models import User, Profile, UserSettings, JobFound
-from src.app.services.embeddings import generate_embeddings
-from src.app.vector_db import vector_db
 from src.app.config import settings
+import httpx
+import json
+from src.app.services.llm_client import get_llm_headers_and_url, is_llm_configured
 
 logger = logging.getLogger(__name__)
 
@@ -112,31 +113,72 @@ class MatchingEngine:
                         "reasons": [f"Offered salary {job.salary} is below user's minimum of ${min_sal:,.2f}."]
                     }
 
-        # 3. Calculate Vector/Semantic Search Similarity
+        # 3. Calculate Semantic Match via LLM
         semantic_score = 0.5 # Default middle score if embedding fails
         try:
-            job_query_text = f"{job.title}. {job.description or ''}"
-            job_embedding = generate_embeddings([job_query_text])[0]
-
-            collection = vector_db.get_or_create_collection("resumes")
-            query_results = collection.query(
-                query_embeddings=[job_embedding],
-                where={"user_id": user_id},
-                n_results=5
-            )
-
-            distances = query_results.get("distances")
-            if distances and len(distances[0]) > 0:
-                # Convert distance metrics into scores.
-                # chroma defaults to L2 distance unless configured otherwise.
-                # L2 distance metric ranges from 0 to infinity (closer is better).
-                # Normalize L2 distance: similarity = 1 / (1 + distance)
-                similarities = [1.0 / (1.0 + d) for d in distances[0]]
-                semantic_score = sum(similarities) / len(similarities)
-                reasons.append(f"Semantic match similarity: {semantic_score:.1%}.")
+            if is_llm_configured():
+                headers, url, model = get_llm_headers_and_url()
+                
+                profile_data = {
+                    "skills": profile.skills,
+                    "experience": profile.experience,
+                    "education": profile.education,
+                }
+                
+                prompt = f"""
+                You are an expert technical recruiter. Evaluate the candidate's profile against this job description.
+                Job Title: {job.title}
+                Job Description: {job.description}
+                
+                Candidate Profile:
+                {json.dumps(profile_data, indent=2)}
+                
+                Return a JSON object with:
+                - score: float between 0.0 and 1.0 representing how well the candidate matches the job.
+                - reason: a short string explaining the score.
+                
+                Return ONLY valid JSON.
+                """
+                
+                payload = {
+                    "model": model,
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": "You are a recruitment AI. Respond ONLY in valid raw JSON format without markdown codeblocks or extra text."
+                        },
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ]
+                }
+                
+                with httpx.Client(timeout=30.0) as client:
+                    response = client.post(url, json=payload, headers=headers)
+                    if response.status_code == 200:
+                        content = response.json()["choices"][0]["message"]["content"].strip()
+                        if content.startswith("```json"):
+                            content = content.replace("```json", "").replace("```", "").strip()
+                        elif content.startswith("```"):
+                            content = content.replace("```", "").strip()
+                        
+                        try:
+                            result = json.loads(content)
+                            semantic_score = float(result.get("score", 0.5))
+                            llm_reason = result.get("reason", "No specific reason provided.")
+                            reasons.append(f"LLM Match Score: {semantic_score:.1%} - {llm_reason}")
+                        except json.JSONDecodeError:
+                            logger.error(f"Failed to parse LLM response: {content}")
+                            reasons.append("LLM matching service returned invalid response, utilizing keyword fallback.")
+                    else:
+                        logger.warning(f"LLM matching service returned status {response.status_code}.")
+                        reasons.append("LLM matching service returned an error, utilizing keyword fallback.")
+            else:
+                reasons.append("LLM matching service not configured, utilizing keyword fallback.")
         except Exception as ve:
             logger.error(f"Semantic evaluation failed: {ve}")
-            reasons.append("Semantic matching database unavailable, utilizing keyword fallback.")
+            reasons.append("LLM evaluation unavailable, utilizing keyword fallback.")
 
         # 4. Heuristic Keyword Matching
         keyword_score = 0.0

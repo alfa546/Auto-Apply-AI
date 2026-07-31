@@ -12,7 +12,6 @@ from src.app.models import User, Profile, UserSettings
 from src.app.services.pdf_parser import extract_text_from_pdf
 from src.app.services.resume_parser import parse_resume_text
 from src.app.services.ats_checker import evaluate_resume_ats
-from src.app.services.embeddings import generate_and_store_resume_embeddings
 
 logger = logging.getLogger(__name__)
 
@@ -267,10 +266,8 @@ async def upload_resume(
         
         db.commit()
         db.refresh(profile)
-        
-        generate_and_store_resume_embeddings(uid, profile_data)
     except Exception as parse_error:
-        logger.error(f"Failed to parse or index resume for user {uid}: {parse_error}", exc_info=True)
+        logger.error(f"Failed to parse resume for user {uid}: {parse_error}", exc_info=True)
 
     return {
         "message": "Resume uploaded and parsed successfully.",

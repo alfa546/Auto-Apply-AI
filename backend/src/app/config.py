@@ -17,10 +17,7 @@ class Settings(BaseSettings):
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     
-    # Vector Database Configurations
-    CHROMADB_HOST: str = "localhost"
-    CHROMADB_PORT: int = 8000
-    
+
     # Firebase Setup
     FIREBASE_PROJECT_ID: Optional[str] = None
     FIREBASE_STORAGE_BUCKET: Optional[str] = None
