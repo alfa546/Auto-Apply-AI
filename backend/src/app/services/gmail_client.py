@@ -143,6 +143,11 @@ class GmailClient:
         """
         Send email using Gmail SMTP with App Password.
         """
+        from src.app.services.email.queue import email_rate_limiter
+        if not email_rate_limiter.can_send():
+            logger.warning("Email rate limit exceeded (SMTP).")
+            return {"success": False, "error": "Email rate limit exceeded. Please try again later."}
+
         try:
             msg = self.create_mime_message(sender_email, recipient_email, subject, body_text, cv_file_path)
             
@@ -151,6 +156,7 @@ class GmailClient:
                 server.login(sender_email, app_password)
                 server.send_message(msg)
                 
+            email_rate_limiter.record_send()
             logger.info(f"Email successfully sent via SMTP to {recipient_email}")
             import uuid
             return {
@@ -175,6 +181,11 @@ class GmailClient:
         """
         Send email using Google Gmail API with OAuth2 Access Token.
         """
+        from src.app.services.email.queue import email_rate_limiter
+        if not email_rate_limiter.can_send():
+            logger.warning("Email rate limit exceeded (OAuth).")
+            return {"success": False, "error": "Email rate limit exceeded. Please try again later."}
+
         try:
             import httpx
             msg = self.create_mime_message(sender_email, recipient_email, subject, body_text, cv_file_path)
@@ -198,6 +209,7 @@ class GmailClient:
                         headers["Authorization"] = f"Bearer {new_access_token}"
                         res = client.post(url, json=payload, headers=headers)
                         if res.status_code == 200:
+                            email_rate_limiter.record_send()
                             data = res.json()
                             return {
                                 "success": True,
@@ -208,6 +220,7 @@ class GmailClient:
                             }
 
                 if res.status_code == 200:
+                    email_rate_limiter.record_send()
                     data = res.json()
                     return {
                         "success": True,
