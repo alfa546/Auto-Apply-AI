@@ -129,12 +129,14 @@ class EmailInteraction(Base):
     user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), index=True)
     application_id = Column(Integer, ForeignKey("applications.id", ondelete="CASCADE"), nullable=True)
     
-    sender_email = Column(String, nullable=False)
-    recipient_email = Column(String, nullable=False)
+    sender = Column(String, nullable=False)
+    recipient = Column(String, nullable=False)
     subject = Column(String, nullable=False)
     body = Column(String, nullable=False)
     gmail_message_id = Column(String, nullable=True)
-    sent_at = Column(DateTime(timezone=True), server_default=func.now())
+    classification = Column(String, nullable=True)
+    response_draft = Column(String, nullable=True)
+    received_at = Column(DateTime(timezone=True), server_default=func.now())
     status = Column(String, default="Sent")
 
 
