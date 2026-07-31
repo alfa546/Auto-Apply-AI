@@ -96,7 +96,7 @@ def extract_skills_and_summary_from_text(raw_text: str) -> dict:
             extracted_skills.append(kw)
 
     lines = [l.strip() for l in raw_text.split("\n") if l.strip() and len(l.strip()) > 15]
-    summary = " ".join(lines[:3]) if lines else "Qualified professional candidate with a strong background in software development and technology."
+    summary = " ".join(lines[:3]) if lines else ""
 
     if is_llm_configured():
         try:
@@ -126,11 +126,11 @@ def extract_skills_and_summary_from_text(raw_text: str) -> dict:
             logger.warning(f"LLM skill extraction failed: {e}. Using extracted skills keyword fallback.")
 
     return {
-        "skills": extracted_skills or ["Python", "JavaScript", "FastAPI", "React", "SQL"],
+        "skills": extracted_skills or [],
         "summary": summary,
-        "experience": [{"title": "Software Developer", "company": "Technology Company", "description": "Developed web applications and services."}],
-        "education": [{"degree": "Bachelor of Science", "institution": "University"}],
-        "projects": [{"name": "Auto-Apply AI", "description": "AI-powered job search and auto-application platform."}]
+        "experience": [],
+        "education": [],
+        "projects": []
     }
 
 def rule_based_ats(profile_data: dict, target_role: str = None) -> dict:
