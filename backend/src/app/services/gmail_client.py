@@ -69,6 +69,35 @@ class GmailClient:
             logger.error(f"OAuth token exchange exception: {e}")
             return {"success": False, "error": str(e)}
 
+    def refresh_access_token(self, refresh_token: str) -> Dict[str, Any]:
+        """
+        Refresh Google OAuth2 Access Token using the refresh token.
+        """
+        import httpx
+        url = "https://oauth2.googleapis.com/token"
+        payload = {
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "refresh_token": refresh_token,
+            "grant_type": "refresh_token"
+        }
+        try:
+            with httpx.Client(timeout=15.0) as client:
+                res = client.post(url, data=payload)
+                if res.status_code == 200:
+                    data = res.json()
+                    return {
+                        "success": True,
+                        "access_token": data.get("access_token"),
+                        "expires_in": data.get("expires_in")
+                    }
+                else:
+                    logger.error(f"OAuth token refresh error: {res.text}")
+                    return {"success": False, "error": res.text}
+        except Exception as e:
+            logger.error(f"OAuth token refresh exception: {e}")
+            return {"success": False, "error": str(e)}
+
     def create_mime_message(
         self,
         sender_email: str,
@@ -140,7 +169,8 @@ class GmailClient:
         recipient_email: str,
         subject: str,
         body_text: str,
-        cv_file_path: Optional[str] = None
+        cv_file_path: Optional[str] = None,
+        refresh_token: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Send email using Google Gmail API with OAuth2 Access Token.
@@ -159,6 +189,24 @@ class GmailClient:
             
             with httpx.Client(timeout=20.0) as client:
                 res = client.post(url, json=payload, headers=headers)
+                
+                if res.status_code == 401 and refresh_token:
+                    logger.info("Access token expired, attempting to refresh...")
+                    refresh_result = self.refresh_access_token(refresh_token)
+                    if refresh_result.get("success"):
+                        new_access_token = refresh_result.get("access_token")
+                        headers["Authorization"] = f"Bearer {new_access_token}"
+                        res = client.post(url, json=payload, headers=headers)
+                        if res.status_code == 200:
+                            data = res.json()
+                            return {
+                                "success": True,
+                                "message_id": data.get("id"),
+                                "thread_id": data.get("threadId"),
+                                "method": "Gmail_OAuth",
+                                "new_access_token": new_access_token
+                            }
+
                 if res.status_code == 200:
                     data = res.json()
                     return {

@@ -107,8 +107,12 @@ def auto_apply_via_email(
             recipient_email=recipient_email,
             subject=subject,
             body_text=cover_letter,
-            cv_file_path=cv_path
+            cv_file_path=cv_path,
+            refresh_token=user_settings.gmail_refresh_token
         )
+        
+        if send_result.get("success") and send_result.get("new_access_token"):
+            user_settings.gmail_access_token = send_result.get("new_access_token")
     else:
         # Mock/Dev Mode Send
         import uuid
