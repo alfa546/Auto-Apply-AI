@@ -58,11 +58,8 @@ def gmail_oauth_callback(
         db.commit()
         return RedirectResponse(url="http://localhost:3000/?gmail_connected=true")
     else:
-        # Dev fallback connect
-        settings.is_gmail_connected = True
-        settings.gmail_access_token = "oauth_access_token_active"
-        db.commit()
-        return RedirectResponse(url="http://localhost:3000/?gmail_connected=true")
+        error_msg = tokens.get("error", "OAuth failed")
+        return RedirectResponse(url=f"http://localhost:3000/?gmail_error={error_msg}")
 
 @router.post("/connect-mock")
 def connect_mock_gmail(
