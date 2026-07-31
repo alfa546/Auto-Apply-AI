@@ -419,11 +419,11 @@ export default function Dashboard() {
         if (res.status === 429) {
           showToast("Your API key limit has been reached! Please enter a new API key in Settings.", "error");
         } else {
-          showToast("Smart Search Agent scanned target countries for matching roles!");
+          showToast("Failed to trigger Smart Search Agent.", "error");
         }
       }
     } catch (err) {
-      showToast("Smart Search Agent completed target country scan!");
+      showToast(err instanceof Error ? err.message : "Failed to trigger Smart Search Agent.", "error");
     } finally {
       setIsTriggeringSearch(false);
     }
@@ -456,10 +456,10 @@ export default function Dashboard() {
       if (res.ok) {
         showToast("Successfully saved API keys & integration credentials!");
       } else {
-        showToast("API keys saved in database session!");
+        showToast("Failed to save API settings.", "error");
       }
     } catch (err) {
-      showToast("API keys saved in database session!");
+      showToast(err instanceof Error ? err.message : "Failed to save API settings.", "error");
     } finally {
       setIsSavingApiSettings(false);
     }
@@ -496,10 +496,10 @@ export default function Dashboard() {
       if (res.ok) {
         showToast(`Saved ${selectedCountries.length} target countries & international preferences!`);
       } else {
-        showToast(`Saved ${selectedCountries.length} target countries & preferences in backend session!`);
+        showToast("Failed to save profile.", "error");
       }
     } catch (err) {
-      showToast(`Saved ${selectedCountries.length} target countries & preferences in backend session!`);
+      showToast(err instanceof Error ? err.message : "Failed to save profile.", "error");
     } finally {
       setIsSavingProfile(false);
     }
@@ -518,7 +518,7 @@ export default function Dashboard() {
     formData.append("file", file);
 
     const fakeLogs = [
-      "[Agent] Initializing RAG context window...",
+      "[Agent] Initializing AI analysis engine...",
       "[Agent] Chunking resume text...",
       "[Agent] Extracting skills and core competencies...",
       "[Agent] Analyzing work experience achievements...",
@@ -574,14 +574,12 @@ export default function Dashboard() {
         if (res.status === 429) {
           showToast("Your API key limit has been reached! Please enter a new API key in Settings.", "error");
         } else {
-          setUploadedResume(file.name);
-          showToast("Resume uploaded & candidate profile updated!");
+          showToast("Failed to upload and analyze resume.", "error");
         }
       }
     } catch (err) {
       clearInterval(logInterval);
-      setUploadedResume(file.name);
-      showToast("Resume uploaded & candidate profile analyzed!");
+      showToast(err instanceof Error ? err.message : "Failed to upload and analyze resume.", "error");
     } finally {
       setTimeout(() => {
         setIsUploading(false);
@@ -618,11 +616,11 @@ export default function Dashboard() {
         if (res.status === 429) {
           showToast("Your API key limit has been reached! Please enter a new API key in Settings.", "error");
         } else {
-          showToast("AI Agent completed ATS Audit check!");
+          showToast("Failed to run ATS Audit check.", "error");
         }
       }
     } catch (err) {
-      showToast("ATS Audit completed!");
+      showToast(err instanceof Error ? err.message : "Failed to run ATS Audit check.", "error");
     } finally {
       setIsAnalyzingATS(false);
     }
@@ -657,13 +655,12 @@ export default function Dashboard() {
         const data = await res.json();
         if (data.gmail_message_id) newApp.gmail_message_id = data.gmail_message_id;
         showToast(data.message || `Applied to ${job.company}! Check your Gmail Sent folder.`);
+        setApplications(prev => [newApp, ...prev]);
       } else {
-        showToast(`Sent application email to ${job.company_email}! Check your Gmail Sent folder.`);
+        showToast(`Failed to send application email to ${job.company_email}.`, "error");
       }
-
-      setApplications(prev => [newApp, ...prev]);
     } catch (err) {
-      showToast(`Sent application email to ${job.company_email}! Check your Gmail Sent folder.`);
+      showToast(err instanceof Error ? err.message : `Failed to send application email to ${job.company_email}.`, "error");
     } finally {
       setIsApplyingId(null);
     }
