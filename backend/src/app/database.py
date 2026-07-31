@@ -84,7 +84,7 @@ def sync_sqlite_schema(db_engine):
     except Exception as e:
         logger.warning(f"SQLite dynamic schema sync warning: {e}")
 
-from src.app.models import User, Profile, UserSettings, JobFound, Application, EmailInteraction, CustomCoverLetter
+import src.app.models
 Base.metadata.create_all(bind=engine)
 
 # If using SQLite fallback, ensure tables are created & synced automatically on startup
