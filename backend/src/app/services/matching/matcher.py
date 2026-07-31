@@ -206,7 +206,7 @@ class MatchingEngine:
             reasons.append("User profile does not contain any skills.")
 
         # 5. Composite Ranking Score
-        composite_score = (0.6 * semantic_score) + (0.4 * keyword_score)
+        composite_score = (0.7 * semantic_score) + (0.3 * keyword_score)
         
         is_above_threshold = composite_score >= settings.MATCHING_THRESHOLD
         if is_above_threshold:
