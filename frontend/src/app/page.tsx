@@ -1,12 +1,5 @@
-"use client";
-
-import Dashboard from "./components/Dashboard";
-import ErrorBoundary from "./components/ErrorBoundary";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <ErrorBoundary>
-      <Dashboard />
-    </ErrorBoundary>
-  );
+  redirect("/opportunities");
 }
