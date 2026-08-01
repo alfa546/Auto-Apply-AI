@@ -1,6 +1,7 @@
 import React from "react";
 import { Job } from "../types";
 import { SparklesIcon, GlobeIcon, GmailIcon } from "./Icons";
+import { JobsSkeleton, ErrorCard } from "./Skeletons";
 
 interface JobsTabProps {
   filteredDailyJobs: Job[];
@@ -9,6 +10,9 @@ interface JobsTabProps {
   handleTriggerSearchAgent: () => void;
   isApplyingId: number | null;
   handleAutoApply: (job: Job) => void;
+  isLoading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
 }
 
 export default function JobsTab({
@@ -17,8 +21,24 @@ export default function JobsTab({
   isTriggeringSearch,
   handleTriggerSearchAgent,
   isApplyingId,
-  handleAutoApply
+  handleAutoApply,
+  isLoading,
+  error,
+  onRetry
 }: JobsTabProps) {
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="glass-panel p-5 rounded-2xl border border-white/10 h-20 animate-pulse bg-slate-900/40"></div>
+        <JobsSkeleton />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <ErrorCard message={error} onRetry={onRetry} />;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-5 rounded-2xl border border-white/10">

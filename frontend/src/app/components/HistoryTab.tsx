@@ -1,6 +1,7 @@
 import React from "react";
 import { Application } from "../types";
 import { CalendarIcon, GmailIcon } from "./Icons";
+import { HistorySkeleton, ErrorCard } from "./Skeletons";
 
 interface HistoryTabProps {
   historyFilter: "today" | "monthly" | "yearly" | "all";
@@ -12,6 +13,9 @@ interface HistoryTabProps {
   yearlyApps: Application[];
   applications: Application[];
   filteredApplications: Application[];
+  isLoading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
 }
 
 export default function HistoryTab({
@@ -23,8 +27,28 @@ export default function HistoryTab({
   monthlyApps,
   yearlyApps,
   applications,
-  filteredApplications
+  filteredApplications,
+  isLoading,
+  error,
+  onRetry
 }: HistoryTabProps) {
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[1, 2, 3].map((_, i) => (
+            <div key={i} className="bg-slate-900/40 border border-slate-800/60 p-5 rounded-2xl h-24 animate-pulse"></div>
+          ))}
+        </div>
+        <HistorySkeleton />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <ErrorCard message={error} onRetry={onRetry} />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Top Metric Cards for Today, Monthly, Yearly */}

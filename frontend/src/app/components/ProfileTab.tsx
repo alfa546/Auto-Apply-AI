@@ -1,6 +1,7 @@
 import React from "react";
 import { ProfileData, AtsMetrics, Experience, Education } from "../types";
 import { UserIcon, SparklesIcon, UploadIcon, TargetIcon } from "./Icons";
+import { ProfileSkeleton, ErrorCard } from "./Skeletons";
 import {
   WORK_MODE_OPTIONS,
   ALL_WORLD_COUNTRIES,
@@ -58,6 +59,9 @@ interface ProfileTabProps {
   atsMetrics: AtsMetrics;
   handleRunAtsCheck: () => void;
   isAnalyzingATS: boolean;
+  isLoading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
 }
 
 export default function ProfileTab({
@@ -82,8 +86,17 @@ export default function ProfileTab({
   isUploading, agentPhase, agentLogs,
   uploadedResume, handleResumeUpload,
   extractedProfile, atsMetrics,
-  handleRunAtsCheck, isAnalyzingATS
+  handleRunAtsCheck, isAnalyzingATS,
+  isLoading, error, onRetry
 }: ProfileTabProps) {
+  if (isLoading) {
+    return <ProfileSkeleton />;
+  }
+
+  if (error) {
+    return <ErrorCard message={error} onRetry={onRetry} />;
+  }
+
   return (
     <div className="space-y-8">
       {/* Top Grid: User Info Form + Resume Upload Card & AI Profile Breakdown */}

@@ -10,7 +10,7 @@ import { Job, Application, ProfileData, AtsMetrics } from "../types";
 import { ALL_WORLD_COUNTRIES } from "../constants";
 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 
 // Standard SVG Icons
@@ -67,6 +67,14 @@ export default function Dashboard() {
   const [dailyJobs, setDailyJobs] = useState<Job[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [isTriggeringSearch, setIsTriggeringSearch] = useState(false);
+
+  // Loading and Error States for API Data
+  const [isJobsLoading, setIsJobsLoading] = useState(true);
+  const [jobsError, setJobsError] = useState<string | null>(null);
+  const [isAppsLoading, setIsAppsLoading] = useState(true);
+  const [appsError, setAppsError] = useState<string | null>(null);
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
+  const [profileError, setProfileError] = useState<string | null>(null);
 
   // Time-based History Filter State ("today" | "monthly" | "yearly" | "all")
   const [historyFilter, setHistoryFilter] = useState<"today" | "monthly" | "yearly" | "all">("today");
@@ -181,120 +189,160 @@ export default function Dashboard() {
     );
   };
 
+  // Stable fetch callbacks with proper error handling and loading states
+  const checkGmailStatus = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/gmail/status`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to check Gmail connection (status ${res.status})`);
+      }
+      const data = await res.json();
+      setIsGmailConnected(data.is_connected);
+      if (data.connected_email) setGmailEmail(data.connected_email);
+    } catch (err) {
+      console.error("Gmail status check error:", err);
+    }
+  }, [token]);
+
+  const fetchUserSettings = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/users/settings`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        if (res.status === 404) return; // No custom settings yet
+        throw new Error(`Failed to fetch user settings (status ${res.status})`);
+      }
+      const data = await res.json();
+      if (data.openai_api_key) setOpenaiApiKey(data.openai_api_key);
+      if (data.google_client_id) setGoogleClientId(data.google_client_id);
+      if (data.google_client_secret) setGoogleClientSecret(data.google_client_secret);
+      if (data.adzuna_app_id) setAdzunaAppId(data.adzuna_app_id);
+      if (data.adzuna_app_key) setAdzunaAppKey(data.adzuna_app_key);
+      if (data.jooble_api_key) setJoobleApiKey(data.jooble_api_key);
+      if (data.target_roles?.length) setTargetRoles(data.target_roles);
+      if (data.target_countries?.length) setSelectedCountries(data.target_countries);
+      if (data.work_mode_preference) setWorkModePref(data.work_mode_preference);
+      if (data.employment_types?.length) setSelectedEmpTypes(data.employment_types);
+      if (data.salary_preference) setSalaryPref(data.salary_preference);
+      if (data.experience_level) setExperiencePref(data.experience_level);
+      if (data.visa_sponsorship !== undefined) setVisaSponsorshipPref(data.visa_sponsorship ? "Visa Sponsorship Required" : "No Visa Needed (Authorized Work Permit)");
+      if (data.daily_job_goal) setDailyJobGoal(data.daily_job_goal);
+      if (data.daily_internship_goal) setDailyInternshipGoal(data.daily_internship_goal);
+      if (data.auto_fulfill_enabled !== undefined) setAutoFulfillEnabled(data.auto_fulfill_enabled);
+      if (data.email) setUserEmail(data.email);
+      if (data.portfolio_url) setPortfolioUrl(data.portfolio_url);
+      if (data.github_url) setGithubUrl(data.github_url);
+      if (data.other_url) setOtherUrl(data.other_url);
+    } catch (err) {
+      console.error("User settings fetch error:", err);
+    }
+  }, [token]);
+
+  const fetchOpportunities = useCallback(async () => {
+    if (!token) return;
+    setIsJobsLoading(true);
+    setJobsError(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/search/opportunities?limit=50`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        if (res.status === 404) {
+          setDailyJobs([]);
+          return;
+        }
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || `Server responded with status ${res.status}`);
+      }
+      const data = await res.json();
+      setDailyJobs(data.items || []);
+    } catch (err: any) {
+      const msg = err instanceof Error ? err.message : "Failed to load job opportunities";
+      setJobsError(msg);
+    } finally {
+      setIsJobsLoading(false);
+    }
+  }, [token]);
+
+  const fetchApplications = useCallback(async () => {
+    if (!token) return;
+    setIsAppsLoading(true);
+    setAppsError(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/applications`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        if (res.status === 404) {
+          setApplications([]);
+          return;
+        }
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || `Server responded with status ${res.status}`);
+      }
+      const data = await res.json();
+      setApplications(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      const msg = err instanceof Error ? err.message : "Failed to load application history";
+      setAppsError(msg);
+    } finally {
+      setIsAppsLoading(false);
+    }
+  }, [token]);
+
+  const fetchResumeProfile = useCallback(async () => {
+    if (!token) return;
+    setIsProfileLoading(true);
+    setProfileError(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/resumes/profile`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        if (res.status === 404) {
+          return; // Default empty state is normal before initial upload
+        }
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || `Server responded with status ${res.status}`);
+      }
+      const data = await res.json();
+      if (data.resume_url) setUploadedResume("Active Resume (Saved)");
+      setExtractedProfile(prev => ({
+        ...prev,
+        summary: data.summary || prev.summary,
+        skills: data.skills || prev.skills,
+        experience: data.experience || prev.experience,
+        education: data.education || prev.education,
+        projects: data.projects || prev.projects
+      }));
+      if (data.ats_score) {
+        setAtsMetrics(prev => ({
+          ...prev,
+          overall_score: data.ats_score
+        }));
+      }
+    } catch (err: any) {
+      const msg = err instanceof Error ? err.message : "Failed to load resume profile data";
+      setProfileError(msg);
+    } finally {
+      setIsProfileLoading(false);
+    }
+  }, [token]);
+
   // Fetch status & live data from backend APIs on mount or when logged in
   useEffect(() => {
     if (!isAuthenticated || !token) return;
-
-    async function checkGmailStatus() {
-      try {
-        const res = await fetch(`${API_BASE}/api/v1/auth/gmail/status`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setIsGmailConnected(data.is_connected);
-          if (data.connected_email) setGmailEmail(data.connected_email);
-        }
-      } catch (err) {
-        console.log("Backend offline or local dev.");
-      }
-    }
-
-    async function fetchUserSettings() {
-      try {
-        const res = await fetch(`${API_BASE}/api/v1/users/settings`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.openai_api_key) setOpenaiApiKey(data.openai_api_key);
-          if (data.google_client_id) setGoogleClientId(data.google_client_id);
-          if (data.google_client_secret) setGoogleClientSecret(data.google_client_secret);
-          if (data.adzuna_app_id) setAdzunaAppId(data.adzuna_app_id);
-          if (data.adzuna_app_key) setAdzunaAppKey(data.adzuna_app_key);
-          if (data.jooble_api_key) setJoobleApiKey(data.jooble_api_key);
-          if (data.target_roles?.length) setTargetRoles(data.target_roles);
-          if (data.target_countries?.length) setSelectedCountries(data.target_countries);
-          if (data.work_mode_preference) setWorkModePref(data.work_mode_preference);
-          if (data.employment_types?.length) setSelectedEmpTypes(data.employment_types);
-          if (data.salary_preference) setSalaryPref(data.salary_preference);
-          if (data.experience_level) setExperiencePref(data.experience_level);
-          if (data.visa_sponsorship !== undefined) setVisaSponsorshipPref(data.visa_sponsorship ? "Visa Sponsorship Required" : "No Visa Needed (Authorized Work Permit)");
-          if (data.daily_job_goal) setDailyJobGoal(data.daily_job_goal);
-          if (data.daily_internship_goal) setDailyInternshipGoal(data.daily_internship_goal);
-          if (data.auto_fulfill_enabled !== undefined) setAutoFulfillEnabled(data.auto_fulfill_enabled);
-          if (data.email) setUserEmail(data.email);
-          if (data.portfolio_url) setPortfolioUrl(data.portfolio_url);
-          if (data.github_url) setGithubUrl(data.github_url);
-          if (data.other_url) setOtherUrl(data.other_url);
-        }
-      } catch (err) {
-        console.log("Local API settings initialized.");
-      }
-    }
-
-    async function fetchOpportunities() {
-      try {
-        const res = await fetch(`${API_BASE}/api/v1/search/opportunities?limit=50`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.items) setDailyJobs(data.items);
-        }
-      } catch (err) {
-        console.log("No backend opportunities fetched.");
-      }
-    }
-
-    async function fetchApplications() {
-      try {
-        const res = await fetch(`${API_BASE}/api/v1/applications`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data)) setApplications(data);
-        }
-      } catch (err) {
-        console.log("No backend applications fetched.");
-      }
-    }
-
-    async function fetchResumeProfile() {
-      try {
-        const res = await fetch(`${API_BASE}/api/v1/resumes/profile`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.resume_url) setUploadedResume("Active Resume (Saved)");
-          setExtractedProfile(prev => ({
-            ...prev,
-            summary: data.summary || prev.summary,
-            skills: data.skills || prev.skills,
-            experience: data.experience || prev.experience,
-            education: data.education || prev.education,
-            projects: data.projects || prev.projects
-          }));
-          if (data.ats_score) {
-            setAtsMetrics(prev => ({
-              ...prev,
-              overall_score: data.ats_score
-            }));
-          }
-        }
-      } catch (err) {
-        console.log("No stored resume profile fetched.");
-      }
-    }
-
     checkGmailStatus();
     fetchUserSettings();
     fetchOpportunities();
     fetchApplications();
     fetchResumeProfile();
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated, token, checkGmailStatus, fetchUserSettings, fetchOpportunities, fetchApplications, fetchResumeProfile]);
 
   // Trigger Smart Job Search Agent
   const handleTriggerSearchAgent = async () => {
@@ -693,10 +741,16 @@ export default function Dashboard() {
             handleTriggerSearchAgent={handleTriggerSearchAgent}
             isApplyingId={isApplyingId}
             handleAutoApply={handleAutoApply}
+            isLoading={isJobsLoading}
+            error={jobsError}
+            onRetry={fetchOpportunities}
           />
         )}
         {activeTab === "profile" && (
           <ProfileTab
+            isLoading={isProfileLoading}
+            error={profileError}
+            onRetry={fetchResumeProfile}
             userEmail={userEmail}
             setUserEmail={setUserEmail}
             portfolioUrl={portfolioUrl}
@@ -748,6 +802,9 @@ export default function Dashboard() {
         )}
         {activeTab === "history" && (
           <HistoryTab
+            isLoading={isAppsLoading}
+            error={appsError}
+            onRetry={fetchApplications}
             historyFilter={historyFilter}
             setHistoryFilter={setHistoryFilter}
             todayApps={todayApps}
