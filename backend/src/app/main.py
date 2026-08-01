@@ -23,7 +23,10 @@ app = FastAPI(
 # Startup and shutdown event hooks for the search aggregator background daemon
 @app.on_event("startup")
 async def startup_event():
-    await start_search_scheduler()
+    try:
+        await start_search_scheduler()
+    except Exception as e:
+        print(f"⚠️ Search scheduler failed to start (non-fatal): {e}")
 
 @app.on_event("shutdown")
 async def shutdown_event():

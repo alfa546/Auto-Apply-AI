@@ -37,10 +37,14 @@ async def stop_search_scheduler():
     logger.info("Search scheduler background daemon stopped.")
 
 async def run_scheduler_loop():
-    aggregator = SearchAggregator()
+    try:
+        aggregator = SearchAggregator()
+    except Exception as e:
+        logger.error(f"Failed to initialize SearchAggregator (non-fatal): {e}")
+        return
+
     interval_seconds = settings.SEARCH_INTERVAL_HOURS * 3600
-    
-    # Wait 30 seconds after startup before first run
+
     try:
         await asyncio.sleep(30.0)
     except asyncio.CancelledError:
@@ -48,9 +52,9 @@ async def run_scheduler_loop():
 
     while not _shutdown_event.is_set():
         logger.info("Background scheduler executing periodic search crawl...")
-        db = SessionLocal()
+        db = None
         try:
-            # Seed standard queries
+            db = SessionLocal()
             queries = ["Python Developer", "React Developer", "AI Engineer"]
             for query in queries:
                 if _shutdown_event.is_set():
@@ -58,11 +62,11 @@ async def run_scheduler_loop():
                 await aggregator.run_aggregation(db, query)
                 await asyncio.sleep(2.0)
         except Exception as e:
-            logger.error(f"Error during scheduled background search crawl: {e}", exc_info=True)
+            logger.error(f"Error during scheduled background search crawl (non-fatal): {e}")
         finally:
-            db.close()
-            
-        # Check every 10 seconds if we need to shut down
+            if db:
+                db.close()
+
         elapsed = 0
         while elapsed < interval_seconds and not _shutdown_event.is_set():
             try:
