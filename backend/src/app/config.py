@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     # Email & Gmail OAuth Configurations
     GOOGLE_CLIENT_ID: Optional[str] = None
     GOOGLE_CLIENT_SECRET: Optional[str] = None
-    GOOGLE_REDIRECT_URI: str = "http://localhost:3000/api/auth/gmail/callback"
+    GOOGLE_REDIRECT_URI: str = "http://localhost:8000/api/v1/auth/gmail/callback"
     EMAIL_IMAP_SERVER: Optional[str] = None
     EMAIL_SMTP_SERVER: str = "smtp.gmail.com"
     EMAIL_SMTP_PORT: int = 587
