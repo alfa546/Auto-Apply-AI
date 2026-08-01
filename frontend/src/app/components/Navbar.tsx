@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import GmailModal from "./GmailModal";
+import Toast from "./Toast";
 import { DashboardIcon, GmailIcon, UserIcon, KeyIcon } from "./Icons";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
@@ -12,6 +13,15 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 export default function Navbar() {
   const { user, token, isAuthenticated, logout } = useAuth();
   const pathname = usePathname();
+
+  // Toast Notification State
+  const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const showToast = (message: string, type: "success" | "error" = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification((prev) => (prev?.message === message ? null : prev));
+    }, 4000);
+  };
 
   // Gmail Connection Status State
   const [isGmailConnected, setIsGmailConnected] = useState(false);
@@ -124,54 +134,20 @@ export default function Navbar() {
         </div>
       </header>
 
+      <Toast notification={notification} />
+
       {showGmailModal && (
         <GmailModal
           API_BASE={API_BASE}
-          showGmailModal={showGmailModal}
+          token={token}
           gmailEmail={gmailEmail}
           setGmailEmail={setGmailEmail}
+          showGmailModal={showGmailModal}
+          setShowGmailModal={setShowGmailModal}
           smtpPassword={smtpPassword}
           setSmtpPassword={setSmtpPassword}
-          isGmailConnected={isGmailConnected}
-          handleConnectGmail={async (e: React.FormEvent) => {
-            e.preventDefault();
-            try {
-              const res = await fetch(`${API_BASE}/api/v1/auth/gmail/connect`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ email: gmailEmail, app_password: smtpPassword })
-              });
-              if (res.ok) {
-                setIsGmailConnected(true);
-                setShowGmailModal(false);
-              } else {
-                const errData = await res.json().catch(() => ({}));
-                alert(errData.detail || "Failed to connect Gmail credentials.");
-              }
-            } catch (err) {
-              alert("Failed to reach server when connecting Gmail.");
-            }
-          }}
-          handleDisconnectGmail={async () => {
-            try {
-              const res = await fetch(`${API_BASE}/api/v1/auth/gmail/disconnect`, {
-                method: "POST",
-                headers: { "Authorization": `Bearer ${token}` }
-              });
-              if (res.ok) {
-                setIsGmailConnected(false);
-                setGmailEmail("");
-                setSmtpPassword("");
-                setShowGmailModal(false);
-              }
-            } catch (err) {
-              alert("Failed to disconnect Gmail account.");
-            }
-          }}
-          setShowGmailModal={setShowGmailModal}
+          setIsGmailConnected={setIsGmailConnected}
+          showToast={showToast}
         />
       )}
     </>

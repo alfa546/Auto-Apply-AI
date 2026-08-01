@@ -156,53 +156,15 @@ export default function SettingsPage() {
       {showGmailModal && (
         <GmailModal
           API_BASE={API_BASE}
-          showGmailModal={showGmailModal}
+          token={token}
           gmailEmail={gmailEmail}
           setGmailEmail={setGmailEmail}
+          showGmailModal={showGmailModal}
+          setShowGmailModal={setShowGmailModal}
           smtpPassword={smtpPassword}
           setSmtpPassword={setSmtpPassword}
-          isGmailConnected={isGmailConnected}
-          handleConnectGmail={async (e: React.FormEvent) => {
-            e.preventDefault();
-            try {
-              const res = await fetch(`${API_BASE}/api/v1/auth/gmail/connect`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ email: gmailEmail, app_password: smtpPassword })
-              });
-              if (res.ok) {
-                setIsGmailConnected(true);
-                setShowGmailModal(false);
-                checkGmailStatus();
-              } else {
-                const errData = await res.json().catch(() => ({}));
-                alert(errData.detail || "Failed to connect Gmail credentials.");
-              }
-            } catch (err) {
-              alert("Failed to reach server when connecting Gmail.");
-            }
-          }}
-          handleDisconnectGmail={async () => {
-            try {
-              const res = await fetch(`${API_BASE}/api/v1/auth/gmail/disconnect`, {
-                method: "POST",
-                headers: { "Authorization": `Bearer ${token}` }
-              });
-              if (res.ok) {
-                setIsGmailConnected(false);
-                setGmailEmail("");
-                setSmtpPassword("");
-                setShowGmailModal(false);
-                checkGmailStatus();
-              }
-            } catch (err) {
-              alert("Failed to disconnect Gmail account.");
-            }
-          }}
-          setShowGmailModal={setShowGmailModal}
+          setIsGmailConnected={setIsGmailConnected}
+          showToast={showToast}
         />
       )}
     </div>

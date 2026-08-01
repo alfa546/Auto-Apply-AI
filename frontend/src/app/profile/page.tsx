@@ -60,7 +60,7 @@ export default function ProfilePage() {
       { title: "Frontend Developer", company: "NextGen Web Analytics", date: "2018 - 2021", description: "Built high-performance dashboards and modular component systems." }
     ],
     education: [
-      { degree: "B.S. Computer Science", institution: "University of Technology", year: "2018" }
+      { degree: "B.S. Computer Science", institution: "University of Technology", date: "2018" }
     ],
     projects: [
       { name: "Autonomous Agent Suite", description: "Developed an AI-powered resume adaptation and email job application tool." },
@@ -71,6 +71,12 @@ export default function ProfilePage() {
   // ATS Metrics
   const [atsMetrics, setAtsMetrics] = useState<AtsMetrics>({
     overall_score: 84,
+    formatting_score: 90,
+    keyword_density_score: 80,
+    action_verbs_score: 85,
+    section_completeness_score: 95,
+    summary: "Strong resume layout with clear formatting and high keyword density.",
+    strengths: ["Clear logical structure", "Action-oriented phrasing"],
     missing_skills: ["Kubernetes", "GraphQL", "Azure"],
     formatting_suggestions: [
       "Quantify achievements in 'NextGen Web Analytics' with specific metrics.",
