@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import uuid
 import jwt
-from passlib.context import CryptContext
+import bcrypt
 from typing import Optional
 
 from src.app.database import get_db
@@ -12,8 +12,6 @@ from src.app.models import User, Profile, UserSettings
 from src.app.config import settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Use a static secret key for local development since this is a local app
 SECRET_KEY = "local_dev_secret_key_auto_apply_ai_2026"
@@ -36,10 +34,13 @@ class Token(BaseModel):
 def verify_password(plain_password, hashed_password):
     if not hashed_password:
         return False
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
+    except Exception:
+        return False
 
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
