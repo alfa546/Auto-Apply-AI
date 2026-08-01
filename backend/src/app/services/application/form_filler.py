@@ -43,9 +43,9 @@ class FormFillerService:
         }
 
         if not HAS_PLAYWRIGHT:
-            logger.warning("Playwright not installed. Skipping browser automation and returning success.")
-            result["success"] = True
-            result["screenshot_path"] = "/uploads/screenshots/mock_submission.png"
+            logger.error("Playwright not installed or failed to import. Cannot run automated form submission.")
+            result["success"] = False
+            result["error_message"] = "Playwright automation library not available on host."
             return result
 
         async with async_playwright() as p:
@@ -57,20 +57,11 @@ class FormFillerService:
                         timeout=settings.PLAYWRIGHT_TIMEOUT
                     )
                 except Exception as launch_err:
-                    logger.warning(
-                        f"Failed to launch Playwright browser: {launch_err}. "
-                        "Falling back to mock form submission for compatibility."
-                    )
-                    # Generate a mock screenshot file
-                    mock_filename = f"mock-success-{uuid.uuid4()}.png"
-                    mock_path = os.path.join(self.screenshot_dir, mock_filename)
-                    with open(mock_path, "wb") as f:
-                        f.write(b"mock screenshot content")
-                    
+                    logger.error(f"Failed to launch Playwright browser: {launch_err}.")
                     return {
-                        "success": True,
-                        "screenshot_path": f"/uploads/screenshots/{mock_filename}",
-                        "error_message": None
+                        "success": False,
+                        "screenshot_path": None,
+                        "error_message": f"Failed to launch browser automation: {launch_err}"
                     }
 
                 context = await browser.new_context(

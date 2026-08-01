@@ -9,12 +9,12 @@ logger = logging.getLogger(__name__)
 class AdzunaProvider(BaseSearchProvider):
     async def search(self, query: str, country: str = "us") -> List[Dict]:
         """
-        Queries the Adzuna API. If credentials are not set, returns fallback mock jobs.
+        Queries the Adzuna API. Returns empty list if credentials are not configured.
         """
         app_id = settings.ADZUNA_APP_ID
         app_key = settings.ADZUNA_APP_KEY
 
-        if not app_id or not app_key or app_id == "mock" or app_key == "mock":
+        if not app_id or not app_key:
             logger.info("Adzuna API credentials not configured.")
             return []
 
@@ -56,41 +56,3 @@ class AdzunaProvider(BaseSearchProvider):
             logger.error(f"Adzuna API request failed: {e}")
 
         return []
-
-    def _get_mock_jobs(self, query: str, country: str) -> List[Dict]:
-        """
-        Generates realistic developer jobs for testing and demonstration.
-        """
-        normalized_query = query.lower()
-        if "react" in normalized_query:
-            role = "Frontend React Developer"
-            skills = "React, TypeScript, Next.js, CSS"
-        elif "python" in normalized_query or "fastapi" in normalized_query:
-            role = "Backend Python Engineer"
-            skills = "Python, FastAPI, PostgreSQL, Docker"
-        else:
-            role = f"Software Engineer ({query})"
-            skills = f"{query}, Git, SQL"
-
-        return [
-            {
-                "title": role,
-                "company": "Stripe",
-                "location": f"Remote, {country.upper()}",
-                "description": f"We are looking for a skilled professional with expertise in {skills} to join our engineering team.",
-                "url": f"https://stripe.com/careers/mock-{normalized_query.replace(' ', '-')}-1",
-                "salary": "$120,000 - $150,000",
-                "opportunity_type": "job",
-                "raw_data": {"source": "adzuna_mock"}
-            },
-            {
-                "title": f"Senior {role}",
-                "company": "Vercel",
-                "location": f"San Francisco, {country.upper()}",
-                "description": f"Join our core frameworks team focusing on cutting-edge features. Experience with {skills} required.",
-                "url": f"https://vercel.com/careers/mock-{normalized_query.replace(' ', '-')}-2",
-                "salary": "$160,000 - $200,000",
-                "opportunity_type": "job",
-                "raw_data": {"source": "adzuna_mock"}
-            }
-        ]

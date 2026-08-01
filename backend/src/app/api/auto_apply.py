@@ -21,11 +21,11 @@ class ApplyRequest(BaseModel):
 
 def get_uid_and_email(user_context):
     if isinstance(user_context, dict):
-        uid = user_context.get("uid", "dev-mock-matcher_test_uid")
-        email = user_context.get("email", "dev-user@example.com")
+        uid = user_context.get("uid", "")
+        email = user_context.get("email", "")
     else:
-        uid = getattr(user_context, "id", "dev-mock-matcher_test_uid")
-        email = getattr(user_context, "email", "dev-user@example.com")
+        uid = str(getattr(user_context, "id", ""))
+        email = getattr(user_context, "email", "")
     return uid, email
 
 @router.post("/send-email")

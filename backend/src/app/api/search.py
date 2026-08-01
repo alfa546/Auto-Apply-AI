@@ -28,7 +28,7 @@ async def trigger_search(
     """
     aggregator = SearchAggregator()
     try:
-        user_id = current_user.get("uid", "dev-mock-matcher_test_uid")
+        user_id = current_user.get("uid")
         
         if payload.query:
             new_jobs = await aggregator.run_aggregation(

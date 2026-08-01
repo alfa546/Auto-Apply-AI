@@ -53,38 +53,25 @@ export default function ProfilePage() {
 
   // Extracted Profile
   const [extractedProfile, setExtractedProfile] = useState<ProfileData>({
-    summary: "Senior Full-Stack Developer with 6+ years of experience specializing in React, Next.js, FastAPI, and Cloud architectures.",
-    skills: ["React", "Next.js", "TypeScript", "Node.js", "FastAPI", "Python", "Docker", "AWS", "PostgreSQL", "Tailwind CSS"],
-    experience: [
-      { title: "Senior Software Engineer", company: "TechScale Systems", date: "2021 - Present", description: "Architected distributed AI-driven workflows and scaled microservices." },
-      { title: "Frontend Developer", company: "NextGen Web Analytics", date: "2018 - 2021", description: "Built high-performance dashboards and modular component systems." }
-    ],
-    education: [
-      { degree: "B.S. Computer Science", institution: "University of Technology", date: "2018" }
-    ],
-    projects: [
-      { name: "Autonomous Agent Suite", description: "Developed an AI-powered resume adaptation and email job application tool." },
-      { name: "Cloud Neural API", description: "High-throughput inference gateway utilizing FastAPI and Redis." }
-    ]
+    summary: "",
+    skills: [],
+    experience: [],
+    education: [],
+    projects: []
   });
 
   // ATS Metrics
   const [atsMetrics, setAtsMetrics] = useState<AtsMetrics>({
-    overall_score: 84,
-    formatting_score: 90,
-    keyword_density_score: 80,
-    action_verbs_score: 85,
-    section_completeness_score: 95,
-    summary: "Strong resume layout with clear formatting and high keyword density.",
-    strengths: ["Clear logical structure", "Action-oriented phrasing"],
-    missing_skills: ["Kubernetes", "GraphQL", "Azure"],
-    formatting_suggestions: [
-      "Quantify achievements in 'NextGen Web Analytics' with specific metrics.",
-      "Add explicit section header for Certifications."
-    ],
-    experience_improvements: [
-      "Emphasize impact on system architectural throughput in Senior Engineer role."
-    ]
+    overall_score: 0,
+    formatting_score: 0,
+    keyword_density_score: 0,
+    action_verbs_score: 0,
+    section_completeness_score: 0,
+    summary: "No resume analyzed yet. Upload a PDF resume above to run real-time ATS grading.",
+    strengths: [],
+    missing_skills: [],
+    formatting_suggestions: [],
+    experience_improvements: []
   });
 
   // Toast Notification State

@@ -76,7 +76,7 @@ def get_user_settings(current_user: dict = Depends(get_current_user), db: Sessio
     """
     Fetch user API keys and integration credentials.
     """
-    uid = current_user.get("uid", "dev-mock-matcher_test_uid")
+    uid = current_user.get("uid")
     settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
     if not settings:
         settings = UserSettings(user_id=uid)
@@ -131,7 +131,7 @@ def update_user_settings(
     """
     Update and save user API keys and integration credentials.
     """
-    uid = current_user.get("uid", "dev-mock-matcher_test_uid")
+    uid = current_user.get("uid")
     settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
     if not settings:
         settings = UserSettings(user_id=uid)
@@ -170,7 +170,7 @@ def update_user_profile(
     """
     Update and save user profile and career preferences.
     """
-    uid = current_user.get("uid", "dev-mock-matcher_test_uid")
+    uid = current_user.get("uid")
     
     # Update User Profile
     profile = db.query(Profile).filter(Profile.user_id == uid).first()

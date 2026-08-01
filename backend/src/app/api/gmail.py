@@ -17,8 +17,8 @@ class SmtpSetupRequest(BaseModel):
 
 def get_uid(user_context) -> str:
     if isinstance(user_context, dict):
-        return user_context.get("uid", "dev-mock-matcher_test_uid")
-    return getattr(user_context, "id", "dev-mock-matcher_test_uid")
+        return user_context.get("uid", "")
+    return str(getattr(user_context, "id", ""))
 
 @router.get("/url")
 def get_gmail_auth_url(current_user: dict = Depends(get_current_user)):
@@ -42,7 +42,9 @@ def gmail_oauth_callback(
     3. Saves tokens and updates is_gmail_connected = True.
     4. Redirects user back to Next.js dashboard frontend.
     """
-    user_id = state or "dev-mock-matcher_test_uid"
+    if not state:
+        raise HTTPException(status_code=400, detail="Missing OAuth state parameter (user ID).")
+    user_id = state
     tokens = gmail_client.exchange_code_for_tokens(code)
     
     settings = db.query(UserSettings).filter(UserSettings.user_id == user_id).first()
@@ -60,27 +62,6 @@ def gmail_oauth_callback(
     else:
         error_msg = tokens.get("error", "OAuth failed")
         return RedirectResponse(url=f"http://localhost:3000/?gmail_error={error_msg}")
-
-@router.post("/connect-mock")
-def connect_mock_gmail(
-    email: str = Query("user@gmail.com"),
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
-    """
-    Directly connects user's Gmail in dev/demo mode.
-    """
-    uid = get_uid(current_user)
-    settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
-    if not settings:
-        settings = UserSettings(user_id=uid)
-        db.add(settings)
-        
-    settings.is_gmail_connected = True
-    settings.gmail_email_address = email
-    settings.gmail_access_token = "mock_access_token_dev"
-    db.commit()
-    return {"message": f"Gmail connected successfully as {email}", "is_connected": True}
 
 @router.post("/setup-smtp")
 def setup_gmail_smtp(

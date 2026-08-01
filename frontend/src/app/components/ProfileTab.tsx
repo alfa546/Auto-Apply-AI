@@ -518,7 +518,7 @@ export default function ProfileTab({
             {/* Candidate Executive Summary */}
             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
               <h4 className="text-[11px] font-bold text-rose-400 uppercase tracking-wider">Executive Summary</h4>
-              <p className="text-xs text-slate-300 leading-relaxed">{extractedProfile.summary}</p>
+              <p className="text-xs text-slate-300 leading-relaxed">{extractedProfile.summary || "No executive summary extracted yet. Upload a PDF resume above to run real-time AI parsing."}</p>
             </div>
 
             {/* Extracted Skills Badges */}

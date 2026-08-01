@@ -69,32 +69,3 @@ class RSSProvider(BaseSearchProvider):
         except Exception as e:
             logger.error(f"Error parsing RSS XML structure: {e}")
         return results
-
-    def _get_mock_opportunities(self, query: str, opportunity_type: str, source: str) -> List[Dict]:
-        normalized_query = query.lower()
-        if opportunity_type == "hackathon":
-            return [
-                {
-                    "title": f"Global {query.capitalize()} AI Hackathon 2026",
-                    "company": source,
-                    "location": "Online / Global",
-                    "description": f"Compete with developers worldwide to build innovative solutions using {query}.",
-                    "url": f"https://devpost.com/hackathons/mock-{normalized_query}-hackathon",
-                    "salary": "Prizes: $15,000",
-                    "opportunity_type": "hackathon",
-                    "raw_data": {"source": f"{source}_mock"}
-                }
-            ]
-        else:
-            return [
-                {
-                    "title": f"{query.capitalize()} Excellence Scholarship",
-                    "company": "EduFoundation",
-                    "location": "United States",
-                    "description": "Financial assistance program for outstanding students pursuing studies in computer science.",
-                    "url": "https://example.org/scholarships/mock-cs-excellence",
-                    "salary": "Grant: $10,000",
-                    "opportunity_type": "scholarship",
-                    "raw_data": {"source": "scholarship_mock"}
-                }
-            ]

@@ -29,7 +29,7 @@ async def upload_resume(
     Upload and parse PDF resume file.
     Extracts skills, experience, education, executive summary, and calculates real-time ATS score.
     """
-    uid = current_user.get("uid", "dev-mock-matcher_test_uid")
+    uid = current_user.get("uid")
     if not file.filename.lower().endswith((".pdf", ".doc", ".docx")):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -86,7 +86,7 @@ def get_resume_profile(
     """
     Retrieve the current authenticated user's structured resume profile, ATS score, and recommendations.
     """
-    uid = current_user.get("uid", "dev-mock-matcher_test_uid")
+    uid = current_user.get("uid")
     profile = db.query(Profile).filter(Profile.user_id == uid).first()
     
     if not profile:
@@ -116,25 +116,22 @@ def run_ats_check(
     """
     Run an ad-hoc ATS grading checklist against a target job role or job description.
     """
-    uid = current_user.get("uid", "dev-mock-matcher_test_uid")
+    uid = current_user.get("uid")
     profile = db.query(Profile).filter(Profile.user_id == uid).first()
     
     if not profile:
-        # Fallback profile evaluation for direct check
-        profile_data = {
-            "skills": ["Python", "FastAPI", "React", "PostgreSQL"],
-            "experience": [{"title": "Software Engineer", "company": "Tech Firm", "description": "Built REST APIs"}],
-            "education": [{"degree": "BS CS", "institution": "University"}],
-            "projects": [{"name": "AI App", "description": "Built AI agent"}]
-        }
-    else:
-        profile_data = {
-            "skills": profile.skills,
-            "experience": profile.experience,
-            "education": profile.education,
-            "projects": profile.projects,
-            "languages": profile.languages
-        }
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No resume profile found for this user. Please upload a resume first to run an ATS check."
+        )
+
+    profile_data = {
+        "skills": profile.skills,
+        "experience": profile.experience,
+        "education": profile.education,
+        "projects": profile.projects,
+        "languages": profile.languages
+    }
     
     target = payload.target_role or (payload.job_description[:100] if payload.job_description else None)
     ats_results = evaluate_resume_ats(profile_data, target_role=target)
