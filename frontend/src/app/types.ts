@@ -3,11 +3,15 @@ export interface Job {
   title: string;
   company: string;
   location?: string;
+  country?: string;
   description?: string;
-  salary?: string;
+  url: string;
   company_email?: string;
-  opportunity_type?: string;
+  salary?: string;
+  source?: string;
+  opportunity_type: "job" | "internship" | "scholarship" | "hackathon";
   match_score?: number;
+  found_at?: string;
 }
 
 export interface Application {
@@ -15,19 +19,40 @@ export interface Application {
   title: string;
   company: string;
   company_email?: string;
-  status: string;
-  gmail_message_id?: string;
-  applied_at: string;
   opportunity_type: string;
+  status: string;
+  url?: string;
+  applied_at: string;
+  cover_letter?: string;
   notes?: string;
+  gmail_message_id?: string;
+}
+
+export interface Experience {
+  title: string;
+  company: string;
+  description?: string;
+  date?: string;
+}
+
+export interface Education {
+  degree: string;
+  institution: string;
+  date?: string;
+}
+
+export interface Project {
+  name: string;
+  description?: string;
+  url?: string;
 }
 
 export interface ProfileData {
   summary: string;
   skills: string[];
-  experience: any[];
-  education: any[];
-  projects: any[];
+  experience: Experience[];
+  education: Education[];
+  projects: Project[];
 }
 
 export interface AtsMetrics {

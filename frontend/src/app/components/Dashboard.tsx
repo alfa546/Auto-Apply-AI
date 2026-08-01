@@ -64,8 +64,8 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 export default function Dashboard() {
   const { user, token, isAuthenticated, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("jobs");
-  const [dailyJobs, setDailyJobs] = useState<any[]>([]);
-  const [applications, setApplications] = useState<any[]>([]);
+  const [dailyJobs, setDailyJobs] = useState<Job[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [isTriggeringSearch, setIsTriggeringSearch] = useState(false);
 
   // Time-based History Filter State ("today" | "monthly" | "yearly" | "all")
@@ -119,25 +119,25 @@ export default function Dashboard() {
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isAnalyzingATS, setIsAnalyzingATS] = useState(false);
 
-  const [atsMetrics, setAtsMetrics] = useState({
+  const [atsMetrics, setAtsMetrics] = useState<AtsMetrics>({
     overall_score: 0,
     formatting_score: 0,
     keyword_density_score: 0,
     action_verbs_score: 0,
     section_completeness_score: 0,
     summary: "No resume PDF uploaded yet. Upload your CV to calculate real-time ATS compatibility scores.",
-    strengths: [] as string[],
-    missing_skills: [] as string[],
-    formatting_suggestions: [] as string[],
-    experience_improvements: [] as string[]
+    strengths: [],
+    missing_skills: [],
+    formatting_suggestions: [],
+    experience_improvements: []
   });
 
-  const [extractedProfile, setExtractedProfile] = useState({
+  const [extractedProfile, setExtractedProfile] = useState<ProfileData>({
     summary: "Upload a PDF resume to view AI-extracted summary, skills, experience, and project breakdown.",
-    skills: [] as string[],
-    experience: [] as any[],
-    education: [] as any[],
-    projects: [] as any[]
+    skills: [],
+    experience: [],
+    education: [],
+    projects: []
   });
 
   // Toast Notification State
@@ -532,7 +532,7 @@ export default function Dashboard() {
   };
 
   // Handle Auto-Apply via Email
-  const handleAutoApply = async (job: any) => {
+  const handleAutoApply = async (job: Job) => {
     setIsApplyingId(job.id);
     try {
       const res = await fetch(`${API_BASE}/api/v1/auto-apply/send-email`, {
@@ -544,13 +544,14 @@ export default function Dashboard() {
         body: JSON.stringify({ job_id: job.id })
       });
 
-      const newApp = {
+      const newApp: Application = {
         id: Date.now(),
         title: job.title,
         company: job.company,
         company_email: job.company_email,
         opportunity_type: job.opportunity_type || "job",
         status: "Sent via Gmail",
+        url: job.url || "",
         gmail_message_id: `msg_${Date.now().toString(16)}`,
         applied_at: new Date().toISOString(),
         notes: `Sent via connected Gmail to ${job.company_email}`

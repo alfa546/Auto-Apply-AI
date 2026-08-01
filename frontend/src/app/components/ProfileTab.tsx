@@ -1,5 +1,5 @@
 import React from "react";
-import { ProfileData, AtsMetrics } from "../types";
+import { ProfileData, AtsMetrics, Experience, Education } from "../types";
 import { UserIcon, SparklesIcon, UploadIcon, TargetIcon } from "./Icons";
 import {
   WORK_MODE_OPTIONS,
@@ -528,7 +528,7 @@ export default function ProfileTab({
             {extractedProfile.experience && extractedProfile.experience.length > 0 && (
               <div className="space-y-2">
                 <h4 className="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2 border-t border-slate-800 pt-4">Work Experience</h4>
-                {extractedProfile.experience.map((exp: any, idx: number) => (
+                {extractedProfile.experience.map((exp: Experience, idx: number) => (
                   <div key={idx} className="bg-slate-950 p-3 rounded-lg border border-slate-800/60 flex flex-col gap-1">
                     <div className="flex justify-between items-start">
                       <span className="text-xs font-bold text-slate-200">{exp.title}</span>
@@ -545,7 +545,7 @@ export default function ProfileTab({
             {extractedProfile.education && extractedProfile.education.length > 0 && (
               <div className="space-y-2">
                 <h4 className="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2 border-t border-slate-800 pt-4">Education</h4>
-                {extractedProfile.education.map((edu: any, idx: number) => (
+                {extractedProfile.education.map((edu: Education, idx: number) => (
                   <div key={idx} className="bg-slate-950 p-3 rounded-lg border border-slate-800/60 flex flex-col gap-1">
                     <div className="flex justify-between items-start">
                       <span className="text-xs font-bold text-slate-200">{edu.degree}</span>
