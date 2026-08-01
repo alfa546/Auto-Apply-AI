@@ -11,6 +11,7 @@ import { ALL_WORLD_COUNTRIES } from "../constants";
 
 
 import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
 
 // Standard SVG Icons
 
@@ -61,15 +62,11 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 
 export default function Dashboard() {
+  const { user, token, isAuthenticated, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("jobs");
   const [dailyJobs, setDailyJobs] = useState<any[]>([]);
   const [applications, setApplications] = useState<any[]>([]);
   const [isTriggeringSearch, setIsTriggeringSearch] = useState(false);
-
-  // Mock Login State
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
-  const [mockLoginInput, setMockLoginInput] = useState("");
 
   // Time-based History Filter State ("today" | "monthly" | "yearly" | "all")
   const [historyFilter, setHistoryFilter] = useState<"today" | "monthly" | "yearly" | "all">("today");
@@ -184,22 +181,14 @@ export default function Dashboard() {
     );
   };
 
-  useEffect(() => {
-    const storedUsername = localStorage.getItem("mock_username");
-    if (storedUsername) {
-      setUsername(storedUsername);
-      setIsLoggedIn(true);
-    }
-  }, []);
-
   // Fetch status & live data from backend APIs on mount or when logged in
   useEffect(() => {
-    if (!isLoggedIn || !username) return;
+    if (!isAuthenticated || !token) return;
 
     async function checkGmailStatus() {
       try {
         const res = await fetch(`${API_BASE}/api/v1/auth/gmail/status`, {
-          headers: { "Authorization": `Bearer dev-mock-${username}` }
+          headers: { "Authorization": `Bearer ${token}` }
         });
         if (res.ok) {
           const data = await res.json();
@@ -214,7 +203,7 @@ export default function Dashboard() {
     async function fetchUserSettings() {
       try {
         const res = await fetch(`${API_BASE}/api/v1/users/settings`, {
-          headers: { "Authorization": `Bearer dev-mock-${username}` }
+          headers: { "Authorization": `Bearer ${token}` }
         });
         if (res.ok) {
           const data = await res.json();
@@ -247,7 +236,7 @@ export default function Dashboard() {
     async function fetchOpportunities() {
       try {
         const res = await fetch(`${API_BASE}/api/v1/search/opportunities?limit=50`, {
-          headers: { "Authorization": `Bearer dev-mock-${username}` }
+          headers: { "Authorization": `Bearer ${token}` }
         });
         if (res.ok) {
           const data = await res.json();
@@ -261,7 +250,7 @@ export default function Dashboard() {
     async function fetchApplications() {
       try {
         const res = await fetch(`${API_BASE}/api/v1/applications`, {
-          headers: { "Authorization": `Bearer dev-mock-${username}` }
+          headers: { "Authorization": `Bearer ${token}` }
         });
         if (res.ok) {
           const data = await res.json();
@@ -275,7 +264,7 @@ export default function Dashboard() {
     async function fetchResumeProfile() {
       try {
         const res = await fetch(`${API_BASE}/api/v1/resumes/profile`, {
-          headers: { "Authorization": `Bearer dev-mock-${username}` }
+          headers: { "Authorization": `Bearer ${token}` }
         });
         if (res.ok) {
           const data = await res.json();
@@ -305,7 +294,7 @@ export default function Dashboard() {
     fetchOpportunities();
     fetchApplications();
     fetchResumeProfile();
-  }, [isLoggedIn, username]);
+  }, [isAuthenticated, token]);
 
   // Trigger Smart Job Search Agent
   const handleTriggerSearchAgent = async () => {
@@ -315,7 +304,7 @@ export default function Dashboard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer dev-mock-${username}`
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({})
       });
@@ -323,7 +312,7 @@ export default function Dashboard() {
         const data = await res.json();
         showToast(data.message || "Smart Job Search Agent completed multi-country scan!");
         const oppRes = await fetch(`${API_BASE}/api/v1/search/opportunities?limit=50`, {
-          headers: { "Authorization": `Bearer dev-mock-${username}` }
+          headers: { "Authorization": `Bearer ${token}` }
         });
         if (oppRes.ok) {
           const oppData = await oppRes.json();
@@ -352,7 +341,7 @@ export default function Dashboard() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer dev-mock-${username}`
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
           llm_provider: llmProvider,
@@ -388,7 +377,7 @@ export default function Dashboard() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer dev-mock-${username}`
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
           email: userEmail,
@@ -512,7 +501,7 @@ export default function Dashboard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer dev-mock-${username}`
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ target_role: targetRoles[0] || "Full Stack Developer" })
       });
@@ -550,7 +539,7 @@ export default function Dashboard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer dev-mock-${username}`
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ job_id: job.id })
       });
@@ -611,45 +600,8 @@ export default function Dashboard() {
     return matchesEmpType;
   });
 
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-[#090a0f] bg-grid-omni bg-coral-glow text-slate-100 font-sans flex items-center justify-center p-4">
-        <div className="glass-panel p-8 rounded-2xl max-w-md w-full text-center space-y-6 border border-white/10 shadow-2xl relative overflow-hidden">
-          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="relative z-10">
-            <SparklesIcon className="w-16 h-16 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-2">Login to AutoApply AI</h2>
-            <p className="text-slate-400 text-sm mb-6">Enter a unique username to access your isolated workspace. This keeps your API keys and data private.</p>
-            <input
-              type="text"
-              value={mockLoginInput}
-              onChange={(e) => setMockLoginInput(e.target.value)}
-              className="w-full bg-slate-900/80 border border-slate-700/50 focus:border-rose-500/50 focus:ring-1 focus:ring-rose-500/50 outline-none text-white rounded-xl px-4 py-3 mb-4 transition-all placeholder:text-slate-500"
-              placeholder="Username (e.g. ali123)"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && mockLoginInput.trim()) {
-                  localStorage.setItem("mock_username", mockLoginInput.trim());
-                  setUsername(mockLoginInput.trim());
-                  setIsLoggedIn(true);
-                }
-              }}
-            />
-            <button
-              onClick={() => {
-                if (mockLoginInput.trim()) {
-                  localStorage.setItem("mock_username", mockLoginInput.trim());
-                  setUsername(mockLoginInput.trim());
-                  setIsLoggedIn(true);
-                }
-              }}
-              className="w-full btn-red-glow text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all"
-            >
-              Enter Workspace
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+  if (!isAuthenticated || !token) {
+    return null;
   }
 
   return (
@@ -684,15 +636,27 @@ export default function Dashboard() {
 
           <div className="flex items-center gap-3">
             {isGmailConnected && (
-              <div className="hidden sm:flex items-center gap-2 bg-rose-950/40 border border-rose-500/30 px-3.5 py-1.5 rounded-full text-xs text-rose-300">
+              <div className="hidden lg:flex items-center gap-2 bg-rose-950/40 border border-rose-500/30 px-3.5 py-1.5 rounded-full text-xs text-rose-300">
                 <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
                 <span>Gmail: <strong className="text-rose-200">{gmailEmail}</strong></span>
               </div>
             )}
+            {user && (
+              <span className="hidden sm:inline-block text-xs font-mono text-slate-400 border border-white/10 px-3 py-1.5 rounded-full bg-slate-900/60">
+                {user.email}
+              </span>
+            )}
             <button onClick={() => setActiveTab("settings")} className="btn-red-glow text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2">
               <KeyIcon />
-              <span>API Vault</span>
+              <span className="hidden sm:inline">API Vault</span>
               <span>→</span>
+            </button>
+            <button
+              onClick={logout}
+              title="Logout"
+              className="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700 text-xs font-semibold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5"
+            >
+              <span>Logout</span>
             </button>
           </div>
         </div>
@@ -836,7 +800,7 @@ export default function Dashboard() {
           setShowGmailModal={setShowGmailModal}
           setIsGmailConnected={setIsGmailConnected}
           showToast={showToast}
-          username={username}
+          token={token}
         />
       )}
     </div>

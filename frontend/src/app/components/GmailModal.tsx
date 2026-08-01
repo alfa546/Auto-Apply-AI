@@ -3,7 +3,7 @@ import { GmailIcon } from "./Icons";
 
 interface GmailModalProps {
   API_BASE: string;
-  username: string;
+  token: string | null;
   gmailEmail: string;
   setGmailEmail: (email: string) => void;
   showGmailModal: boolean;
@@ -16,7 +16,7 @@ interface GmailModalProps {
 
 export default function GmailModal({
   API_BASE,
-  username,
+  token,
   gmailEmail,
   setGmailEmail,
   showGmailModal,
@@ -65,7 +65,7 @@ export default function GmailModal({
               onClick={async () => {
                 try {
                   const res = await fetch(`${API_BASE}/api/v1/auth/gmail/url`, {
-                    headers: { "Authorization": `Bearer dev-mock-${username}` }
+                    headers: { "Authorization": `Bearer ${token}` }
                   });
                   if (res.ok) {
                     const data = await res.json();
@@ -116,7 +116,7 @@ export default function GmailModal({
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
-                      "Authorization": `Bearer dev-mock-${username}`
+                      "Authorization": `Bearer ${token}`
                     },
                     body: JSON.stringify({ email: gmailEmail, app_password: smtpPassword })
                   });

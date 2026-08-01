@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, AuthGuard } from "./context/AuthContext";
 
 export default function RootLayout({
   children,
@@ -35,7 +35,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <AuthGuard>{children}</AuthGuard>
+        </AuthProvider>
       </body>
     </html>
   );
