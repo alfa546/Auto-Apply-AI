@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/search", tags=["search"])
 
 class TriggerSearchRequest(BaseModel):
-    query: Optional[str] = Field(None, description="The search query, e.g. 'Python Developer'. If empty, RAG & Preferences search is triggered.")
+    query: Optional[str] = Field(None, description="The search query, e.g. 'Python Developer'. If empty, Preferences-guided search is triggered.")
     country: Optional[str] = Field(None, description="Country code, e.g. 'us', 'gb'")
 
 @router.post("/trigger")
@@ -24,7 +24,7 @@ async def trigger_search(
     db: Session = Depends(get_db)
 ):
     """
-    Triggers the Search Aggregator pipeline to scan for new opportunities based on user preferences and RAG skills.
+    Triggers the Search Aggregator pipeline to scan for new opportunities based on user preferences and resume skills.
     """
     aggregator = SearchAggregator()
     try:
@@ -37,14 +37,14 @@ async def trigger_search(
                 country=payload.country or "us"
             )
         else:
-            new_jobs = await aggregator.run_rag_guided_search(
+            new_jobs = await aggregator.run_preferences_guided_search(
                 db=db,
                 user_id=user_id
             )
             
         return {
             "status": "success",
-            "message": f"RAG & Preferences guided search completed. Discovered {new_jobs} new opportunities.",
+            "message": f"Preferences-guided search completed. Discovered {new_jobs} new opportunities.",
             "new_opportunities_found": new_jobs
         }
     except HTTPException:

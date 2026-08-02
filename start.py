@@ -10,8 +10,6 @@ import sys
 import time
 import subprocess
 import webbrowser
-import shutil
-import signal
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 BACKEND_DIR = os.path.join(ROOT_DIR, "backend")

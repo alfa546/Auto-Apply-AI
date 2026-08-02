@@ -92,13 +92,13 @@ class SearchAggregator:
         logger.info(f"Aggregator pipeline complete. Saved {new_records_count} new opportunities to the database.")
         return new_records_count
 
-    async def run_rag_guided_search(self, db: Session, user_id: str):
+    async def run_preferences_guided_search(self, db: Session, user_id: str):
         """
-        Smooth RAG & Preferences Guided Job Search Agent:
+        Preferences-Guided Job Search Agent:
         1. Reads user preferences (target countries, target roles, employment types).
-        2. Reads candidate RAG resume profile skills & keywords from vector DB / Profile model.
-        3. Formulates optimized search queries blending RAG skills + user target preferences.
-        4. Runs search aggregator across preferred countries and evaluates RAG match scores.
+        2. Reads candidate resume profile skills & keywords from Profile model.
+        3. Formulates optimized search queries blending resume skills + user target preferences.
+        4. Runs search aggregator across preferred countries and evaluates match scores.
         """
         from src.app.models import Profile, UserSettings
         from src.app.services.matching.matcher import MatchingEngine
@@ -125,14 +125,14 @@ class SearchAggregator:
             if extracted_codes:
                 target_countries = list(set(extracted_codes))
 
-        # Extract RAG resume skills & target roles
-        rag_skills = (profile.skills if profile and profile.skills else ["Python", "FastAPI", "React", "Next.js"])
+        # Extract resume skills & target roles
+        resume_skills = (profile.skills if profile and profile.skills else ["Python", "FastAPI", "React", "Next.js"])
         target_roles = (user_settings.target_roles if user_settings and user_settings.target_roles else ["Full Stack Developer", "AI Engineer"])
 
-        # Formulate RAG search queries
+        # Formulate search queries
         search_queries = []
         for role in target_roles[:2]:
-            top_skills = " ".join(rag_skills[:2]) if rag_skills else ""
+            top_skills = " ".join(resume_skills[:2]) if resume_skills else ""
             search_queries.append(f"{role} {top_skills}".strip())
 
         if profile and profile.employment_types and any("internship" in et.lower() for et in profile.employment_types):
@@ -144,11 +144,11 @@ class SearchAggregator:
                 count = await self.run_aggregation(db=db, query=query, country=country)
                 total_new_opportunities += count
 
-        # Run RAG Matcher evaluation for unrated jobs
+        # Run Matcher evaluation for unrated jobs
         matcher = MatchingEngine()
         unrated_jobs = db.query(JobFound).all()
         for job in unrated_jobs:
             eval_res = await matcher.evaluate_job_match(db=db, user_id=user_id, job_id=job.id)
-            logger.info(f"RAG Evaluated Job {job.id} ({job.title}): Score={eval_res.get('score')} Match={eval_res.get('is_match')}")
+            logger.info(f"Evaluated Job {job.id} ({job.title}): Score={eval_res.get('score')} Match={eval_res.get('is_match')}")
 
         return total_new_opportunities
