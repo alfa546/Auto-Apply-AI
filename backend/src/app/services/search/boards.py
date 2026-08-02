@@ -1,10 +1,19 @@
 import logging
 import httpx
+import re
+import html
 from typing import List, Dict
 from src.app.config import settings
 from src.app.services.search.base import BaseSearchProvider
 
 logger = logging.getLogger(__name__)
+
+def clean_html(text: str) -> str:
+    if not text:
+        return ""
+    text = re.sub(r'<[^>]+>', ' ', text)
+    text = html.unescape(text)
+    return " ".join(text.split())
 
 class GreenhouseProvider(BaseSearchProvider):
     async def search(self, query: str, country: str = "us") -> List[Dict]:
@@ -61,7 +70,7 @@ class LeverProvider(BaseSearchProvider):
                         data = response.json() # Lever returns root list of postings
                         for posting in data:
                             title = posting.get("text", "")
-                            desc = posting.get("description", "")
+                            desc = clean_html(posting.get("description", ""))
                             if normalized_query in title.lower() or normalized_query in desc.lower():
                                 results.append({
                                     "title": title,

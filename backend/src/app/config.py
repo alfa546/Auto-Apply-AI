@@ -34,8 +34,8 @@ class Settings(BaseSettings):
     ADZUNA_APP_ID: Optional[str] = None
     ADZUNA_APP_KEY: Optional[str] = None
     JOOBLE_API_KEY: Optional[str] = None
-    TRACKED_COMPANIES_GREENHOUSE: list[str] = ["stripe", "vercel", "openai", "cloudflare"]
-    TRACKED_COMPANIES_LEVER: list[str] = ["figma", "vercel", "openai", "palantir"]
+    TRACKED_COMPANIES_GREENHOUSE: list[str] = ["vercel", "openai", "cloudflare"]
+    TRACKED_COMPANIES_LEVER: list[str] = ["figma", "vercel", "openai"]
     SEARCH_INTERVAL_HOURS: int = 6
     MATCHING_THRESHOLD: float = 0.8
     PLAYWRIGHT_HEADLESS: bool = True

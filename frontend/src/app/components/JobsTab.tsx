@@ -122,7 +122,7 @@ export default function JobsTab({
                   {job.company_email && <span className="text-rose-400 font-mono">✉️ HR Email: {job.company_email}</span>}
                 </div>
 
-                {job.description && <p className="text-xs text-slate-300 line-clamp-2 pt-1">{job.description}</p>}
+                {job.description && <p className="text-xs text-slate-300 line-clamp-2 pt-1">{job.description.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()}</p>}
               </div>
 
               <div className="flex md:flex-col items-end justify-between gap-4 min-w-[200px]">
