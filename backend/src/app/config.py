@@ -1,10 +1,12 @@
 # Configuration loader
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
+import os
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Auto Apply AI"
     API_V1_STR: str = "/api/v1"
+    CORS_ORIGINS: list[str] = ["http://localhost:3000"]
     
     # Database Configurations
     POSTGRES_SERVER: str = "localhost"
@@ -44,7 +46,7 @@ class Settings(BaseSettings):
     # Email & Gmail OAuth Configurations
     GOOGLE_CLIENT_ID: Optional[str] = None
     GOOGLE_CLIENT_SECRET: Optional[str] = None
-    GOOGLE_REDIRECT_URI: str = "http://localhost:8000/api/v1/auth/gmail/callback"
+    GOOGLE_REDIRECT_URI: str = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/v1/auth/gmail/callback")
     EMAIL_IMAP_SERVER: Optional[str] = None
     EMAIL_SMTP_SERVER: str = "smtp.gmail.com"
     EMAIL_SMTP_PORT: int = 587

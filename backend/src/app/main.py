@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
 
+from src.app.config import settings
 from src.app.api.auth import router as auth_router
 from src.app.api.users import router as users_router
 from src.app.api.resumes import router as resumes_router
@@ -35,7 +36,7 @@ async def shutdown_event():
 # Enable CORS for frontend integration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, restrict to frontend domain
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
