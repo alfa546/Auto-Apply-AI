@@ -215,7 +215,10 @@ export default function ProfilePage() {
           employment_types: selectedEmpTypes,
           salary_preference: salaryPref,
           experience_level: experiencePref,
-          visa_sponsorship: visaSponsorshipPref.toLowerCase().includes("required") || visaSponsorshipPref.toLowerCase().includes("needed"),
+          visa_sponsorship: (() => {
+            const visaStr = visaSponsorshipPref.toLowerCase();
+            return (visaStr.includes("required") || visaStr.includes("needed")) && !visaStr.includes("no visa") && !visaStr.includes("not required");
+          })(),
           visa_sponsorship_str: visaSponsorshipPref,
           daily_job_goal: dailyJobGoal,
           daily_internship_goal: dailyInternshipGoal,
