@@ -49,13 +49,12 @@ async def upload_resume(
     user_settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
     if user_settings and user_settings.openai_api_key:
         import src.app.config as config_module
-        config_module.settings.OPENAI_API_KEY = user_settings.openai_api_key
-        if user_settings.llm_provider:
-            config_module.settings.llm_provider = user_settings.llm_provider
+        if user_settings.llm_provider == "gemini" or user_settings.openai_api_key.startswith("AIzaSy"):
+            config_module.settings.GEMINI_API_KEY = user_settings.openai_api_key
+        else:
+            config_module.settings.OPENAI_API_KEY = user_settings.openai_api_key
         if user_settings.llm_model:
             config_module.settings.OPENAI_MODEL = user_settings.llm_model
-        if user_settings.custom_api_base:
-            config_module.settings.custom_api_base = user_settings.custom_api_base
 
     # 3. Extract candidate skills & executive summary via AI / Parser
     parsed_info = extract_skills_and_summary_from_text(raw_text)
