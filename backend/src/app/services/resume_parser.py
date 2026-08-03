@@ -203,20 +203,30 @@ def rule_based_parse(text: str) -> dict:
         # Remove empty or extremely long items
         parsed["skills"] = list(dict.fromkeys([s for s in skills if len(s) < 40]))[:30]
     
-    # Process education (simple lines)
+    # Process education (extract degree/institution/year patterns if possible)
     for line in sections["education"][:5]: # Limit to top 5 lines
+        institution = "N/A"
+        year = "N/A"
+        # Try to extract institution (after comma, dash, or " at ")
+        inst_match = re.search(r'(?:at|,|-)\s*([A-Za-z\s]+?)(?:,|\s+\d{4})?$', line, re.IGNORECASE)
+        if inst_match and inst_match.group(1).strip() not in ("University", "College"):
+            institution = inst_match.group(1).strip()
+        # Try to extract year
+        year_match = re.search(r'\b(19|20)\d{2}\b', line)
+        if year_match:
+            year = year_match.group(0)
         parsed["education"].append({
             "degree": line,
-            "institution": "University / Institution",
-            "year": "N/A"
+            "institution": institution,
+            "year": year
         })
     
-    # Process experience (simple lines)
+    # Process experience (simple lines - only include real resume content, no placeholders)
     for line in sections["experience"][:10]: # Limit to top 10 lines
         parsed["experience"].append({
             "title": line,
-            "company": "Company",
-            "duration": "N/A",
+            "company": "",
+            "duration": "",
             "description": line
         })
         
@@ -233,28 +243,19 @@ def rule_based_parse(text: str) -> dict:
         langs = [l.strip() for l in re.split(r"[,•|;]|\band\b", lang_text) if l.strip()]
         parsed["languages"] = list(dict.fromkeys(langs))
         
-    # Fallback default fill-ins if sections were empty/not found
+    # Fallback: extract real tech stack keywords from the resume text
+    # Only include skills ACTUALLY found in the resume - never fabricate data
     if not parsed["skills"]:
-        common_tech = ["Python", "JavaScript", "TypeScript", "React", "Node", "FastAPI", "SQL", "PostgreSQL", "Docker", "Git", "C++", "Java", "Go", "AWS", "HTML", "CSS"]
+        common_tech = ["Python", "JavaScript", "TypeScript", "React", "Next.js", "Node.js", "Node", "FastAPI", "Django", "Flask", "SQL", "PostgreSQL", "MongoDB", "MySQL", "Docker", "Kubernetes", "Git", "GitHub", "AWS", "GCP", "Azure", "HTML", "CSS", "TailwindCSS", "Redux", "GraphQL", "REST", "CI/CD", "Linux", "Machine Learning", "TensorFlow", "PyTorch", "Java", "C++", "C#", "Go", "PHP", "Laravel", "Vue.js", "Angular", "Bootstrap"]
         found_tech = []
         for tech in common_tech:
-            if re.search(rf"\b{tech}\b", text, re.IGNORECASE):
+            if re.search(rf"\b{re.escape(tech)}\b", text, re.IGNORECASE):
                 found_tech.append(tech)
-        parsed["skills"] = found_tech if found_tech else ["Communication", "Problem Solving"]
-        
-    if not parsed["education"]:
-        parsed["education"].append({
-            "degree": "Bachelor of Science",
-            "institution": "University",
-            "year": "N/A"
-        })
-        
-    if not parsed["experience"]:
-        parsed["experience"].append({
-            "title": "Software Engineer",
-            "company": "Tech Company",
-            "duration": "N/A",
-            "description": "Developed web applications."
-        })
+        # Only set skills if something was actually found in the resume
+        parsed["skills"] = found_tech
+
+    # Note: No fabricated education/experience fallbacks.
+    # Empty lists correctly signal that the resume parser could not extract those sections,
+    # which is more honest than injecting fake "University" / "Tech Company" placeholder entries.
 
     return parsed

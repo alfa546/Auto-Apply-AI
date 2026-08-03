@@ -129,19 +129,39 @@ class SearchAggregator:
         # Extract target countries or default to US/GB/DE/CA/AE
         target_countries = ["us", "ca", "gb", "de", "ae"]
         if user_settings and user_settings.preferred_countries:
+            # Strip emoji flags from country names before matching (e.g. "United States 🇺🇸" -> "United States")
+            import re as _re
+            emoji_pattern = _re.compile(
+                "[\U0001F1E6-\U0001F1FF]"
+            )
             country_map = {
                 "united states": "us", "canada": "ca", "united kingdom": "gb", 
                 "germany": "de", "netherlands": "nl", "switzerland": "ch", 
                 "sweden": "se", "australia": "au", "singapore": "sg", 
-                "united arab emirates": "ae", "saudi arabia": "sa", "japan": "jp"
+                "united arab emirates": "ae", "saudi arabia": "sa", "japan": "jp",
+                "ireland": "ie", "france": "fr", "new zealand": "nz", 
+                "denmark": "dk", "norway": "no", "finland": "fi",
+                "austria": "at", "belgium": "be", "spain": "es",
+                "italy": "it", "portugal": "pt", "poland": "pl",
+                "estonia": "ee", "qatar": "qa", "kuwait": "kw",
+                "oman": "om", "bahrain": "bh", "turkey": "tr",
+                "south korea": "kr", "malaysia": "my", "china": "cn",
+                "india": "in", "pakistan": "pk", "brazil": "br",
+                "mexico": "mx", "argentina": "ar", "chile": "cl",
+                "south africa": "za"
             }
             extracted_codes = []
             for country_str in user_settings.preferred_countries:
-                c_clean = country_str.lower()
+                # Remove emoji flags and normalize
+                c_clean = emoji_pattern.sub("", country_str.lower()).strip()
                 for name_key, code in country_map.items():
                     if name_key in c_clean or code in c_clean:
                         extracted_codes.append(code)
                         break
+                else:
+                    # Try direct code match (e.g. "us", "gb")
+                    if len(c_clean) == 2 and c_clean.isalpha():
+                        extracted_codes.append(c_clean)
             if extracted_codes:
                 target_countries = list(set(extracted_codes))
 

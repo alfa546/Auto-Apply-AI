@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Union
 from sqlalchemy.orm import Session
 import logging
 
@@ -40,7 +40,9 @@ class ProfileUpdateRequest(BaseModel):
     employment_types: Optional[List[str]] = None
     salary_preference: Optional[str] = None
     experience_level: Optional[str] = None
-    visa_sponsorship: Optional[bool] = None
+    visa_sponsorship: Optional[Union[bool, str]] = None
+    # Also accept string-based visa preference labels from the UI
+    visa_sponsorship_str: Optional[str] = None
     daily_job_goal: Optional[int] = None
     daily_internship_goal: Optional[int] = None
     auto_fulfill_enabled: Optional[bool] = None
@@ -210,8 +212,21 @@ def update_user_profile(
         settings.min_salary_preference = payload.salary_preference
     if payload.experience_level is not None:
         settings.experience_level = payload.experience_level
+    # Handle visa sponsorship - the UI sends a string label, but we store a boolean
     if payload.visa_sponsorship is not None:
-        settings.visa_sponsorship_required = payload.visa_sponsorship
+        if isinstance(payload.visa_sponsorship, str):
+            # Map string labels to boolean: any option that mentions "Required" or "Needed" = True
+            visa_str = payload.visa_sponsorship.lower()
+            settings.visa_sponsorship_required = any(
+                keyword in visa_str for keyword in ["required", "needed", "need", "sponsorship"]
+            ) and "no visa" not in visa_str and "not required" not in visa_str
+        else:
+            settings.visa_sponsorship_required = payload.visa_sponsorship
+    elif payload.visa_sponsorship_str:
+        visa_str = payload.visa_sponsorship_str.lower()
+        settings.visa_sponsorship_required = any(
+            keyword in visa_str for keyword in ["required", "needed", "need", "sponsorship"]
+        ) and "no visa" not in visa_str and "not required" not in visa_str
     if payload.daily_job_goal is not None:
         settings.daily_job_goal = payload.daily_job_goal
     if payload.daily_internship_goal is not None:

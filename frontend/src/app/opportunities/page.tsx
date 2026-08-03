@@ -9,6 +9,55 @@ import Toast from "../components/Toast";
 import { Job, Application } from "../types";
 import { ALL_WORLD_COUNTRIES } from "../constants";
 
+// Map country names (with emoji flags) to standardized names without emoji for matching
+const COUNTRY_NAME_MAP: Record<string, string> = {
+  "United States": "us",
+  "Canada": "ca",
+  "United Kingdom": "gb",
+  "Germany": "de",
+  "Netherlands": "nl",
+  "Switzerland": "ch",
+  "Sweden": "se",
+  "Australia": "au",
+  "Singapore": "sg",
+  "United Arab Emirates": "ae",
+  "Saudi Arabia": "sa",
+  "Japan": "jp",
+  "Ireland": "ie",
+  "France": "fr",
+  "New Zealand": "nz",
+  "Denmark": "dk",
+  "Norway": "no",
+  "Finland": "fi",
+  "Austria": "at",
+  "Belgium": "be",
+  "Spain": "es",
+  "Italy": "it",
+  "Portugal": "pt",
+  "Poland": "pl",
+  "Estonia": "ee",
+  "Qatar": "qa",
+  "Kuwait": "kw",
+  "Oman": "om",
+  "Bahrain": "bh",
+  "Turkey": "tr",
+  "South Korea": "kr",
+  "Malaysia": "my",
+  "China": "cn",
+  "India": "in",
+  "Pakistan": "pk",
+  "Brazil": "br",
+  "Mexico": "mx",
+  "Argentina": "ar",
+  "Chile": "cl",
+  "South Africa": "za"
+};
+
+function normalizeCountryName(country: string): string {
+  // Strip emoji flags and trim
+  return country.replace(/[\u{1F1E6}-\u{1F1FF}]/gu, "").trim();
+}
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
 export default function OpportunitiesPage() {
@@ -148,8 +197,23 @@ export default function OpportunitiesPage() {
   };
 
   // Filter jobs by selected target countries
+  // Convert selected country names (e.g. "United States 🇺🇸") to country codes ("us")
+  // to match against job.country which stores codes like "us", "gb", "de"
+  const selectedCountryCodes = selectedCountries.map(c => {
+    const name = normalizeCountryName(c).toLowerCase();
+    // Reverse lookup from name map
+    for (const [countryName, code] of Object.entries(COUNTRY_NAME_MAP)) {
+      if (countryName.toLowerCase() === name) return code;
+    }
+    // Try direct match (e.g. user typed "US" or "us")
+    return name === "usa" ? "us" : name;
+  });
+
   const filteredDailyJobs = dailyJobs.filter(
-    (job) => !job.country || selectedCountries.includes(job.country)
+    (job) => {
+      if (!job.country) return true;
+      return selectedCountryCodes.includes(job.country.toLowerCase());
+    }
   );
 
   return (

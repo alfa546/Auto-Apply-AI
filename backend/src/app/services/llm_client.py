@@ -12,6 +12,7 @@ def detect_llm_provider(api_key: str) -> str:
     - 'AIzaSy' -> Google Gemini
     - 'sk-ant-' -> Anthropic Claude
     - 'sk-proj-' or 'sk-' -> OpenAI / DeepSeek
+    - 'AQ.' -> Could be an invalid/mistyped key, default to a clear error hint
     """
     if not api_key:
         return "openai"
@@ -27,6 +28,10 @@ def detect_llm_provider(api_key: str) -> str:
         return "anthropic"
     elif k.startswith("sk-") or k.startswith("sk-proj-"):
         return "openai"
+    elif k.startswith("AQ."):
+        # This doesn't match any known provider - likely a mistyped/incorrect key
+        # Return a special value that triggers clearer error handling
+        return "invalid"
     
     return "openai"
 
@@ -42,6 +47,21 @@ def get_llm_headers_and_url(
     """
     key = api_key or settings.OPENAI_API_KEY or settings.GEMINI_API_KEY or "free-local"
     detected_provider = provider or detect_llm_provider(key)
+    
+    # Handle invalid API key that doesn't match known provider patterns
+    if detected_provider == "invalid":
+        # Try Gemini or fall back to openai gracefully
+        logger.warning(f"API key format not recognized (starts with '{key[:3]}...'). Trying Gemini fallback.")
+        if settings.GEMINI_API_KEY:
+            key = settings.GEMINI_API_KEY
+            detected_provider = "gemini"
+        elif settings.OPENAI_API_KEY and settings.OPENAI_API_KEY.startswith(("sk-", "sk-proj-")):
+            key = settings.OPENAI_API_KEY
+            detected_provider = "openai"
+        else:
+            # No valid key available - return a clear instruction by defaulting to OpenAI
+            # The error will be surfaced when the API call fails
+            pass
 
     # 1. Ollama or Local Offline Open-Source Models (100% Free, no API Key needed)
     if detected_provider == "ollama" or custom_api_base:
@@ -112,9 +132,21 @@ def get_llm_headers_and_url(
     return headers, url, model
 
 def is_llm_configured(api_key: str = None, provider: str = None, custom_api_base: str = None) -> bool:
+    """
+    Returns True only if a valid LLM configuration exists.
+    Local endpoints (Ollama/custom) are always allowed.
+    Invalid/mistyped API keys (e.g. 'AQ.xxx') are treated as NOT configured to
+    avoid 401 failures - the app will gracefully fall back to template generation.
+    """
     if provider == "ollama" or custom_api_base:
         return True
-    return bool(api_key or settings.OPENAI_API_KEY or settings.GEMINI_API_KEY)
+
+    key = api_key or settings.OPENAI_API_KEY or settings.GEMINI_API_KEY
+    if not key:
+        return False
+
+    # Validate the key format matches a known provider prefix
+    return detect_llm_provider(key) != "invalid"
 
 def generate_custom_cover_letter(candidate_name: str = "Candidate", job_title: str = "Software Engineer", company: str = "Company", skills: list = None, job_description: str = None) -> str:
     """

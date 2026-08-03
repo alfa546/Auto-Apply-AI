@@ -6,7 +6,7 @@ import logging
 
 from src.app.database import get_db
 from src.app.auth import get_current_user
-from src.app.models import User, Profile
+from src.app.models import User, Profile, UserSettings
 from src.app.storage import get_storage_provider
 from src.app.services.pdf_parser import extract_text_from_pdf
 from src.app.services.ats_checker import evaluate_resume_ats, extract_skills_and_summary_from_text

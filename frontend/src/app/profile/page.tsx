@@ -31,7 +31,7 @@ export default function ProfilePage() {
   const [workModePref, setWorkModePref] = useState("Remote & Hybrid Permitted");
   const [salaryPref, setSalaryPref] = useState("$100,000+");
   const [experiencePref, setExperiencePref] = useState("Mid-to-Senior (3-7 yrs)");
-  const [visaSponsorshipPref, setVisaSponsorshipPref] = useState("Required if relocation needed");
+  const [visaSponsorshipPref, setVisaSponsorshipPref] = useState("No visa sponsorship required");
   const [selectedEmpTypes, setSelectedEmpTypes] = useState<string[]>(["Full-time", "Contract"]);
   const [dailyJobGoal, setDailyJobGoal] = useState(15);
   const [dailyInternshipGoal, setDailyInternshipGoal] = useState(5);
@@ -177,7 +177,7 @@ export default function ProfilePage() {
   }, [isAuthenticated, token, fetchResumeProfile, fetchUserSettings, fetchTodayApplicationCounts]);
 
   const toggleEmpType = (type: string) => {
-    setSelectedEmpTypes(prev => 
+    setSelectedEmpTypes(prev =>
       prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
     );
   };
@@ -215,7 +215,8 @@ export default function ProfilePage() {
           employment_types: selectedEmpTypes,
           salary_preference: salaryPref,
           experience_level: experiencePref,
-          visa_sponsorship: visaSponsorshipPref,
+          visa_sponsorship: visaSponsorshipPref.toLowerCase().includes("required") || visaSponsorshipPref.toLowerCase().includes("needed"),
+          visa_sponsorship_str: visaSponsorshipPref,
           daily_job_goal: dailyJobGoal,
           daily_internship_goal: dailyInternshipGoal,
           auto_fulfill_enabled: autoFulfillEnabled
@@ -270,7 +271,7 @@ export default function ProfilePage() {
         headers: { "Authorization": `Bearer ${token}` },
         body: formData
       });
-      
+
       clearInterval(logInterval);
       setAgentPhase("complete");
       setAgentLogs(prev => [...prev, "[Agent] Process finished successfully!"]);
@@ -357,7 +358,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#090a0f] bg-grid-omni text-slate-100 selection:bg-rose-500 selection:text-white">
       <Toast notification={notification} />
       <Navbar />
-      
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ErrorBoundary>
           <ProfileTab

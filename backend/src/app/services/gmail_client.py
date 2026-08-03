@@ -240,6 +240,16 @@ class GmailClient:
                         "thread_id": data.get("threadId"),
                         "method": "Gmail_OAuth"
                     }
+                elif res.status_code == 403:
+                    # Gmail API not enabled in the Google Cloud project
+                    error_msg = (
+                        "Gmail API is not enabled for this Google Cloud project. "
+                        "Please enable it at https://console.developers.google.com/apis/api/gmail.googleapis.com "
+                        "or use SMTP App Password instead. "
+                        f"Details: {res.text}"
+                    )
+                    logger.error(f"Gmail API 403 (not enabled): {error_msg}")
+                    return {"success": False, "error": error_msg, "gmail_api_disabled": True}
                 else:
                     logger.error(f"Gmail API error: {res.status_code} - {res.text}")
                     return {"success": False, "error": res.text}

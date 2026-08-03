@@ -82,13 +82,34 @@ def auto_apply_via_email(
         cover_letter = payload.custom_cover_letter
     else:
         try:
-            cover_letter = generate_custom_cover_letter(
-                candidate_name=user_email.split("@")[0],
-                job_title=job.title,
-                company=job.company,
-                skills=profile.skills if profile else [],
-                job_description=job.description or job.title
-            )
+            # Pass user's saved LLM settings (API key, provider, model) if available
+            user_api_key = user_settings.openai_api_key
+            user_provider = user_settings.llm_provider
+            user_model = user_settings.llm_model
+            user_custom_base = user_settings.custom_api_base
+
+            # Temporarily override global settings for this request
+            import src.app.config as config_module
+            _saved_openai = config_module.settings.OPENAI_API_KEY
+            _saved_gemini = config_module.settings.GEMINI_API_KEY
+            if user_api_key:
+                if user_provider == "gemini" or user_api_key.startswith("AIzaSy"):
+                    config_module.settings.GEMINI_API_KEY = user_api_key
+                else:
+                    config_module.settings.OPENAI_API_KEY = user_api_key
+
+            try:
+                cover_letter = generate_custom_cover_letter(
+                    candidate_name=user_email.split("@")[0],
+                    job_title=job.title,
+                    company=job.company,
+                    skills=profile.skills if profile else [],
+                    job_description=job.description or job.title
+                )
+            finally:
+                # Restore original settings
+                config_module.settings.OPENAI_API_KEY = _saved_openai
+                config_module.settings.GEMINI_API_KEY = _saved_gemini
         except Exception as e:
             logger.warning(f"Fallback cover letter generation: {e}")
             skills_str = ', '.join(profile.skills[:5]) if profile and profile.skills else 'software development'
