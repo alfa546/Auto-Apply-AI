@@ -10,6 +10,10 @@ interface JobsTabProps {
   handleTriggerSearchAgent: () => void;
   isApplyingId: number | null;
   handleAutoApply: (job: Job) => void;
+  handleAutoApplyBatch: () => void;
+  isAutoApplyRunning: boolean;
+  onStopAutoApply: () => void;
+  isAutoApplyStopping: boolean;
   isLoading?: boolean;
   error?: string | null;
   onRetry?: () => void;
@@ -22,6 +26,10 @@ export default function JobsTab({
   handleTriggerSearchAgent,
   isApplyingId,
   handleAutoApply,
+  handleAutoApplyBatch,
+  isAutoApplyRunning,
+  onStopAutoApply,
+  isAutoApplyStopping,
   isLoading,
   error,
   onRetry
@@ -68,6 +76,29 @@ export default function JobsTab({
             )}
           </button>
 
+          {/* Auto-Apply Button - becomes Stop button when running */}
+          <button
+            onClick={isAutoApplyRunning ? onStopAutoApply : handleAutoApplyBatch}
+            disabled={isAutoApplyRunning && isAutoApplyStopping}
+            className={
+              isAutoApplyRunning
+                ? "bg-gradient-to-r from-red-700 via-red-600 to-red-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-lg shadow-red-500/20 flex items-center gap-2 transition-all hover:shadow-red-500/40 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
+                : "bg-gradient-to-r from-rose-600 via-red-600 to-orange-600 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-lg shadow-rose-500/20 flex items-center gap-2 transition-all hover:shadow-rose-500/40 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
+            }
+          >
+            {isAutoApplyRunning ? (
+              <>
+                <span className="text-sm">⏹</span>
+                <span>{isAutoApplyStopping ? "Stopping..." : "Stop Auto-Apply"}</span>
+              </>
+            ) : (
+              <>
+                <span className="text-sm">⚡</span>
+                <span>Auto-Apply</span>
+              </>
+            )}
+          </button>
+
           <div className="bg-slate-950/80 border border-rose-500/40 px-3.5 py-1.5 rounded-xl text-xs text-rose-300 flex items-center gap-2 shadow-inner">
             <GlobeIcon />
             <span>Target Countries: <strong className="text-rose-200 font-mono">{selectedCountries.length} Active</strong></span>
@@ -107,8 +138,8 @@ export default function JobsTab({
                 <div className="flex items-center gap-3">
                   <h3 className="text-lg font-bold text-slate-100">{job.title}</h3>
                   <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${job.opportunity_type === "internship"
-                      ? "bg-amber-950/80 text-amber-300 border border-amber-500/30"
-                      : "bg-rose-950/80 text-rose-300 border border-rose-500/30"
+                    ? "bg-amber-950/80 text-amber-300 border border-amber-500/30"
+                    : "bg-rose-950/80 text-rose-300 border border-rose-500/30"
                     }`}>
                     {(job.opportunity_type || "job").toUpperCase()}
                   </span>

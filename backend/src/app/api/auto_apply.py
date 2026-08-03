@@ -11,6 +11,7 @@ from src.app.auth import get_current_user
 from src.app.services.gmail_client import gmail_client
 from src.app.services.llm_client import generate_custom_cover_letter
 from src.app.services.application.pipeline import resolve_resume_local_path
+from src.app.services.auto_apply.runner import auto_apply_runner
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,10 @@ router = APIRouter(prefix="/auto-apply", tags=["Direct Email Auto Apply"])
 class ApplyRequest(BaseModel):
     job_id: int
     custom_cover_letter: Optional[str] = None
+
+class AutoApplyBatchRequest(BaseModel):
+    job_count: Optional[int] = 10
+    internship_count: Optional[int] = 3
 
 def get_uid_and_email(user_context):
     if isinstance(user_context, dict):
@@ -29,36 +34,50 @@ def get_uid_and_email(user_context):
         email = getattr(user_context, "email", "")
     return uid, email
 
-@router.post("/send-email")
-def auto_apply_via_email(
-    payload: ApplyRequest,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
+def build_cover_letter_with_links(cover_letter: str, profile: Profile) -> str:
     """
-    Auto-applies to a specific job by generating a tailored cover letter,
-    attaching user's CV PDF, and sending directly from user's connected Gmail.
+    Appends GitHub, LinkedIn, and Portfolio links to the cover letter signature block.
     """
-    uid, user_email = get_uid_and_email(current_user)
+    links = []
+    if profile:
+        if profile.github_url:
+            links.append(f"GitHub: {profile.github_url}")
+        if profile.portfolio_url:
+            links.append(f"Portfolio: {profile.portfolio_url}")
+        if profile.other_url:
+            links.append(f"LinkedIn: {profile.other_url}")
 
-    # 1. Check Job Details
-    job = db.query(JobFound).filter(JobFound.id == payload.job_id).first()
-    if not job:
-        raise HTTPException(status_code=404, detail="Job not found.")
-        
+    if not links:
+        return cover_letter
+
+    # Append links section before the signature
+    links_block = "\n\n" + "\n".join(links)
+    # Insert before "Sincerely," or "Best regards," or at the end
+    import re
+    signature_match = re.search(r"\n(Sincerely|Best regards|Regards|Yours truly)[,\s]", cover_letter, re.IGNORECASE)
+    if signature_match:
+        insert_pos = signature_match.start()
+        return cover_letter[:insert_pos] + links_block + cover_letter[insert_pos:]
+    else:
+        return cover_letter + links_block
+
+def prepare_application_data(
+    db: Session,
+    uid: str,
+    user_email: str,
+    job: JobFound,
+    user_settings: UserSettings,
+    profile: Profile,
+    custom_cover_letter: Optional[str] = None
+) -> dict:
+    """
+    Shared helper to prepare all email application data (recipient, subject, cover letter, cv path).
+    Used by both the preview endpoint and the send endpoint.
+    """
     recipient_email = job.company_email
     if not recipient_email:
         recipient_email = f"careers@{job.company.lower().replace(' ', '')}.com"
 
-    # 2. Check User Gmail Connection
-    user_settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
-    if not user_settings or not user_settings.is_gmail_connected:
-        raise HTTPException(
-            status_code=400,
-            detail="Gmail is not connected. Please connect your Gmail account in Settings before applying."
-        )
-    
-    # Determine sender email - use connected Gmail address or fall back to user email
     sender_email = user_settings.gmail_email_address or user_email
     if not sender_email:
         raise HTTPException(
@@ -66,8 +85,6 @@ def auto_apply_via_email(
             detail="No sender email address configured. Please connect your Gmail account in Settings."
         )
 
-    # 3. Fetch User Profile and Resume
-    profile = db.query(Profile).filter(Profile.user_id == uid).first()
     raw_resume_url = profile.resume_url if profile and profile.resume_url else None
     cv_path = resolve_resume_local_path(raw_resume_url) if raw_resume_url else None
     if cv_path:
@@ -75,11 +92,10 @@ def auto_apply_via_email(
     else:
         logger.warning(f"Could not resolve resume path from: {raw_resume_url}")
 
-    # 4. Generate AI Tailored Cover Letter
     subject = f"Application for {job.title} - {user_email}"
-    
-    if payload.custom_cover_letter:
-        cover_letter = payload.custom_cover_letter
+
+    if custom_cover_letter:
+        cover_letter = custom_cover_letter
     else:
         try:
             # Pass user's saved LLM settings (API key, provider, model) if available
@@ -121,6 +137,117 @@ def auto_apply_via_email(
                 f"Please find my attached resume for your consideration. I look forward to hearing from you.\n\n"
                 f"Best regards,\n{sender_email}"
             )
+
+    # Append GitHub / LinkedIn / Portfolio links to the cover letter
+    cover_letter = build_cover_letter_with_links(cover_letter, profile)
+
+    return {
+        "recipient_email": recipient_email,
+        "sender_email": sender_email,
+        "subject": subject,
+        "cover_letter": cover_letter,
+        "cv_path": cv_path,
+        "job_title": job.title,
+        "company": job.company
+    }
+
+@router.post("/preview")
+def preview_application_email(
+    payload: ApplyRequest,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Generates a preview of the email application WITHOUT sending it.
+    Returns recipient, subject, cover letter, and attachment info for user review.
+    """
+    uid, user_email = get_uid_and_email(current_user)
+
+    # 1. Check Job Details
+    job = db.query(JobFound).filter(JobFound.id == payload.job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found.")
+
+    # 2. Check User Gmail Connection
+    user_settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
+    if not user_settings or not user_settings.is_gmail_connected:
+        raise HTTPException(
+            status_code=400,
+            detail="Gmail is not connected. Please connect your Gmail account in Settings before applying."
+        )
+
+    # 3. Fetch User Profile
+    profile = db.query(Profile).filter(Profile.user_id == uid).first()
+
+    # 4. Prepare all data (no sending)
+    data = prepare_application_data(
+        db=db,
+        uid=uid,
+        user_email=user_email,
+        job=job,
+        user_settings=user_settings,
+        profile=profile,
+        custom_cover_letter=payload.custom_cover_letter
+    )
+
+    return {
+        "success": True,
+        "preview": {
+            "job_title": data["job_title"],
+            "company": data["company"],
+            "recipient_email": data["recipient_email"],
+            "sender_email": data["sender_email"],
+            "subject": data["subject"],
+            "cover_letter": data["cover_letter"],
+            "has_resume_attachment": bool(data["cv_path"]),
+            "resume_filename": os.path.basename(data["cv_path"]) if data["cv_path"] else None
+        }
+    }
+
+@router.post("/send-email")
+def auto_apply_via_email(
+    payload: ApplyRequest,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Auto-applies to a specific job by generating a tailored cover letter,
+    attaching user's CV PDF, and sending directly from user's connected Gmail.
+    """
+    uid, user_email = get_uid_and_email(current_user)
+
+    # 1. Check Job Details
+    job = db.query(JobFound).filter(JobFound.id == payload.job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found.")
+
+    # 2. Check User Gmail Connection
+    user_settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
+    if not user_settings or not user_settings.is_gmail_connected:
+        raise HTTPException(
+            status_code=400,
+            detail="Gmail is not connected. Please connect your Gmail account in Settings before applying."
+        )
+
+    # 3. Fetch User Profile
+    profile = db.query(Profile).filter(Profile.user_id == uid).first()
+
+    # 4. Prepare all data
+    data = prepare_application_data(
+        db=db,
+        uid=uid,
+        user_email=user_email,
+        job=job,
+        user_settings=user_settings,
+        profile=profile,
+        custom_cover_letter=payload.custom_cover_letter
+    )
+
+    recipient_email = data["recipient_email"]
+    sender_email = data["sender_email"]
+    subject = data["subject"]
+    cover_letter = data["cover_letter"]
+    cv_path = data["cv_path"]
 
     # 5. Send Email
     send_result = None
@@ -186,3 +313,65 @@ def auto_apply_via_email(
         "error": send_result.get("error") if not success else None,
         "cover_letter_preview": cover_letter[:200] + "..."
     }
+
+@router.post("/start")
+def start_auto_apply_batch(
+    payload: AutoApplyBatchRequest,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Starts a fully automated batch auto-apply.
+    Applies to up to 10 jobs and up to 3 internships without user review.
+    Runs in the background until targets are met or stopped.
+    """
+    uid, user_email = get_uid_and_email(current_user)
+
+    # Check Gmail connection
+    user_settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
+    if not user_settings or not user_settings.is_gmail_connected:
+        raise HTTPException(
+            status_code=400,
+            detail="Gmail is not connected. Please connect your Gmail account in Settings before applying."
+        )
+
+    # Check resume/profile exists
+    profile = db.query(Profile).filter(Profile.user_id == uid).first()
+    if not profile or not profile.resume_url:
+        raise HTTPException(
+            status_code=400,
+            detail="No resume found. Please upload your resume in Profile before starting auto-apply."
+        )
+
+    # Validate and start batch
+    try:
+        result = auto_apply_runner.start_batch(
+            db=db,
+            uid=uid,
+            user_email=user_email,
+            job_count=payload.job_count or 10,
+            internship_count=payload.internship_count or 3
+        )
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/status")
+def get_auto_apply_status(
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Returns the current status of the auto-apply batch runner for the user.
+    """
+    uid, _ = get_uid_and_email(current_user)
+    return auto_apply_runner.get_status(uid)
+
+@router.post("/stop")
+def stop_auto_apply_batch(
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Stops the running auto-apply batch for the user.
+    """
+    uid, _ = get_uid_and_email(current_user)
+    return auto_apply_runner.stop_batch(uid)

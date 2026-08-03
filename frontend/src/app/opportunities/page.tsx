@@ -9,6 +9,8 @@ import Toast from "../components/Toast";
 import { Job, Application } from "../types";
 import { ALL_WORLD_COUNTRIES } from "../constants";
 import EmailReviewModal from "../components/EmailReviewModal";
+import AutoApplyModal from "../components/AutoApplyModal";
+import AutoApplyProgress from "../components/AutoApplyProgress";
 
 // Map country names (with emoji flags) to standardized names without emoji for matching
 const COUNTRY_NAME_MAP: Record<string, string> = {
@@ -82,6 +84,12 @@ export default function OpportunitiesPage() {
   const [emailPreview, setEmailPreview] = useState<any>(null);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [pendingJob, setPendingJob] = useState<Job | null>(null);
+
+  // Auto-Apply Batch State
+  const [isAutoApplyModalOpen, setIsAutoApplyModalOpen] = useState(false);
+  const [isStartingAutoApply, setIsStartingAutoApply] = useState(false);
+  const [autoApplyStatus, setAutoApplyStatus] = useState<any>(null);
+  const [isStoppingAutoApply, setIsStoppingAutoApply] = useState(false);
 
   // Toast Notification State
   const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -241,6 +249,83 @@ export default function OpportunitiesPage() {
     }
   };
 
+  // Auto-Apply Batch Handlers
+  const fetchAutoApplyStatus = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auto-apply/status`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAutoApplyStatus(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch auto-apply status:", err);
+    }
+  }, [token]);
+
+  const handleStartAutoApply = async (jobCount: number, internshipCount: number) => {
+    setIsStartingAutoApply(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auto-apply/start`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ job_count: jobCount, internship_count: internshipCount })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        showToast(data.message || "Auto-apply started successfully!");
+        setIsAutoApplyModalOpen(false);
+        fetchAutoApplyStatus();
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        showToast(errData.detail || `Failed to start auto-apply (status ${res.status}).`, "error");
+      }
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Failed to connect to backend auto-apply router.", "error");
+    } finally {
+      setIsStartingAutoApply(false);
+    }
+  };
+
+  const openAutoApplyModal = () => {
+    setIsAutoApplyModalOpen(true);
+  };
+
+  const handleStopAutoApply = async () => {
+    setIsStoppingAutoApply(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auto-apply/stop`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        showToast(data.message || "Auto-apply stopped.");
+        fetchAutoApplyStatus();
+      }
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Failed to stop auto-apply.", "error");
+    } finally {
+      setIsStoppingAutoApply(false);
+    }
+  };
+
+  // Poll auto-apply status every 3 seconds while running
+  useEffect(() => {
+    if (!isAuthenticated || !token) return;
+    fetchAutoApplyStatus();
+    const interval = setInterval(() => {
+      fetchAutoApplyStatus();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, token, fetchAutoApplyStatus]);
+
   // Filter jobs by selected target countries
   // Convert selected country names (e.g. "United States 🇺🇸") to country codes ("us")
   // to match against job.country which stores codes like "us", "gb", "de"
@@ -275,6 +360,10 @@ export default function OpportunitiesPage() {
             handleTriggerSearchAgent={handleTriggerSearchAgent}
             isApplyingId={isApplyingId}
             handleAutoApply={handleAutoApply}
+            handleAutoApplyBatch={openAutoApplyModal}
+            isAutoApplyRunning={autoApplyStatus?.status === "running"}
+            onStopAutoApply={handleStopAutoApply}
+            isAutoApplyStopping={isStoppingAutoApply}
             isLoading={isJobsLoading}
             error={jobsError}
             onRetry={fetchOpportunities}
@@ -293,6 +382,21 @@ export default function OpportunitiesPage() {
         onConfirm={handleConfirmSendEmail}
         preview={emailPreview}
         isSending={isSendingEmail}
+      />
+
+      {/* Auto-Apply Modal - configure counts */}
+      <AutoApplyModal
+        isOpen={isAutoApplyModalOpen}
+        onClose={() => setIsAutoApplyModalOpen(false)}
+        onStart={handleStartAutoApply}
+        isStarting={isStartingAutoApply}
+      />
+
+      {/* Auto-Apply Progress Tracker - floating status panel */}
+      <AutoApplyProgress
+        status={autoApplyStatus}
+        onStop={handleStopAutoApply}
+        isStopping={isStoppingAutoApply}
       />
     </div>
   );
