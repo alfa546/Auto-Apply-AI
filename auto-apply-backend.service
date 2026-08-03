@@ -1,0 +1,15 @@
+[Unit]
+Description=Auto-Apply AI Backend
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/auto-apply-ai/backend
+EnvironmentFile=/var/www/auto-apply-ai/backend/.env
+ExecStart=/var/www/auto-apply-ai/backend/venv/bin/uvicorn src.app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
