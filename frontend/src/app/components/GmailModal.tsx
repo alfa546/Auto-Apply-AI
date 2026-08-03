@@ -12,6 +12,10 @@ interface GmailModalProps {
   setSmtpPassword: (password: string) => void;
   setIsGmailConnected: (connected: boolean) => void;
   showToast: (message: string, type?: "success" | "error") => void;
+  googleClientId?: string;
+  setGoogleClientId?: (id: string) => void;
+  googleClientSecret?: string;
+  setGoogleClientSecret?: (secret: string) => void;
 }
 
 export default function GmailModal({
@@ -24,13 +28,17 @@ export default function GmailModal({
   smtpPassword,
   setSmtpPassword,
   setIsGmailConnected,
-  showToast
+  showToast,
+  googleClientId = "",
+  setGoogleClientId,
+  googleClientSecret = "",
+  setGoogleClientSecret
 }: GmailModalProps) {
   if (!showGmailModal) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full space-y-5 shadow-2xl">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
             <GmailIcon />
@@ -61,9 +69,50 @@ export default function GmailModal({
               <span className="font-bold text-slate-200">Option 1: Google OAuth 2.0 (Fast 1-Click)</span>
               <span className="bg-rose-950 text-rose-300 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded font-semibold">Recommended</span>
             </div>
+
+            <div className="space-y-2">
+              <div>
+                <label className="block text-slate-400 text-[11px] mb-1">Google OAuth Client ID</label>
+                <input 
+                  type="text" 
+                  value={googleClientId}
+                  onChange={e => setGoogleClientId && setGoogleClientId(e.target.value)}
+                  placeholder="xxxxxx.apps.googleusercontent.com"
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-purple-500 font-mono text-[11px]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 text-[11px] mb-1">Google OAuth Client Secret</label>
+                <input 
+                  type="password" 
+                  value={googleClientSecret}
+                  onChange={e => setGoogleClientSecret && setGoogleClientSecret(e.target.value)}
+                  placeholder="GOCSPX-xxxxxxxxxxxx"
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-purple-500 font-mono text-[11px]"
+                />
+              </div>
+            </div>
+
             <button
               onClick={async () => {
                 try {
+                  // 1. Save Client ID & Secret to Backend Settings
+                  if (googleClientId || googleClientSecret) {
+                    await fetch(`${API_BASE}/api/v1/users/settings`, {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                      },
+                      body: JSON.stringify({
+                        google_client_id: googleClientId,
+                        google_client_secret: googleClientSecret
+                      })
+                    });
+                  }
+
+                  // 2. Fetch Authorization URL
                   const res = await fetch(`${API_BASE}/api/v1/auth/gmail/url`, {
                     headers: { "Authorization": `Bearer ${token}` }
                   });
@@ -86,7 +135,7 @@ export default function GmailModal({
               className="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-semibold py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30"
             >
               <GmailIcon />
-              <span>Connect with Google OAuth</span>
+              <span>Save &amp; Connect via Google OAuth</span>
             </button>
           </div>
 

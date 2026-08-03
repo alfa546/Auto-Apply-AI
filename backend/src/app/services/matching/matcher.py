@@ -118,8 +118,18 @@ class MatchingEngine:
         # 3. Calculate Semantic Match via LLM
         semantic_score = 0.5 # Default middle score if embedding fails
         try:
-            if is_llm_configured():
-                headers, url, model = get_llm_headers_and_url()
+            user_api_key = user_settings.openai_api_key if user_settings else None
+            user_provider = user_settings.llm_provider if user_settings else None
+            user_model = user_settings.llm_model if user_settings else None
+            user_api_base = user_settings.custom_api_base if user_settings else None
+
+            if is_llm_configured(api_key=user_api_key, provider=user_provider, custom_api_base=user_api_base):
+                headers, url, model = get_llm_headers_and_url(
+                    api_key=user_api_key,
+                    provider=user_provider,
+                    model_name=user_model,
+                    custom_api_base=user_api_base
+                )
                 
                 profile_data = {
                     "skills": profile.skills,
@@ -174,7 +184,10 @@ class MatchingEngine:
                             logger.error(f"Failed to parse LLM response: {content}")
                             reasons.append("LLM matching service returned invalid response, utilizing keyword fallback.")
                     else:
-                        logger.warning(f"LLM matching service returned status {response.status_code}.")
+                        if response.status_code == 401:
+                            logger.info("LLM matching service unauthorized (401). Utilizing keyword matching fallback.")
+                        else:
+                            logger.warning(f"LLM matching service returned status {response.status_code}.")
                         reasons.append("LLM matching service returned an error, utilizing keyword fallback.")
             else:
                 reasons.append("LLM matching service not configured, utilizing keyword fallback.")

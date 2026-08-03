@@ -111,7 +111,9 @@ def get_llm_headers_and_url(
     logger.info(f"Using OpenAI LLM with model: {model}")
     return headers, url, model
 
-def is_llm_configured(api_key: str = None) -> bool:
+def is_llm_configured(api_key: str = None, provider: str = None, custom_api_base: str = None) -> bool:
+    if provider == "ollama" or custom_api_base:
+        return True
     return bool(api_key or settings.OPENAI_API_KEY or settings.GEMINI_API_KEY)
 
 def generate_custom_cover_letter(candidate_name: str = "Candidate", job_title: str = "Software Engineer", company: str = "Company", skills: list = None, job_description: str = None) -> str:

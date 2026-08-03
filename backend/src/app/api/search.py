@@ -34,7 +34,8 @@ async def trigger_search(
             new_jobs = await aggregator.run_aggregation(
                 db=db,
                 query=payload.query,
-                country=payload.country or "us"
+                country=payload.country or "us",
+                user_id=user_id
             )
         else:
             new_jobs = await aggregator.run_preferences_guided_search(

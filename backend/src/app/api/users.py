@@ -172,6 +172,13 @@ def update_user_profile(
     """
     uid = current_user.get("uid")
     
+    # Ensure User record exists
+    user = db.query(User).filter(User.id == uid).first()
+    if not user:
+        user = User(id=uid, email=current_user.get("email", f"{uid}@local.com"))
+        db.add(user)
+        db.commit()
+    
     # Update User Profile
     profile = db.query(Profile).filter(Profile.user_id == uid).first()
     if not profile:

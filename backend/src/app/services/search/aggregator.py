@@ -20,15 +20,33 @@ class SearchAggregator:
             RSSProvider()
         ]
 
-    async def run_aggregation(self, db: Session, query: str, country: str = "us"):
+    async def run_aggregation(self, db: Session, query: str, country: str = "us", user_id: str = None):
         """
         Runs all active search providers, aggregates findings, filters duplicates,
         and saves unique records into the database.
         """
         logger.info(f"Starting Search Aggregator pipeline for query: '{query}' in country: '{country}'")
         
+        # Retrieve user-configured API keys from UserSettings database
+        jooble_key = None
+        adzuna_id = None
+        adzuna_key = None
+        if user_id and db:
+            from src.app.models import UserSettings
+            u_set = db.query(UserSettings).filter(UserSettings.user_id == user_id).first()
+            if u_set:
+                jooble_key = u_set.jooble_api_key
+                adzuna_id = u_set.adzuna_app_id
+                adzuna_key = u_set.adzuna_app_key
+
         # Run all providers concurrently
-        tasks = [provider.search(query, country) for provider in self.providers]
+        tasks = [
+            AdzunaProvider().search(query, country, app_id=adzuna_id, app_key=adzuna_key),
+            JoobleProvider().search(query, country, api_key=jooble_key),
+            GreenhouseProvider().search(query, country),
+            LeverProvider().search(query, country),
+            RSSProvider().search(query, country)
+        ]
         gathered_results = await asyncio.gather(*tasks, return_exceptions=True)
         
         all_opportunities = []
@@ -141,7 +159,7 @@ class SearchAggregator:
         total_new_opportunities = 0
         for country in target_countries[:3]:
             for query in search_queries:
-                count = await self.run_aggregation(db=db, query=query, country=country)
+                count = await self.run_aggregation(db=db, query=query, country=country, user_id=user_id)
                 total_new_opportunities += count
 
         # Run Matcher evaluation for unrated jobs

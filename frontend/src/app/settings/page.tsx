@@ -165,6 +165,10 @@ export default function SettingsPage() {
           setSmtpPassword={setSmtpPassword}
           setIsGmailConnected={setIsGmailConnected}
           showToast={showToast}
+          googleClientId={googleClientId}
+          setGoogleClientId={setGoogleClientId}
+          googleClientSecret={googleClientSecret}
+          setGoogleClientSecret={setGoogleClientSecret}
         />
       )}
     </div>

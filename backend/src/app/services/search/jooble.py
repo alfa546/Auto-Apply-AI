@@ -7,17 +7,17 @@ from src.app.services.search.base import BaseSearchProvider
 logger = logging.getLogger(__name__)
 
 class JoobleProvider(BaseSearchProvider):
-    async def search(self, query: str, country: str = "us") -> List[Dict]:
+    async def search(self, query: str, country: str = "us", api_key: str = None) -> List[Dict]:
         """
         Queries the Jooble API. Returns empty list if credentials are not configured.
         """
-        api_key = settings.JOOBLE_API_KEY
+        key = api_key or settings.JOOBLE_API_KEY
 
-        if not api_key:
+        if not key:
             logger.info("Jooble API key not configured.")
             return []
 
-        url = f"https://jooble.org/api/{api_key}"
+        url = f"https://jooble.org/api/{key}"
         payload = {
             "keywords": query,
             "location": country

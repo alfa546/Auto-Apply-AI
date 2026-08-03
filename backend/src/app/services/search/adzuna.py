@@ -7,21 +7,21 @@ from src.app.services.search.base import BaseSearchProvider
 logger = logging.getLogger(__name__)
 
 class AdzunaProvider(BaseSearchProvider):
-    async def search(self, query: str, country: str = "us") -> List[Dict]:
+    async def search(self, query: str, country: str = "us", app_id: str = None, app_key: str = None) -> List[Dict]:
         """
         Queries the Adzuna API. Returns empty list if credentials are not configured.
         """
-        app_id = settings.ADZUNA_APP_ID
-        app_key = settings.ADZUNA_APP_KEY
+        aid = app_id or settings.ADZUNA_APP_ID
+        akey = app_key or settings.ADZUNA_APP_KEY
 
-        if not app_id or not app_key:
+        if not aid or not akey:
             logger.info("Adzuna API credentials not configured.")
             return []
 
         url = f"https://api.adzuna.com/v1/api/jobs/{country.lower()}/search/1"
         params = {
-            "app_id": app_id,
-            "app_key": app_key,
+            "app_id": aid,
+            "app_key": akey,
             "results_per_page": 10,
             "what": query,
             "content-type": "application/json"
