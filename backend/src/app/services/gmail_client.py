@@ -17,18 +17,19 @@ class GmailClient:
         self.client_secret = settings.GOOGLE_CLIENT_SECRET
         self.redirect_uri = settings.GOOGLE_REDIRECT_URI
 
-    def get_authorization_url(self, user_id: str) -> str:
+    def get_authorization_url(self, user_id: str, client_id: Optional[str] = None) -> str:
         """
         Generate Google OAuth2 Authorization URL.
         """
-        if not self.client_id:
+        cid = client_id or self.client_id
+        if not cid:
             # Fallback mock OAuth URL for testing / dev mode
-            return f"http://localhost:3000/api/auth/gmail/mock-connect?state={user_id}"
+            return f"http://localhost:3000/?gmail_connected=true&mock=true&state={user_id}"
             
         scopes = "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email"
         url = (
             f"https://accounts.google.com/o/oauth2/v2/auth?"
-            f"client_id={self.client_id}&"
+            f"client_id={cid}&"
             f"redirect_uri={self.redirect_uri}&"
             f"response_type=code&"
             f"scope={scopes}&"
@@ -38,15 +39,17 @@ class GmailClient:
         )
         return url
 
-    def exchange_code_for_tokens(self, code: str) -> Dict[str, Any]:
+    def exchange_code_for_tokens(self, code: str, client_id: Optional[str] = None, client_secret: Optional[str] = None) -> Dict[str, Any]:
         """
         Exchanges Google OAuth authorization code for access_token and refresh_token.
         """
         import httpx
+        cid = client_id or self.client_id
+        csecret = client_secret or self.client_secret
         url = "https://oauth2.googleapis.com/token"
         payload = {
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
+            "client_id": cid,
+            "client_secret": csecret,
             "code": code,
             "grant_type": "authorization_code",
             "redirect_uri": self.redirect_uri

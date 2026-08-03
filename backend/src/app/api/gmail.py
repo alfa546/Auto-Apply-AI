@@ -21,12 +21,17 @@ def get_uid(user_context) -> str:
     return str(getattr(user_context, "id", ""))
 
 @router.get("/url")
-def get_gmail_auth_url(current_user: dict = Depends(get_current_user)):
+def get_gmail_auth_url(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
     """
     Returns Google OAuth authorization URL for connecting user's Gmail.
     """
     uid = get_uid(current_user)
-    url = gmail_client.get_authorization_url(uid)
+    user_settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
+    client_id = user_settings.google_client_id if (user_settings and user_settings.google_client_id) else None
+    url = gmail_client.get_authorization_url(uid, client_id=client_id)
     return {"auth_url": url}
 
 @router.get("/callback")
@@ -45,12 +50,15 @@ def gmail_oauth_callback(
     if not state:
         raise HTTPException(status_code=400, detail="Missing OAuth state parameter (user ID).")
     user_id = state
-    tokens = gmail_client.exchange_code_for_tokens(code)
     
     settings = db.query(UserSettings).filter(UserSettings.user_id == user_id).first()
     if not settings:
         settings = UserSettings(user_id=user_id)
         db.add(settings)
+
+    cid = settings.google_client_id if (settings and settings.google_client_id) else None
+    csecret = settings.google_client_secret if (settings and settings.google_client_secret) else None
+    tokens = gmail_client.exchange_code_for_tokens(code, client_id=cid, client_secret=csecret)
         
     if tokens.get("success"):
         settings.is_gmail_connected = True
