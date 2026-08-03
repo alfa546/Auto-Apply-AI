@@ -1,0 +1,16 @@
+[Unit]
+Description=Auto-Apply AI Frontend
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/auto-apply-ai/frontend
+Environment=NODE_ENV=production
+Environment=NEXT_PUBLIC_API_BASE=https://your-domain.com
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
