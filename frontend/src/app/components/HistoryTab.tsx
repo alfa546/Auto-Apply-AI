@@ -54,13 +54,12 @@ export default function HistoryTab({
       {/* Top Metric Cards for Today, Monthly, Yearly */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Card 1: Today */}
-        <div 
+        <div
           onClick={() => setHistoryFilter("today")}
-          className={`p-5 rounded-2xl border cursor-pointer transition-all shadow-lg ${
-            historyFilter === "today"
+          className={`p-5 rounded-2xl border cursor-pointer transition-all shadow-lg ${historyFilter === "today"
               ? "bg-rose-950/40 border-rose-500/80 ring-2 ring-rose-500/30"
               : "bg-slate-900/80 border-slate-800 hover:border-slate-700"
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -79,13 +78,12 @@ export default function HistoryTab({
         </div>
 
         {/* Card 2: Monthly */}
-        <div 
+        <div
           onClick={() => setHistoryFilter("monthly")}
-          className={`p-5 rounded-2xl border cursor-pointer transition-all shadow-lg ${
-            historyFilter === "monthly"
+          className={`p-5 rounded-2xl border cursor-pointer transition-all shadow-lg ${historyFilter === "monthly"
               ? "bg-rose-950/40 border-rose-500/80 ring-2 ring-rose-500/30"
               : "bg-slate-900/80 border-slate-800 hover:border-slate-700"
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -101,13 +99,12 @@ export default function HistoryTab({
         </div>
 
         {/* Card 3: Yearly */}
-        <div 
+        <div
           onClick={() => setHistoryFilter("yearly")}
-          className={`p-5 rounded-2xl border cursor-pointer transition-all shadow-lg ${
-            historyFilter === "yearly"
+          className={`p-5 rounded-2xl border cursor-pointer transition-all shadow-lg ${historyFilter === "yearly"
               ? "bg-rose-950/40 border-rose-500/80 ring-2 ring-rose-500/30"
               : "bg-slate-900/80 border-slate-800 hover:border-slate-700"
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -138,41 +135,37 @@ export default function HistoryTab({
           <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
             <button
               onClick={() => setHistoryFilter("today")}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                historyFilter === "today"
+              className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${historyFilter === "today"
                   ? "bg-rose-600 text-white shadow"
                   : "text-slate-400 hover:text-slate-200"
-              }`}
+                }`}
             >
               ⚡ Today ({todayApps.length})
             </button>
             <button
               onClick={() => setHistoryFilter("monthly")}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                historyFilter === "monthly"
+              className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${historyFilter === "monthly"
                   ? "bg-rose-600 text-white shadow"
                   : "text-slate-400 hover:text-slate-200"
-              }`}
+                }`}
             >
               📅 Monthly ({monthlyApps.length})
             </button>
             <button
               onClick={() => setHistoryFilter("yearly")}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                historyFilter === "yearly"
+              className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${historyFilter === "yearly"
                   ? "bg-rose-600 text-white shadow"
                   : "text-slate-400 hover:text-slate-200"
-              }`}
+                }`}
             >
               🗓️ Yearly ({yearlyApps.length})
             </button>
             <button
               onClick={() => setHistoryFilter("all")}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                historyFilter === "all"
+              className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${historyFilter === "all"
                   ? "bg-slate-800 text-white shadow"
                   : "text-slate-400 hover:text-slate-200"
-              }`}
+                }`}
             >
               🌐 All ({applications.length})
             </button>
@@ -191,11 +184,10 @@ export default function HistoryTab({
                 <div className="space-y-1.5 flex-1">
                   <div className="flex items-center gap-3">
                     <h4 className="text-sm font-bold text-slate-100">{app.title}</h4>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-                      app.opportunity_type === "internship"
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${app.opportunity_type === "internship"
                         ? "bg-amber-950/80 text-amber-300 border border-amber-500/30"
                         : "bg-rose-950/80 text-rose-300 border border-rose-500/30"
-                    }`}>
+                      }`}>
                       {(app.opportunity_type || "job").toUpperCase()}
                     </span>
                     <span className="bg-rose-950/80 text-rose-300 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded-full font-semibold">
@@ -213,9 +205,19 @@ export default function HistoryTab({
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-rose-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 font-mono">
-                    ✓ Appears in Gmail "Sent" folder
-                  </span>
+                  {app.gmail_message_id && !app.gmail_message_id.startsWith("smtp_") ? (
+                    <span className="text-xs text-rose-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 font-mono">
+                      ✓ Appears in Gmail "Sent" folder
+                    </span>
+                  ) : app.gmail_message_id && app.gmail_message_id.startsWith("smtp_") ? (
+                    <span className="text-xs text-amber-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 font-mono">
+                      ✓ Sent via SMTP
+                    </span>
+                  ) : (
+                    <span className="text-xs text-slate-500 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 font-mono">
+                      ⚠ No delivery proof
+                    </span>
+                  )}
                 </div>
               </div>
             ))

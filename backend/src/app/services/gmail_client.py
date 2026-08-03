@@ -72,15 +72,18 @@ class GmailClient:
             logger.error(f"OAuth token exchange exception: {e}")
             return {"success": False, "error": str(e)}
 
-    def refresh_access_token(self, refresh_token: str) -> Dict[str, Any]:
+    def refresh_access_token(self, refresh_token: str, client_id: Optional[str] = None, client_secret: Optional[str] = None) -> Dict[str, Any]:
         """
         Refresh Google OAuth2 Access Token using the refresh token.
+        Uses user-provided client_id/client_secret if available, otherwise falls back to global config.
         """
         import httpx
+        cid = client_id or self.client_id
+        csecret = client_secret or self.client_secret
         url = "https://oauth2.googleapis.com/token"
         payload = {
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
+            "client_id": cid,
+            "client_secret": csecret,
             "refresh_token": refresh_token,
             "grant_type": "refresh_token"
         }
@@ -179,7 +182,9 @@ class GmailClient:
         subject: str,
         body_text: str,
         cv_file_path: Optional[str] = None,
-        refresh_token: Optional[str] = None
+        refresh_token: Optional[str] = None,
+        client_id: Optional[str] = None,
+        client_secret: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Send email using Google Gmail API with OAuth2 Access Token.
@@ -206,7 +211,7 @@ class GmailClient:
                 
                 if res.status_code == 401 and refresh_token:
                     logger.info("Access token expired, attempting to refresh...")
-                    refresh_result = self.refresh_access_token(refresh_token)
+                    refresh_result = self.refresh_access_token(refresh_token, client_id=client_id, client_secret=client_secret)
                     if refresh_result.get("success"):
                         new_access_token = refresh_result.get("access_token")
                         headers["Authorization"] = f"Bearer {new_access_token}"
@@ -221,6 +226,10 @@ class GmailClient:
                                 "method": "Gmail_OAuth",
                                 "new_access_token": new_access_token
                             }
+                        else:
+                            # Return new access token even if send failed, so it can be saved for next attempt
+                            logger.error(f"Gmail API error after token refresh: {res.status_code} - {res.text}")
+                            return {"success": False, "error": res.text, "new_access_token": new_access_token}
 
                 if res.status_code == 200:
                     email_rate_limiter.record_send()

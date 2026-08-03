@@ -3,11 +3,14 @@ from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from typing import Optional
 from sqlalchemy.orm import Session
+import logging
 
 from src.app.database import get_db
 from src.app.models import User, UserSettings
 from src.app.auth import get_current_user
 from src.app.services.gmail_client import gmail_client
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth/gmail", tags=["Gmail Authentication"])
 
@@ -65,6 +68,25 @@ def gmail_oauth_callback(
         settings.gmail_access_token = tokens.get("access_token")
         if tokens.get("refresh_token"):
             settings.gmail_refresh_token = tokens.get("refresh_token")
+        
+        # Fetch the user's Gmail email address using the access token
+        try:
+            import httpx
+            userinfo_url = "https://www.googleapis.com/oauth2/v2/userinfo"
+            headers = {"Authorization": f"Bearer {tokens.get('access_token')}"}
+            with httpx.Client(timeout=10.0) as client:
+                userinfo_res = client.get(userinfo_url, headers=headers)
+                if userinfo_res.status_code == 200:
+                    userinfo = userinfo_res.json()
+                    gmail_addr = userinfo.get("email")
+                    if gmail_addr:
+                        settings.gmail_email_address = gmail_addr
+                        logger.info(f"Retrieved Gmail address: {gmail_addr}")
+                else:
+                    logger.warning(f"Failed to fetch Gmail userinfo: {userinfo_res.status_code} - {userinfo_res.text}")
+        except Exception as e:
+            logger.warning(f"Error fetching Gmail userinfo: {e}")
+        
         db.commit()
         return RedirectResponse(url="http://localhost:3000/?gmail_connected=true")
     else:

@@ -93,10 +93,15 @@ def get_opportunities(
                 "title": o.title,
                 "company": o.company,
                 "location": o.location,
+                "country": o.country,
                 "description": o.description,
                 "url": o.url,
+                "company_email": o.company_email,
+                "extracted_emails": o.extracted_emails or [],
                 "salary": o.salary,
+                "source": o.source,
                 "opportunity_type": o.opportunity_type,
+                "match_score": o.match_score,
                 "found_at": o.found_at
             }
             for o in opportunities

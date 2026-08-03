@@ -34,12 +34,14 @@ def list_applications(
             "id": a.id,
             "title": a.title,
             "company": a.company,
+            "company_email": a.company_email,
             "opportunity_type": a.opportunity_type,
             "status": a.status,
             "url": a.url,
             "applied_at": a.applied_at,
             "cover_letter": a.cover_letter,
-            "notes": a.notes
+            "notes": a.notes,
+            "gmail_message_id": a.gmail_message_id
         }
         for a in apps
     ]
@@ -66,12 +68,14 @@ def get_application_details(
         "id": app_record.id,
         "title": app_record.title,
         "company": app_record.company,
+        "company_email": app_record.company_email,
         "opportunity_type": app_record.opportunity_type,
         "status": app_record.status,
         "url": app_record.url,
         "applied_at": app_record.applied_at,
         "cover_letter": app_record.cover_letter,
-        "notes": app_record.notes
+        "notes": app_record.notes,
+        "gmail_message_id": app_record.gmail_message_id
     }
 
 # Background worker wrapper

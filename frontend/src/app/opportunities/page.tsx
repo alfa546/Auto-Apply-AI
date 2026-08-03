@@ -130,7 +130,12 @@ export default function OpportunitiesPage() {
       });
 
       if (res.ok) {
-        showToast(`⚡ Application successfully emailed to ${job.company} via Gmail!`);
+        const data = await res.json();
+        if (data.success) {
+          showToast(`⚡ Application successfully emailed to ${job.company} via Gmail! Sent to ${data.recipient_email || 'HR'}`);
+        } else {
+          showToast(data.message || data.error || `Failed to send email application.`, "error");
+        }
       } else {
         const errData = await res.json().catch(() => ({}));
         showToast(errData.detail || `Failed to send email application (status ${res.status}).`, "error");
@@ -151,7 +156,7 @@ export default function OpportunitiesPage() {
     <div className="min-h-screen bg-[#090a0f] bg-grid-omni text-slate-100 selection:bg-rose-500 selection:text-white">
       <Toast notification={notification} />
       <Navbar />
-      
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ErrorBoundary>
           <JobsTab

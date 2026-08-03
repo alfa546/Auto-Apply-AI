@@ -119,6 +119,7 @@ class Application(Base):
     applied_at = Column(DateTime(timezone=True), server_default=func.now())
     cover_letter = Column(String, nullable=True)
     notes = Column(String, nullable=True)
+    gmail_message_id = Column(String, nullable=True) # Gmail API message ID for sent email proof
 
     user = relationship("User", back_populates="applications")
 

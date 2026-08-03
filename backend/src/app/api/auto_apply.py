@@ -10,6 +10,7 @@ from src.app.models import User, Profile, UserSettings, Application, JobFound
 from src.app.auth import get_current_user
 from src.app.services.gmail_client import gmail_client
 from src.app.services.llm_client import generate_custom_cover_letter
+from src.app.services.application.pipeline import resolve_resume_local_path
 
 logger = logging.getLogger(__name__)
 
@@ -52,16 +53,27 @@ def auto_apply_via_email(
     # 2. Check User Gmail Connection
     user_settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
     if not user_settings or not user_settings.is_gmail_connected:
-        sender_email = user_email
-    else:
-        sender_email = user_settings.gmail_email_address or user_email
+        raise HTTPException(
+            status_code=400,
+            detail="Gmail is not connected. Please connect your Gmail account in Settings before applying."
+        )
+    
+    # Determine sender email - use connected Gmail address or fall back to user email
+    sender_email = user_settings.gmail_email_address or user_email
+    if not sender_email:
+        raise HTTPException(
+            status_code=400,
+            detail="No sender email address configured. Please connect your Gmail account in Settings."
+        )
 
     # 3. Fetch User Profile and Resume
     profile = db.query(Profile).filter(Profile.user_id == uid).first()
-    cv_path = profile.resume_url if profile and profile.resume_url else None
-    
-    if cv_path and not os.path.isabs(cv_path):
-        cv_path = os.path.abspath(cv_path)
+    raw_resume_url = profile.resume_url if profile and profile.resume_url else None
+    cv_path = resolve_resume_local_path(raw_resume_url) if raw_resume_url else None
+    if cv_path:
+        logger.info(f"Resume resolved to local path: {cv_path}")
+    else:
+        logger.warning(f"Could not resolve resume path from: {raw_resume_url}")
 
     # 4. Generate AI Tailored Cover Letter
     subject = f"Application for {job.title} - {user_email}"
@@ -91,7 +103,7 @@ def auto_apply_via_email(
 
     # 5. Send Email
     send_result = None
-    if user_settings and user_settings.smtp_app_password:
+    if user_settings.smtp_app_password:
         send_result = gmail_client.send_email_via_smtp(
             sender_email=sender_email,
             app_password=user_settings.smtp_app_password,
@@ -100,7 +112,7 @@ def auto_apply_via_email(
             body_text=cover_letter,
             cv_file_path=cv_path
         )
-    elif user_settings and user_settings.gmail_access_token:
+    elif user_settings.gmail_access_token:
         send_result = gmail_client.send_email_via_oauth(
             access_token=user_settings.gmail_access_token,
             sender_email=sender_email,
@@ -108,19 +120,19 @@ def auto_apply_via_email(
             subject=subject,
             body_text=cover_letter,
             cv_file_path=cv_path,
-            refresh_token=user_settings.gmail_refresh_token
+            refresh_token=user_settings.gmail_refresh_token,
+            client_id=user_settings.google_client_id,
+            client_secret=user_settings.google_client_secret
         )
         
-        if send_result.get("success") and send_result.get("new_access_token"):
+        # Save new access token if returned (even on failure, to avoid re-authentication)
+        if send_result.get("new_access_token"):
             user_settings.gmail_access_token = send_result.get("new_access_token")
     else:
-        # Mock/Dev Mode Send
-        import uuid
-        send_result = {
-            "success": True,
-            "message_id": f"msg_mock_{uuid.uuid4().hex[:10]}",
-            "method": "Dev_Mock"
-        }
+        raise HTTPException(
+            status_code=400,
+            detail="Gmail is connected but no sending method is configured. Please set up either Google OAuth or SMTP App Password in Settings."
+        )
 
     # 6. Record Application in DB
     app_record = Application(
@@ -132,15 +144,24 @@ def auto_apply_via_email(
         status="Sent via Gmail" if send_result.get("success") else "Failed",
         url=job.url,
         cover_letter=cover_letter,
-        notes=f"Sent to {recipient_email} via {send_result.get('method')}"
+        notes=f"Sent to {recipient_email} via {send_result.get('method')}",
+        gmail_message_id=send_result.get("message_id")
     )
     db.add(app_record)
     db.commit()
 
+    success = send_result.get("success", False)
+    message = (
+        f"Successfully applied to {job.company} ({job.title})! Sent to {recipient_email}"
+        if success
+        else f"Failed to apply to {job.company} ({job.title}). Error: {send_result.get('error', 'Unknown error')}"
+    )
+    
     return {
-        "success": send_result.get("success", False),
-        "message": f"Successfully applied to {job.company} ({job.title})! Sent to {recipient_email}",
+        "success": success,
+        "message": message,
         "recipient_email": recipient_email,
         "gmail_message_id": send_result.get("message_id"),
+        "error": send_result.get("error") if not success else None,
         "cover_letter_preview": cover_letter[:200] + "..."
     }

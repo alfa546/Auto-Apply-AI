@@ -66,6 +66,12 @@ def resolve_resume_local_path(resume_url: str) -> str:
         local_path = resume_url.lstrip("/")
         if os.path.exists(local_path):
             return os.path.abspath(local_path)
+        
+        # Also try resolving relative to the backend directory (in case cwd differs)
+        backend_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+        alt_path = os.path.join(backend_root, local_path)
+        if os.path.exists(alt_path):
+            return os.path.abspath(alt_path)
 
     if os.path.exists(resume_url):
         return os.path.abspath(resume_url)
