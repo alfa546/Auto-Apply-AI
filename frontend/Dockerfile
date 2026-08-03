@@ -9,6 +9,10 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Pass build-time environment variable for Next.js bundle compilation
+ARG NEXT_PUBLIC_API_BASE=http://localhost:8000
+ENV NEXT_PUBLIC_API_BASE=$NEXT_PUBLIC_API_BASE
+
 # Build the application
 RUN npm run build
 

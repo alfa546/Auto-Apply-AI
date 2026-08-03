@@ -26,7 +26,7 @@ if database_url or (settings.POSTGRES_SERVER and settings.POSTGRES_SERVER != "lo
     try:
         connect_args = {}
         # Heroku Postgres requires sslmode=require for secure cloud connections
-        if "postgresql" in postgres_url and "localhost" not in postgres_url and "127.0.0.1" not in postgres_url:
+        if "postgresql" in postgres_url and not any(host in postgres_url for host in ["localhost", "127.0.0.1", "@postgres:", "@auto_apply_postgres:"]):
             connect_args = {"sslmode": "require"}
             
         test_engine = create_engine(postgres_url, pool_pre_ping=True, connect_args=connect_args)
