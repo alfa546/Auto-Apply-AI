@@ -8,6 +8,7 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import Toast from "../components/Toast";
 import { Job, Application } from "../types";
 import { ALL_WORLD_COUNTRIES } from "../constants";
+import EmailReviewModal from "../components/EmailReviewModal";
 
 // Map country names (with emoji flags) to standardized names without emoji for matching
 const COUNTRY_NAME_MAP: Record<string, string> = {
@@ -75,6 +76,12 @@ export default function OpportunitiesPage() {
 
   const [isTriggeringSearch, setIsTriggeringSearch] = useState(false);
   const [isApplyingId, setIsApplyingId] = useState<number | null>(null);
+
+  // Email Review Modal State
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [emailPreview, setEmailPreview] = useState<any>(null);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [pendingJob, setPendingJob] = useState<Job | null>(null);
 
   // Toast Notification State
   const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -166,10 +173,11 @@ export default function OpportunitiesPage() {
     }
   };
 
+  // Step 1: Generate preview and show review modal
   const handleAutoApply = async (job: Job) => {
     setIsApplyingId(job.id);
     try {
-      const res = await fetch(`${API_BASE}/api/v1/auto-apply/send-email`, {
+      const res = await fetch(`${API_BASE}/api/v1/auto-apply/preview`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -180,8 +188,42 @@ export default function OpportunitiesPage() {
 
       if (res.ok) {
         const data = await res.json();
+        if (data.success && data.preview) {
+          setPendingJob(job);
+          setEmailPreview(data.preview);
+          setIsReviewModalOpen(true);
+        } else {
+          showToast(data.message || "Failed to generate email preview.", "error");
+        }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        showToast(errData.detail || `Failed to generate email preview (status ${res.status}).`, "error");
+      }
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Failed to connect to backend application router.", "error");
+    } finally {
+      setIsApplyingId(null);
+    }
+  };
+
+  // Step 2: User confirmed - send the email
+  const handleConfirmSendEmail = async () => {
+    if (!pendingJob) return;
+    setIsSendingEmail(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auto-apply/send-email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ job_id: pendingJob.id })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
         if (data.success) {
-          showToast(`⚡ Application successfully emailed to ${job.company} via Gmail! Sent to ${data.recipient_email || 'HR'}`);
+          showToast(`⚡ Application successfully emailed to ${pendingJob.company} via Gmail! Sent to ${data.recipient_email || 'HR'}`);
         } else {
           showToast(data.message || data.error || `Failed to send email application.`, "error");
         }
@@ -192,7 +234,10 @@ export default function OpportunitiesPage() {
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Failed to connect to backend application router.", "error");
     } finally {
-      setIsApplyingId(null);
+      setIsSendingEmail(false);
+      setIsReviewModalOpen(false);
+      setPendingJob(null);
+      setEmailPreview(null);
     }
   };
 
@@ -236,6 +281,19 @@ export default function OpportunitiesPage() {
           />
         </ErrorBoundary>
       </main>
+
+      {/* Email Review Modal - shows before sending */}
+      <EmailReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => {
+          setIsReviewModalOpen(false);
+          setPendingJob(null);
+          setEmailPreview(null);
+        }}
+        onConfirm={handleConfirmSendEmail}
+        preview={emailPreview}
+        isSending={isSendingEmail}
+      />
     </div>
   );
 }

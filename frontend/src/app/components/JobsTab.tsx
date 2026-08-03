@@ -99,18 +99,17 @@ export default function JobsTab({
           </div>
         ) : (
           filteredDailyJobs.map((job) => (
-            <div 
-              key={job.id} 
+            <div
+              key={job.id}
               className="bg-slate-900/80 border border-slate-800 hover:border-rose-500/50 p-6 rounded-xl transition-all shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6"
             >
               <div className="space-y-2 flex-1">
                 <div className="flex items-center gap-3">
                   <h3 className="text-lg font-bold text-slate-100">{job.title}</h3>
-                  <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
-                    job.opportunity_type === "internship"
+                  <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${job.opportunity_type === "internship"
                       ? "bg-amber-950/80 text-amber-300 border border-amber-500/30"
                       : "bg-rose-950/80 text-rose-300 border border-rose-500/30"
-                  }`}>
+                    }`}>
                     {(job.opportunity_type || "job").toUpperCase()}
                   </span>
                 </div>
@@ -139,7 +138,7 @@ export default function JobsTab({
                   {isApplyingId === job.id ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Sending via Gmail...</span>
+                      <span>Preparing Preview...</span>
                     </>
                   ) : (
                     <>
