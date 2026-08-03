@@ -95,9 +95,11 @@ class SearchAggregator:
                     company_email=company_email,
                     extracted_emails=extracted_emails,
                     location=opp.get("location"),
+                    country=opp.get("country") or country,
                     description=description,
                     url=url,
                     salary=opp.get("salary"),
+                    source=opp.get("source", "Aggregator"),
                     opportunity_type=opp.get("opportunity_type", "job"),
                     raw_data=opp.get("raw_data", {})
                 )

@@ -38,6 +38,7 @@ class JoobleProvider(BaseSearchProvider):
                             "description": job.get("snippet", ""),
                             "url": job.get("link", ""),
                             "salary": job.get("salary", "N/A"),
+                            "source": "Jooble",
                             "opportunity_type": "job",
                             "raw_data": job
                         })
