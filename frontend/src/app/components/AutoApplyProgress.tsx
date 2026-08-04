@@ -17,12 +17,16 @@ interface AutoApplyProgressProps {
     } | null;
     onStop: () => void;
     isStopping: boolean;
+    onDismiss?: () => void;
+    isDismissing?: boolean;
 }
 
 export default function AutoApplyProgress({
     status,
     onStop,
-    isStopping
+    isStopping,
+    onDismiss,
+    isDismissing = false
 }: AutoApplyProgressProps) {
     if (!status || status.status === "idle") return null;
 
@@ -56,16 +60,28 @@ export default function AutoApplyProgress({
                     )}
                     <h4 className={`text-xs font-bold ${statusColor}`}>{statusLabel}</h4>
                 </div>
-                {isRunning && (
-                    <button
-                        onClick={onStop}
-                        disabled={isStopping}
-                        className="bg-red-600 hover:bg-red-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-lg border border-red-400/80 shadow flex items-center gap-1 transition-all disabled:opacity-50"
-                    >
-                        <span>⏹️</span>
-                        <span>{isStopping ? "Stopping..." : "Stop"}</span>
-                    </button>
-                )}
+                <div className="flex items-center gap-2">
+                    {isRunning && (
+                        <button
+                            onClick={onStop}
+                            disabled={isStopping}
+                            className="bg-red-600 hover:bg-red-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-lg border border-red-400/80 shadow flex items-center gap-1 transition-all disabled:opacity-50"
+                        >
+                            <span>⏹️</span>
+                            <span>{isStopping ? "Stopping..." : "Stop"}</span>
+                        </button>
+                    )}
+                    {!isRunning && onDismiss && (
+                        <button
+                            onClick={onDismiss}
+                            disabled={isDismissing}
+                            className="text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 p-1 rounded-lg text-xs transition-all flex items-center justify-center w-7 h-7"
+                            title="Close"
+                        >
+                            ✕
+                        </button>
+                    )}
+                </div>
             </div>
 
             <div className="p-4 space-y-3.5">
@@ -133,6 +149,20 @@ export default function AutoApplyProgress({
                         >
                             <span className="text-base">⏹️</span>
                             <span className="tracking-wide">{isStopping ? "STOPPING AUTO-APPLY..." : "STOP AUTO-APPLY NOW"}</span>
+                        </button>
+                    </div>
+                )}
+
+                {/* Close Button when Finished */}
+                {!isRunning && onDismiss && (
+                    <div className="pt-2 border-t border-white/10">
+                        <button
+                            onClick={onDismiss}
+                            disabled={isDismissing}
+                            className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-2.5 rounded-xl border border-white/10 shadow flex items-center justify-center gap-1.5 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                        >
+                            <span className="text-sm">✖</span>
+                            <span>{isDismissing ? "Closing..." : "Close"}</span>
                         </button>
                     </div>
                 )}

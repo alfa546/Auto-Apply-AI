@@ -115,6 +115,14 @@ class AutoApplyBatchRunner:
             return {"success": True, "message": f"Auto-apply stopped. Applied {state['total_applied']} applications so far."}
         return {"success": False, "message": "No active auto-apply run found."}
 
+    def dismiss_batch(self, uid: str) -> dict:
+        """Dismisses and clears the stored batch status for a user."""
+        if uid in _active_runs:
+            _active_runs.pop(uid, None)
+            logger.info(f"Dismissed auto-apply status for user {uid}")
+            return {"success": True, "message": "Auto-apply status dismissed."}
+        return {"success": True, "message": "No active auto-apply run found."}
+
     def get_status(self, uid: str) -> dict:
         """Returns current batch status for a user."""
         if uid not in _active_runs:

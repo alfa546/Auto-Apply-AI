@@ -375,3 +375,13 @@ def stop_auto_apply_batch(
     """
     uid, _ = get_uid_and_email(current_user)
     return auto_apply_runner.stop_batch(uid)
+
+@router.post("/dismiss")
+def dismiss_auto_apply_status(
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Dismisses/clears the completed, stopped, or failed auto-apply status for the user.
+    """
+    uid, _ = get_uid_and_email(current_user)
+    return auto_apply_runner.dismiss_batch(uid)

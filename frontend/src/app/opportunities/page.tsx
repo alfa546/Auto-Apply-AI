@@ -96,6 +96,7 @@ export default function OpportunitiesPage() {
   const [isStartingAutoApply, setIsStartingAutoApply] = useState(false);
   const [autoApplyStatus, setAutoApplyStatus] = useState<any>(null);
   const [isStoppingAutoApply, setIsStoppingAutoApply] = useState(false);
+  const [isDismissingAutoApply, setIsDismissingAutoApply] = useState(false);
 
   // Toast Notification State
   const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -337,6 +338,22 @@ export default function OpportunitiesPage() {
     }
   };
 
+  const handleDismissAutoApply = async () => {
+    setIsDismissingAutoApply(true);
+    try {
+      await fetch(`${API_BASE}/api/v1/auto-apply/dismiss`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      setAutoApplyStatus(null);
+    } catch (err) {
+      console.error("Failed to dismiss auto-apply status:", err);
+      setAutoApplyStatus(null);
+    } finally {
+      setIsDismissingAutoApply(false);
+    }
+  };
+
   // Poll auto-apply status every 3 seconds while running
   useEffect(() => {
     if (!isAuthenticated || !token) return;
@@ -419,6 +436,8 @@ export default function OpportunitiesPage() {
         status={autoApplyStatus}
         onStop={handleStopAutoApply}
         isStopping={isStoppingAutoApply}
+        onDismiss={handleDismissAutoApply}
+        isDismissing={isDismissingAutoApply}
       />
 
       {/* Job Details Modal - shows full description with apply button */}
