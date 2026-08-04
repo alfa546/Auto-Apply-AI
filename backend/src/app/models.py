@@ -1,7 +1,24 @@
-from sqlalchemy import Column, String, Boolean, DateTime, Integer, JSON, ForeignKey
+from sqlalchemy import Column, String, Boolean, DateTime, Integer, JSON, ForeignKey, Enum as SQLEnum, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from enum import Enum
 from src.app.database import Base
+
+class UserRole(str, Enum):
+    USER = "user"
+    ADMIN = "admin"
+    SUPER_ADMIN = "super_admin"
+
+class PlanType(str, Enum):
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
+
+class SubscriptionStatus(str, Enum):
+    ACTIVE = "active"
+    CANCELLED = "cancelled"
+    EXPIRED = "expired"
+    TRIAL = "trial"
 
 class User(Base):
     __tablename__ = "users"
@@ -9,11 +26,17 @@ class User(Base):
     id = Column(String, primary_key=True, index=True) # Firebase UID or local UUID
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=True)
+    role = Column(SQLEnum(UserRole), default=UserRole.USER, nullable=False)
+    is_active = Column(Boolean, default=True)
+    is_verified = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     profile = relationship("Profile", back_populates="user", uselist=False, cascade="all, delete-orphan")
     settings = relationship("UserSettings", back_populates="user", uselist=False, cascade="all, delete-orphan")
     applications = relationship("Application", back_populates="user", cascade="all, delete-orphan")
+    subscription = relationship("Subscription", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    api_usage = relationship("APIUsage", back_populates="user", cascade="all, delete-orphan")
 
 
 class Profile(Base):
@@ -58,7 +81,7 @@ class UserSettings(Base):
     daily_internship_goal = Column(Integer, default=5)
     auto_fulfill_enabled = Column(Boolean, default=False)
     
-    # 🔑 API Keys & AI Provider Configuration
+    # 🔑 API Keys & AI Provider Configuration (Encrypted in production)
     llm_provider = Column(String, default="openai") # "openai", "gemini", "deepseek", "groq", "openrouter", "ollama", "custom"
     llm_model = Column(String, default="gpt-4o") # "gpt-4o", "gemini-1.5-pro", "deepseek-chat", "llama-3.1-70b"
     custom_api_base = Column(String, nullable=True) # e.g. "http://localhost:11434/v1" or "https://openrouter.ai/api/v1"
@@ -83,6 +106,56 @@ class UserSettings(Base):
     search_hackathons = Column(Boolean, default=False)
 
     user = relationship("User", back_populates="settings")
+
+
+class Plan(Base):
+    __tablename__ = "plans"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(SQLEnum(PlanType), unique=True, nullable=False)
+    display_name = Column(String, nullable=False)
+    price_monthly = Column(Float, nullable=False)
+    price_yearly = Column(Float, nullable=True)
+    max_daily_applications = Column(Integer, nullable=False)
+    max_monthly_api_calls = Column(Integer, nullable=False)
+    max_resumes = Column(Integer, nullable=False)
+    features = Column(JSON, default=dict) # Feature flags
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), unique=True, index=True)
+    plan_id = Column(Integer, ForeignKey("plans.id", ondelete="SET NULL"), nullable=True)
+    status = Column(SQLEnum(SubscriptionStatus), default=SubscriptionStatus.TRIAL, nullable=False)
+    current_period_start = Column(DateTime(timezone=True), nullable=True)
+    current_period_end = Column(DateTime(timezone=True), nullable=True)
+    cancelled_at = Column(DateTime(timezone=True), nullable=True)
+    trial_end = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    user = relationship("User", back_populates="subscription")
+    plan = relationship("Plan")
+
+
+class APIUsage(Base):
+    __tablename__ = "api_usage"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    service = Column(String, nullable=False) # "openai", "gemini", "adzuna", "jooble", etc.
+    endpoint = Column(String, nullable=True) # Specific endpoint called
+    tokens_used = Column(Integer, default=0)
+    requests_count = Column(Integer, default=1)
+    success = Column(Boolean, default=True)
+    error_message = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", back_populates="api_usage")
 
 
 class JobFound(Base):
