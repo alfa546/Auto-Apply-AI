@@ -48,10 +48,11 @@ class UserSettings(Base):
     # Career Preferences & Target Criteria
     preferred_countries = Column(JSON, default=list) # e.g. ["US", "DE", "UK"]
     target_roles = Column(JSON, default=list) # e.g. ["Backend Developer", "AI Engineer"]
-    work_mode_preference = Column(String, default="Remote") # Remote, Hybrid, Onsite
+    work_mode_preference = Column(String, default="Fully Remote (Worldwide)") # Remote, Hybrid, Onsite
     min_salary_preference = Column(String, nullable=True) # e.g. "$80,000"
     experience_level = Column(String, nullable=True) # Entry, Mid, Senior
     visa_sponsorship_required = Column(Boolean, default=False)
+    visa_sponsorship_preference = Column(String, default="No Visa Needed (Authorized Work Permit)")
     daily_apply_limit = Column(Integer, default=20)
     daily_job_goal = Column(Integer, default=10)
     daily_internship_goal = Column(Integer, default=5)

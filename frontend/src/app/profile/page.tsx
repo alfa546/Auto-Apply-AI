@@ -28,11 +28,11 @@ export default function ProfilePage() {
     "Germany", "France", "Singapore", "Netherlands",
     "Sweden", "Switzerland", "United Arab Emirates"
   ]);
-  const [workModePref, setWorkModePref] = useState("Remote & Hybrid Permitted");
-  const [salaryPref, setSalaryPref] = useState("$100,000+");
-  const [experiencePref, setExperiencePref] = useState("Mid-to-Senior (3-7 yrs)");
-  const [visaSponsorshipPref, setVisaSponsorshipPref] = useState("No visa sponsorship required");
-  const [selectedEmpTypes, setSelectedEmpTypes] = useState<string[]>(["Full-time", "Contract"]);
+  const [workModePref, setWorkModePref] = useState("Fully Remote (Worldwide)");
+  const [salaryPref, setSalaryPref] = useState("$90,000 - $130,000 / year");
+  const [experiencePref, setExperiencePref] = useState("Mid-Level (2 - 5 Yrs)");
+  const [visaSponsorshipPref, setVisaSponsorshipPref] = useState("No Visa Needed (Authorized Work Permit)");
+  const [selectedEmpTypes, setSelectedEmpTypes] = useState<string[]>(["Full-Time Jobs", "Internships & Traineeships"]);
   const [dailyJobGoal, setDailyJobGoal] = useState(15);
   const [dailyInternshipGoal, setDailyInternshipGoal] = useState(5);
   const [autoFulfillEnabled, setAutoFulfillEnabled] = useState(true);
@@ -146,8 +146,21 @@ export default function ProfilePage() {
       });
       if (res.ok) {
         const data = await res.json();
-        if (data.target_countries?.length) {
-          setSelectedCountries(data.target_countries);
+        if (data.target_countries?.length) setSelectedCountries(data.target_countries);
+        if (data.target_roles?.length) setTargetRoles(data.target_roles);
+        if (data.work_mode_preference) setWorkModePref(data.work_mode_preference);
+        if (data.salary_preference) setSalaryPref(data.salary_preference);
+        if (data.experience_level) setExperiencePref(data.experience_level);
+        if (data.employment_types?.length) setSelectedEmpTypes(data.employment_types);
+        if (typeof data.daily_job_goal === "number") setDailyJobGoal(data.daily_job_goal);
+        if (typeof data.daily_internship_goal === "number") setDailyInternshipGoal(data.daily_internship_goal);
+        if (data.portfolio_url) setPortfolioUrl(data.portfolio_url);
+        if (data.github_url) setGithubUrl(data.github_url);
+        if (data.other_url) setOtherUrl(data.other_url);
+        if (data.visa_sponsorship_str) {
+          setVisaSponsorshipPref(data.visa_sponsorship_str);
+        } else if (data.visa_sponsorship !== undefined) {
+          setVisaSponsorshipPref(data.visa_sponsorship ? "Visa Sponsorship Required" : "No Visa Needed (Authorized Work Permit)");
         }
       }
     } catch (err) {

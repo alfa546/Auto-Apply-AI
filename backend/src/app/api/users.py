@@ -114,6 +114,7 @@ def get_user_settings(current_user: dict = Depends(get_current_user), db: Sessio
         "salary_preference": settings.min_salary_preference or "$90,000 - $130,000 / year",
         "experience_level": settings.experience_level or "Mid-Level (2 - 5 Yrs)",
         "visa_sponsorship": settings.visa_sponsorship_required,
+        "visa_sponsorship_str": getattr(settings, "visa_sponsorship_preference", None) or ("Visa Sponsorship Required" if settings.visa_sponsorship_required else "No Visa Needed (Authorized Work Permit)"),
         "daily_job_goal": settings.daily_job_goal,
         "daily_internship_goal": settings.daily_internship_goal,
         "auto_fulfill_enabled": settings.auto_fulfill_enabled,
@@ -212,17 +213,19 @@ def update_user_profile(
         settings.min_salary_preference = payload.salary_preference
     if payload.experience_level is not None:
         settings.experience_level = payload.experience_level
-    # Handle visa sponsorship - the UI sends a string label, but we store a boolean
+    # Handle visa sponsorship
     if payload.visa_sponsorship is not None:
         if isinstance(payload.visa_sponsorship, str):
-            # Map string labels to boolean: any option that mentions "Required" or "Needed" = True
+            settings.visa_sponsorship_preference = payload.visa_sponsorship
             visa_str = payload.visa_sponsorship.lower()
             settings.visa_sponsorship_required = any(
                 keyword in visa_str for keyword in ["required", "needed", "need", "sponsorship"]
             ) and "no visa" not in visa_str and "not required" not in visa_str
         else:
             settings.visa_sponsorship_required = payload.visa_sponsorship
-    elif payload.visa_sponsorship_str:
+            settings.visa_sponsorship_preference = "Visa Sponsorship Required" if payload.visa_sponsorship else "No Visa Needed (Authorized Work Permit)"
+    if payload.visa_sponsorship_str is not None:
+        settings.visa_sponsorship_preference = payload.visa_sponsorship_str
         visa_str = payload.visa_sponsorship_str.lower()
         settings.visa_sponsorship_required = any(
             keyword in visa_str for keyword in ["required", "needed", "need", "sponsorship"]
