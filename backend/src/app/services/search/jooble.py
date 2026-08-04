@@ -39,8 +39,13 @@ class JoobleProvider(BaseSearchProvider):
                             snippet = re.sub(r'https?://(?:www\.)?jooble\.org[^\s]*', '', snippet)
                             # Remove HTML tags
                             snippet = re.sub(r'<[^>]+>', ' ', snippet)
+                            # Remove leading/trailing truncation dots (e.g. "...doing the work...")
+                            snippet = re.sub(r'^\.{2,}\s*', '', snippet.strip())
+                            snippet = re.sub(r',?\s*\.{2,}$', '', snippet.strip())
                             # Clean up whitespace
                             snippet = re.sub(r'\s+', ' ', snippet).strip()
+                            if snippet and len(snippet) > 0:
+                                snippet = snippet[0].upper() + snippet[1:]
                         
                         results.append({
                             "title": job.get("title", "N/A"),
