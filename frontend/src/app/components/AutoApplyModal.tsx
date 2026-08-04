@@ -45,11 +45,15 @@ export default function AutoApplyModal({
 
                 <div className="p-5 space-y-5">
                     {/* Info banner */}
-                    <div className="bg-rose-950/40 border border-rose-500/30 rounded-xl p-3 text-xs text-rose-200 space-y-1">
-                        <p className="font-semibold">🚀 Fully Automated Mode</p>
-                        <p className="text-rose-300/80">
-                            The agent will generate cover letters, attach your CV, and send emails to all selected opportunities. Runs in the background until targets are met.
+                    <div className="bg-rose-950/40 border border-rose-500/30 rounded-xl p-3.5 text-xs text-rose-200 space-y-1.5">
+                        <p className="font-bold text-rose-100 flex items-center gap-1.5">🚀 Fully Automated Mode</p>
+                        <p className="text-rose-200/90 leading-relaxed">
+                            The agent will generate custom cover letters, attach your CV, and send applications in the background until your target counts are met.
                         </p>
+                        <div className="pt-1 flex items-center gap-1.5 text-red-300 font-semibold border-t border-rose-500/20 mt-2">
+                            <span>⏹️</span>
+                            <span>Full Control: A prominent Red Stop Button lets you halt auto-apply instantly at any moment.</span>
+                        </div>
                     </div>
 
                     {/* Job Count Input */}

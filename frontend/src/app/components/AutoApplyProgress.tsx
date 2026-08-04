@@ -46,13 +46,13 @@ export default function AutoApplyProgress({
     }[status.status] || "text-slate-300";
 
     return (
-        <div className={`fixed bottom-6 right-6 z-50 w-[380px] shadow-2xl border rounded-2xl backdrop-blur-xl ${isRunning ? "border-rose-500/40 bg-[#12141d]/95" : "border-white/10 bg-[#12141d]/95"
+        <div className={`fixed bottom-6 right-6 z-50 w-[380px] shadow-2xl border rounded-2xl backdrop-blur-xl ${isRunning ? "border-red-500/60 bg-[#12141d]/95 shadow-[0_10px_30px_rgba(239,68,68,0.25)]" : "border-white/10 bg-[#12141d]/95"
             }`}>
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
                 <div className="flex items-center gap-2">
                     {isRunning && (
-                        <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
                     )}
                     <h4 className={`text-xs font-bold ${statusColor}`}>{statusLabel}</h4>
                 </div>
@@ -60,27 +60,28 @@ export default function AutoApplyProgress({
                     <button
                         onClick={onStop}
                         disabled={isStopping}
-                        className="text-[10px] font-semibold text-amber-300 border border-amber-500/30 hover:bg-amber-950/30 px-2 py-0.5 rounded"
+                        className="bg-red-600 hover:bg-red-700 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-lg border border-red-400/80 shadow flex items-center gap-1 transition-all disabled:opacity-50"
                     >
-                        {isStopping ? "Stopping..." : "⏹ Stop"}
+                        <span>⏹️</span>
+                        <span>{isStopping ? "Stopping..." : "Stop"}</span>
                     </button>
                 )}
             </div>
 
-            <div className="p-4 space-y-3">
+            <div className="p-4 space-y-3.5">
                 {/* Progress bar */}
                 <div>
                     <div className="flex justify-between text-[10px] text-slate-400 mb-1">
                         <span>Progress</span>
-                        <span className="font-mono text-rose-300">{progress}%</span>
+                        <span className="font-mono font-bold text-rose-300">{progress}%</span>
                     </div>
-                    <div className="w-full bg-[#090a0f] h-2 rounded-full overflow-hidden border border-white/10">
+                    <div className="w-full bg-[#090a0f] h-2.5 rounded-full overflow-hidden border border-white/10">
                         <div
                             className={`h-full rounded-full transition-all duration-500 ${status.status === "completed"
                                     ? "bg-emerald-500"
                                     : status.status === "error"
                                         ? "bg-red-500"
-                                        : "bg-gradient-to-r from-rose-600 via-rose-500 to-rose-400"
+                                        : "bg-gradient-to-r from-rose-600 via-red-500 to-red-400 animate-pulse"
                                 }`}
                             style={{ width: `${progress}%` }}
                         ></div>
@@ -89,36 +90,50 @@ export default function AutoApplyProgress({
 
                 {/* Current job being applied */}
                 {isRunning && status.current_job_title && (
-                    <div className="bg-[#090a0f] border border-white/10 rounded-lg px-3 py-2">
-                        <p className="text-[10px] text-slate-400">Currently applying to:</p>
-                        <p className="text-xs font-semibold text-slate-200 truncate">{status.current_job_title}</p>
-                        <p className="text-[10px] text-rose-300 truncate">{status.current_job_company}</p>
+                    <div className="bg-[#090a0f] border border-white/10 rounded-xl px-3.5 py-2.5">
+                        <p className="text-[10px] text-slate-400 font-medium">Currently applying to:</p>
+                        <p className="text-xs font-bold text-slate-200 truncate mt-0.5">{status.current_job_title}</p>
+                        <p className="text-[11px] text-rose-400 font-semibold truncate">{status.current_job_company}</p>
                     </div>
                 )}
 
                 {/* Stats grid */}
                 <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-[#090a0f] border border-white/10 rounded-lg p-2 text-center">
+                    <div className="bg-[#090a0f] border border-white/10 rounded-xl p-2.5 text-center">
                         <div className="text-lg font-extrabold text-rose-400 font-mono">{status.job_applied}/{status.job_target}</div>
-                        <div className="text-[10px] text-slate-400">💼 Jobs</div>
+                        <div className="text-[10px] text-slate-400 font-medium">💼 Jobs</div>
                     </div>
-                    <div className="bg-[#090a0f] border border-white/10 rounded-lg p-2 text-center">
+                    <div className="bg-[#090a0f] border border-white/10 rounded-xl p-2.5 text-center">
                         <div className="text-lg font-extrabold text-amber-400 font-mono">{status.internship_applied}/{status.internship_target}</div>
-                        <div className="text-[10px] text-slate-400">🎓 Internships</div>
+                        <div className="text-[10px] text-slate-400 font-medium">🎓 Internships</div>
                     </div>
-                    <div className="bg-[#090a0f] border border-white/10 rounded-lg p-2 text-center">
+                    <div className="bg-[#090a0f] border border-white/10 rounded-xl p-2.5 text-center">
                         <div className="text-lg font-extrabold text-emerald-400 font-mono">{status.total_applied}</div>
-                        <div className="text-[10px] text-slate-400">✅ Applied</div>
+                        <div className="text-[10px] text-slate-400 font-medium">✅ Applied</div>
                     </div>
-                    <div className="bg-[#090a0f] border border-white/10 rounded-lg p-2 text-center">
+                    <div className="bg-[#090a0f] border border-white/10 rounded-xl p-2.5 text-center">
                         <div className="text-lg font-extrabold text-red-400 font-mono">{status.total_failed}</div>
-                        <div className="text-[10px] text-slate-400">❌ Failed</div>
+                        <div className="text-[10px] text-slate-400 font-medium">❌ Failed</div>
                     </div>
                 </div>
 
                 {status.last_error && (
-                    <div className="bg-red-950/40 border border-red-500/30 rounded-lg px-3 py-2 text-[10px] text-red-300">
+                    <div className="bg-red-950/40 border border-red-500/30 rounded-xl px-3 py-2 text-[11px] text-red-300">
                         ⚠️ {status.last_error}
+                    </div>
+                )}
+
+                {/* Prominent Red Stop Button when Running */}
+                {isRunning && (
+                    <div className="pt-2 border-t border-white/10">
+                        <button
+                            onClick={onStop}
+                            disabled={isStopping}
+                            className="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs py-3 rounded-xl border-2 border-red-400/80 shadow-[0_0_15px_rgba(239,68,68,0.6)] flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                        >
+                            <span className="text-base">⏹️</span>
+                            <span className="tracking-wide">{isStopping ? "STOPPING AUTO-APPLY..." : "STOP AUTO-APPLY NOW"}</span>
+                        </button>
                     </div>
                 )}
             </div>

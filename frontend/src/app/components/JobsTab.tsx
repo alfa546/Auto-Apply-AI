@@ -78,20 +78,20 @@ export default function JobsTab({
             )}
           </button>
 
-          {/* Auto-Apply Button - becomes Stop button when running */}
+          {/* Auto-Apply Button - becomes a bright Red Stop button when running */}
           <button
             onClick={isAutoApplyRunning ? onStopAutoApply : handleAutoApplyBatch}
             disabled={isAutoApplyRunning && isAutoApplyStopping}
             className={
               isAutoApplyRunning
-                ? "bg-gradient-to-r from-red-700 via-red-600 to-red-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-lg shadow-red-500/20 flex items-center gap-2 transition-all hover:shadow-red-500/40 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
+                ? "bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs py-2.5 px-5 rounded-xl border-2 border-red-400 shadow-[0_0_20px_rgba(239,68,68,0.8)] animate-pulse flex items-center gap-2 transition-all hover:scale-[1.03] disabled:opacity-50 disabled:hover:scale-100 disabled:animate-none"
                 : "bg-gradient-to-r from-rose-600 via-red-600 to-orange-600 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-lg shadow-rose-500/20 flex items-center gap-2 transition-all hover:shadow-rose-500/40 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
             }
           >
             {isAutoApplyRunning ? (
               <>
-                <span className="text-sm">⏹</span>
-                <span>{isAutoApplyStopping ? "Stopping..." : "Stop Auto-Apply"}</span>
+                <span className="text-sm font-black">⏹️</span>
+                <span>{isAutoApplyStopping ? "Stopping..." : "STOP AUTO-APPLY"}</span>
               </>
             ) : (
               <>

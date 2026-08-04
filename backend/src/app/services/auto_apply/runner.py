@@ -332,6 +332,11 @@ class AutoApplyBatchRunner:
             from src.app.api.auto_apply import build_cover_letter_with_links
             cover_letter = build_cover_letter_with_links(cover_letter, profile)
 
+            # Instant STOP check: do not send email if user clicked stop while LLM was generating
+            if self._is_stopped(uid):
+                logger.info(f"Auto-apply stopped by user {uid} before email dispatch to {job.company}.")
+                return {"success": False, "error": "Stopped by user"}
+
             # Send email
             if user_settings.smtp_app_password:
                 send_result = gmail_client.send_email_via_smtp(
