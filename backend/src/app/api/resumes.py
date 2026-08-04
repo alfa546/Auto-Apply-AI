@@ -86,6 +86,10 @@ async def upload_resume(
         "skills": profile.skills,
         "summary": profile.summary,
         "ats_score": profile.ats_score,
+        "formatting_score": ats_results.get("formatting_score", 0),
+        "keyword_density_score": ats_results.get("keyword_density_score", 0),
+        "action_verbs_score": ats_results.get("action_verbs_score", 0),
+        "section_completeness_score": ats_results.get("section_completeness_score", 0),
         "ats_suggestions": profile.ats_suggestions
     }
 
@@ -115,6 +119,10 @@ def get_resume_profile(
         "projects": profile.projects,
         "languages": profile.languages,
         "ats_score": profile.ats_score,
+        "formatting_score": getattr(profile, 'formatting_score', None),
+        "keyword_density_score": getattr(profile, 'keyword_density_score', None),
+        "action_verbs_score": getattr(profile, 'action_verbs_score', None),
+        "section_completeness_score": getattr(profile, 'section_completeness_score', None),
         "ats_suggestions": profile.ats_suggestions
     }
 
@@ -153,4 +161,12 @@ def run_ats_check(
         db.commit()
         db.refresh(profile)
     
-    return ats_results
+    # Return all ATS data including 4 detailed scores
+    return {
+        "ats_score": ats_results.get("ats_score"),
+        "formatting_score": ats_results.get("formatting_score", 0),
+        "keyword_density_score": ats_results.get("keyword_density_score", 0),
+        "action_verbs_score": ats_results.get("action_verbs_score", 0),
+        "section_completeness_score": ats_results.get("section_completeness_score", 0),
+        "ats_suggestions": ats_results.get("ats_suggestions", {})
+    }

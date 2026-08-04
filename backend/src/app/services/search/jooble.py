@@ -1,5 +1,6 @@
 import logging
 import httpx
+import re
 from typing import List, Dict
 from src.app.config import settings
 from src.app.services.search.base import BaseSearchProvider
@@ -31,11 +32,21 @@ class JoobleProvider(BaseSearchProvider):
                     results = []
                     # Jooble returns list of jobs in 'jobs' key
                     for job in data.get("jobs", []):
+                        # Clean description - remove Jooble links and HTML
+                        snippet = job.get("snippet", "")
+                        if snippet:
+                            # Remove Jooble-specific links
+                            snippet = re.sub(r'https?://(?:www\.)?jooble\.org[^\s]*', '', snippet)
+                            # Remove HTML tags
+                            snippet = re.sub(r'<[^>]+>', ' ', snippet)
+                            # Clean up whitespace
+                            snippet = re.sub(r'\s+', ' ', snippet).strip()
+                        
                         results.append({
                             "title": job.get("title", "N/A"),
                             "company": job.get("company", "N/A"),
                             "location": job.get("location", "N/A"),
-                            "description": job.get("snippet", ""),
+                            "description": snippet,
                             "url": job.get("link", ""),
                             "salary": job.get("salary", "N/A"),
                             "source": "Jooble",

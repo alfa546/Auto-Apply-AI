@@ -159,72 +159,112 @@ def extract_skills_and_summary_from_text(raw_text: str) -> dict:
 def rule_based_ats(profile_data: dict, target_role: str = None) -> dict:
     """
     Computes standard heuristic metrics to rate a profile and suggest updates.
+    Returns detailed breakdown of 4 ATS categories.
     """
-    score = 65
-    missing_skills = []
-    formatting_suggestions = []
-    experience_improvements = []
-    
     skills = profile_data.get("skills", [])
     experience = profile_data.get("experience", [])
     education = profile_data.get("education", [])
     projects = profile_data.get("projects", [])
     
-    # Assess skills
-    if len(skills) < 5:
-        score -= 10
-        missing_skills.append("Add more technical/industry skills (aim for at least 8-10 skills).")
-    elif len(skills) > 10:
-        score += min(15, len(skills) - 10)
-        
-    # Assess experience
-    if not experience:
-        score -= 20
-        experience_improvements.append("No professional work experience detected. Add internships, freelance or contract roles.")
-    else:
-        # Check descriptions
-        for exp in experience:
-            desc = exp.get("description", "")
-            if len(desc) < 30:
-                score -= 3
-                experience_improvements.append(f"Elaborate on your role as '{exp.get('title')}' at '{exp.get('company')}'. Describe achievements and technologies used.")
-                break
-                
-    # Assess education
-    if not education:
-        score -= 5
-        formatting_suggestions.append("Education section appears to be missing or could not be detected.")
-        
-    # Assess projects
-    if not projects:
-        score -= 5
-        experience_improvements.append("Consider adding personal or academic projects to show practical application of skills.")
-        
-    # Check target role specifics
-    if target_role:
-        target_role_lower = target_role.lower()
-        # Look for keywords related to target role
-        keywords_matched = False
-        for s in skills:
-            if s.lower() in target_role_lower or any(word in s.lower() for word in target_role_lower.split()):
-                keywords_matched = True
-                break
-        if keywords_matched:
-            score += 10
-        else:
-            score -= 10
-            missing_skills.append(f"Add key skills matching the target role '{target_role}'.")
-            
-    # Cap score boundaries
-    score = max(30, min(95, score))
+    missing_skills = []
+    formatting_suggestions = []
+    experience_improvements = []
     
-    # Standard formatting suggestions
+    # 1. Formatting & Structure Score (0-100)
+    formatting_score = 70
+    if not education:
+        formatting_score -= 15
+        formatting_suggestions.append("Education section appears to be missing or could not be detected.")
+    if not experience:
+        formatting_score -= 20
+        formatting_suggestions.append("Work experience section is missing. Add your professional history.")
     if not formatting_suggestions:
         formatting_suggestions.append("Ensure your contact details, including LinkedIn and GitHub, are prominent at the top.")
         formatting_suggestions.append("Use standard bullet points with action verbs (e.g., Developed, Orchestrated, Optimized) instead of paragraphs.")
+    
+    # 2. Technical Skill Density Score (0-100)
+    keyword_density_score = 50
+    if len(skills) < 5:
+        keyword_density_score = 30
+        missing_skills.append("Add more technical/industry skills (aim for at least 8-10 skills).")
+    elif len(skills) < 8:
+        keyword_density_score = 55
+        missing_skills.append("Add a few more relevant technical skills to improve keyword density.")
+    elif len(skills) <= 15:
+        keyword_density_score = 85
+    else:
+        keyword_density_score = 95
+    
+    # Check target role skill match
+    if target_role:
+        target_role_lower = target_role.lower()
+        keywords_matched = any(
+            s.lower() in target_role_lower or any(word in s.lower() for word in target_role_lower.split())
+            for s in skills
+        )
+        if not keywords_matched:
+            keyword_density_score -= 15
+            missing_skills.append(f"Add key skills matching the target role '{target_role}'.")
+    
+    # 3. Action Verbs & Impact Score (0-100)
+    action_verbs_score = 60
+    action_verbs = ['developed', 'engineered', 'architected', 'implemented', 'optimized', 'led', 'managed', 
+                    'created', 'designed', 'built', 'improved', 'increased', 'reduced', 'launched', 'delivered']
+    
+    has_strong_verbs = False
+    if experience:
+        for exp in experience:
+            desc = exp.get("description", "").lower()
+            if any(verb in desc for verb in action_verbs):
+                has_strong_verbs = True
+                break
+        if not has_strong_verbs:
+            action_verbs_score = 40
+            experience_improvements.append("Use stronger action verbs (e.g., 'Engineered', 'Optimized', 'Architected') to describe your achievements.")
+    
+    # Check experience description quality
+    if experience:
+        for exp in experience:
+            desc = exp.get("description", "")
+            if len(desc) < 30:
+                action_verbs_score -= 10
+                experience_improvements.append(f"Elaborate on your role as '{exp.get('title')}' at '{exp.get('company')}'. Describe achievements, metrics, and technologies used.")
+                break
+    
+    # 4. Section Completeness Score (0-100)
+    section_completeness_score = 60
+    if education:
+        section_completeness_score += 10
+    if experience:
+        section_completeness_score += 10
+    if skills and len(skills) >= 5:
+        section_completeness_score += 10
+    if projects:
+        section_completeness_score += 10
+    
+    # Calculate overall score (weighted average)
+    overall_score = int((
+        formatting_score * 0.25 +
+        keyword_density_score * 0.25 +
+        action_verbs_score * 0.25 +
+        section_completeness_score * 0.25
+    ))
+    
+    # Cap score boundaries
+    overall_score = max(30, min(95, overall_score))
+    
+    # Additional improvements
+    if not projects:
+        experience_improvements.append("Consider adding personal or academic projects to show practical application of skills.")
+    if not experience:
+        experience_improvements.append("No professional work experience detected. Add internships, freelance, or contract roles to strengthen your profile.")
 
     return {
-        "ats_score": score,
+        "ats_score": overall_score,
+        "formatting_score": min(100, formatting_score),
+        "keyword_density_score": min(100, keyword_density_score),
+        "action_verbs_score": min(100, action_verbs_score),
+        "section_completeness_score": min(100, section_completeness_score),
         "ats_suggestions": {
             "missing_skills": missing_skills,
             "formatting_suggestions": formatting_suggestions,

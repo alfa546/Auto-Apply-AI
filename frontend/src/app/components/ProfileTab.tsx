@@ -101,7 +101,7 @@ export default function ProfileTab({
     <div className="space-y-8">
       {/* Top Grid: User Info Form + Resume Upload Card & AI Profile Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Col 1 & 2: User Personal Details & Portfolio Links Form */}
         <div className="lg:col-span-2 bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-6">
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
@@ -121,8 +121,8 @@ export default function ProfileTab({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-slate-300 font-semibold mb-1">Email Address</label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   value={userEmail}
                   onChange={e => setUserEmail(e.target.value)}
                   placeholder="you@domain.com"
@@ -133,8 +133,8 @@ export default function ProfileTab({
 
               <div>
                 <label className="block text-slate-300 font-semibold mb-1">Portfolio / Personal Website</label>
-                <input 
-                  type="url" 
+                <input
+                  type="url"
                   value={portfolioUrl}
                   onChange={e => setPortfolioUrl(e.target.value)}
                   placeholder="https://yourportfolio.com"
@@ -144,8 +144,8 @@ export default function ProfileTab({
 
               <div>
                 <label className="block text-slate-300 font-semibold mb-1">GitHub / GitLab Profile</label>
-                <input 
-                  type="url" 
+                <input
+                  type="url"
                   value={githubUrl}
                   onChange={e => setGithubUrl(e.target.value)}
                   placeholder="https://github.com/username"
@@ -155,8 +155,8 @@ export default function ProfileTab({
 
               <div>
                 <label className="block text-slate-300 font-semibold mb-1">Other Link (LinkedIn, Twitter)</label>
-                <input 
-                  type="url" 
+                <input
+                  type="url"
                   value={otherUrl}
                   onChange={e => setOtherUrl(e.target.value)}
                   placeholder="https://linkedin.com/in/username"
@@ -170,8 +170,8 @@ export default function ProfileTab({
 
               <div>
                 <label className="block text-slate-300 font-semibold mb-1">Target Roles (Comma separated)</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={targetRoles.join(", ")}
                   onChange={e => setTargetRoles(e.target.value.split(",").map(r => r.trim()))}
                   placeholder="e.g. Software Engineer, Frontend Developer"
@@ -207,11 +207,10 @@ export default function ProfileTab({
                             <div
                               key={idx}
                               onClick={() => handleSelectCountryFromDropdown(country)}
-                              className={`px-4 py-2.5 text-xs font-semibold cursor-pointer flex items-center justify-between transition-colors ${
-                                isAlreadySelected
+                              className={`px-4 py-2.5 text-xs font-semibold cursor-pointer flex items-center justify-between transition-colors ${isAlreadySelected
                                   ? "bg-slate-950 text-slate-500 cursor-not-allowed"
                                   : "hover:bg-rose-950/40 text-slate-200 hover:text-rose-300"
-                              }`}
+                                }`}
                             >
                               <span>{country}</span>
                               {isAlreadySelected ? (
@@ -234,7 +233,7 @@ export default function ProfileTab({
                   <span className="text-[11px] font-semibold text-slate-400 block mb-2 mt-2">Active Target Countries List (CV will be sent to these countries):</span>
                   <div className="flex flex-wrap gap-2">
                     {selectedCountries.map((country, idx) => (
-                      <span 
+                      <span
                         key={idx}
                         className="bg-rose-950/90 border border-rose-500/50 text-rose-200 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm"
                       >
@@ -322,11 +321,10 @@ export default function ProfileTab({
                         type="button"
                         key={idx}
                         onClick={() => toggleEmpType(type)}
-                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
-                          isSelected
+                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${isSelected
                             ? "bg-rose-950/80 border-rose-500 text-rose-200 shadow"
                             : "bg-[#12141d] border-white/10 text-slate-400 hover:text-slate-200"
-                        }`}
+                          }`}
                       >
                         {isSelected ? "✓ " : "+ "}{type}
                       </button>
@@ -355,7 +353,7 @@ export default function ProfileTab({
                   <label className="block text-slate-300 font-semibold mb-1">
                     💼 Daily Jobs Goal (Applications / Day)
                   </label>
-                  <input 
+                  <input
                     type="number"
                     min="1"
                     max="50"
@@ -370,7 +368,7 @@ export default function ProfileTab({
                   <label className="block text-slate-300 font-semibold mb-1">
                     🎓 Daily Internships Goal (Applications / Day)
                   </label>
-                  <input 
+                  <input
                     type="number"
                     min="1"
                     max="50"
@@ -393,8 +391,8 @@ export default function ProfileTab({
                 </div>
 
                 <div className="w-full bg-[#12141d] h-2.5 rounded-full overflow-hidden border border-white/10">
-                  <div 
-                    className="bg-gradient-to-r from-rose-600 via-rose-500 to-rose-400 h-full rounded-full transition-all duration-500" 
+                  <div
+                    className="bg-gradient-to-r from-rose-600 via-rose-500 to-rose-400 h-full rounded-full transition-all duration-500"
                     style={{ width: `${overallGoalProgress}%` }}
                   ></div>
                 </div>
@@ -420,14 +418,14 @@ export default function ProfileTab({
 
         {/* Col 3: PDF Resume Upload & Extracted Candidate Profile Breakdown Card */}
         <div className="lg:col-span-1 space-y-6">
-          
+
           {/* Upload Card or Agent Thinking UI */}
           {isUploading ? (
             <div className="bg-slate-900/90 border-2 border-rose-500/50 p-6 rounded-2xl shadow-[0_0_30px_rgba(244,63,94,0.15)] space-y-4 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-slate-800">
                 <div className="h-full bg-rose-500 rounded-r-full animate-pulse" style={{ width: agentPhase === 'reading' ? '25%' : agentPhase === 'planning' ? '50%' : agentPhase === 'extracting' ? '75%' : agentPhase === 'scoring' ? '90%' : '100%' }}></div>
               </div>
-              
+
               <div className="flex items-center justify-between border-b border-rose-500/30 pb-3">
                 <h3 className="text-sm font-bold text-rose-300 flex items-center gap-2">
                   <SparklesIcon />
@@ -465,8 +463,8 @@ export default function ProfileTab({
                 </div>
 
                 <div className="border-2 border-dashed border-slate-700 hover:border-rose-500 p-6 rounded-xl text-center bg-slate-950/60 cursor-pointer relative transition-all group">
-                  <input 
-                    type="file" 
+                  <input
+                    type="file"
                     accept=".pdf,.doc,.docx"
                     onChange={handleResumeUpload}
                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
@@ -596,7 +594,7 @@ export default function ProfileTab({
 
         {/* Score Gauge Card */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          
+
           {/* Score Gauge Card */}
           <div className="md:col-span-1 bg-slate-950 border border-slate-800 p-6 rounded-xl text-center flex flex-col justify-center items-center space-y-2">
             <div className="relative w-28 h-28 flex items-center justify-center rounded-full bg-gradient-to-tr from-rose-500/20 via-red-500/20 to-orange-500/20 border-4 border-rose-500/50 shadow-lg shadow-rose-500/10">
@@ -613,7 +611,7 @@ export default function ProfileTab({
 
           {/* Detailed Meters */}
           <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
+
             {/* Meter 1: Formatting & Structure */}
             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
               <div className="flex justify-between text-xs">
@@ -662,6 +660,63 @@ export default function ProfileTab({
               <p className="text-[10px] text-slate-400">Education, experience, skills & contact links present.</p>
             </div>
           </div>
+
+          {/* ATS Suggestions Section */}
+          {(atsMetrics.missing_skills?.length > 0 || atsMetrics.formatting_suggestions?.length > 0 || atsMetrics.experience_improvements?.length > 0) && (
+            <div className="mt-6 space-y-4">
+              <h4 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                <SparklesIcon />
+                <span>ATS Optimization Suggestions</span>
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Missing Skills */}
+                {atsMetrics.missing_skills?.length > 0 && (
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider">🔑 Missing Skills</h5>
+                    <ul className="space-y-1.5">
+                      {atsMetrics.missing_skills.map((skill, idx) => (
+                        <li key={idx} className="text-[11px] text-slate-300 flex items-start gap-2">
+                          <span className="text-amber-400 mt-0.5">•</span>
+                          <span>{skill}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Formatting Suggestions */}
+                {atsMetrics.formatting_suggestions?.length > 0 && (
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <h5 className="text-xs font-bold text-indigo-400 uppercase tracking-wider">🎨 Formatting Tips</h5>
+                    <ul className="space-y-1.5">
+                      {atsMetrics.formatting_suggestions.map((suggestion, idx) => (
+                        <li key={idx} className="text-[11px] text-slate-300 flex items-start gap-2">
+                          <span className="text-indigo-400 mt-0.5">•</span>
+                          <span>{suggestion}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Experience Improvements */}
+                {atsMetrics.experience_improvements?.length > 0 && (
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <h5 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">⚡ Experience Enhancements</h5>
+                    <ul className="space-y-1.5">
+                      {atsMetrics.experience_improvements.map((improvement, idx) => (
+                        <li key={idx} className="text-[11px] text-slate-300 flex items-start gap-2">
+                          <span className="text-emerald-400 mt-0.5">•</span>
+                          <span>{improvement}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

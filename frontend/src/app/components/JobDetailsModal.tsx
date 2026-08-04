@@ -21,10 +21,22 @@ export default function JobDetailsModal({
 }: JobDetailsModalProps) {
     if (!isOpen || !job) return null;
 
-    // Clean HTML tags from description for readable display
-    const cleanDescription = (html: string | undefined) => {
-        if (!html) return "No description available for this position.";
-        return html
+    // Parse enhanced description with metadata
+    const parseDescription = (raw: string | undefined) => {
+        if (!raw) return { metadata: [], description: "No description available for this position." };
+
+        // Split by separator to get metadata and description
+        const parts = raw.split('='.repeat(50));
+        const metadataPart = parts[0] || "";
+        const descriptionPart = parts.length > 1 ? parts[1] : raw;
+
+        // Extract metadata lines
+        const metadataLines = metadataPart.split('\n').filter(line =>
+            line.trim() && (line.includes('🏢') || line.includes('📍') || line.includes('🌍') || line.includes('💰'))
+        );
+
+        // Clean description part
+        const cleanDesc = descriptionPart
             .replace(/<[^>]+>/g, "\n")
             .replace(/&nbsp;/g, " ")
             .replace(/&/g, "&")
@@ -34,9 +46,11 @@ export default function JobDetailsModal({
             .replace(/&#39;/g, "'")
             .replace(/\n{3,}/g, "\n\n")
             .trim();
+
+        return { metadata: metadataLines, description: cleanDesc };
     };
 
-    const description = cleanDescription(job.description);
+    const { metadata, description } = parseDescription(job.description);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
@@ -108,6 +122,13 @@ export default function JobDetailsModal({
                     {/* Full Description */}
                     <div className="bg-[#090a0f] border border-white/10 rounded-xl p-4">
                         <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider mb-3">📋 Full Job Description</h4>
+                        {metadata.length > 0 && (
+                            <div className="mb-3 pb-3 border-b border-white/10 space-y-1">
+                                {metadata.map((line, idx) => (
+                                    <div key={idx} className="text-xs text-slate-300 font-mono">{line}</div>
+                                ))}
+                            </div>
+                        )}
                         <div className="text-xs text-slate-300 whitespace-pre-wrap font-sans leading-relaxed max-h-[40vh] overflow-y-auto custom-scrollbar">
                             {description}
                         </div>

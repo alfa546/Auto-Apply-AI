@@ -119,7 +119,14 @@ export default function ProfilePage() {
       if (data.ats_score) {
         setAtsMetrics(prev => ({
           ...prev,
-          overall_score: data.ats_score
+          overall_score: data.ats_score,
+          formatting_score: data.formatting_score || prev.formatting_score,
+          keyword_density_score: data.keyword_density_score || prev.keyword_density_score,
+          action_verbs_score: data.action_verbs_score || prev.action_verbs_score,
+          section_completeness_score: data.section_completeness_score || prev.section_completeness_score,
+          missing_skills: data.ats_suggestions?.missing_skills || prev.missing_skills,
+          formatting_suggestions: data.ats_suggestions?.formatting_suggestions || prev.formatting_suggestions,
+          experience_improvements: data.ats_suggestions?.experience_improvements || prev.experience_improvements
         }));
       }
     } catch (err: any) {
@@ -293,7 +300,14 @@ export default function ProfilePage() {
         if (data.ats_score) {
           setAtsMetrics(prev => ({
             ...prev,
-            overall_score: data.ats_score
+            overall_score: data.ats_score,
+            formatting_score: data.formatting_score || prev.formatting_score,
+            keyword_density_score: data.keyword_density_score || prev.keyword_density_score,
+            action_verbs_score: data.action_verbs_score || prev.action_verbs_score,
+            section_completeness_score: data.section_completeness_score || prev.section_completeness_score,
+            missing_skills: data.ats_suggestions?.missing_skills || prev.missing_skills,
+            formatting_suggestions: data.ats_suggestions?.formatting_suggestions || prev.formatting_suggestions,
+            experience_improvements: data.ats_suggestions?.experience_improvements || prev.experience_improvements
           }));
         }
         showToast("Resume uploaded and parsed successfully by AI Engine!");
@@ -333,6 +347,10 @@ export default function ProfilePage() {
           setAtsMetrics(prev => ({
             ...prev,
             overall_score: data.ats_score,
+            formatting_score: data.formatting_score || prev.formatting_score,
+            keyword_density_score: data.keyword_density_score || prev.keyword_density_score,
+            action_verbs_score: data.action_verbs_score || prev.action_verbs_score,
+            section_completeness_score: data.section_completeness_score || prev.section_completeness_score,
             missing_skills: data.ats_suggestions?.missing_skills || prev.missing_skills,
             formatting_suggestions: data.ats_suggestions?.formatting_suggestions || prev.formatting_suggestions,
             experience_improvements: data.ats_suggestions?.experience_improvements || prev.experience_improvements

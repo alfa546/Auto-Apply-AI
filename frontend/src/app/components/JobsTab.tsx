@@ -156,7 +156,17 @@ export default function JobsTab({
                   {job.company_email && <span className="text-rose-400 font-mono">✉️ HR Email: {job.company_email}</span>}
                 </div>
 
-                {job.description && <p className="text-xs text-slate-300 line-clamp-2 pt-1">{job.description.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()}</p>}
+                {job.description && (
+                  <p className="text-xs text-slate-300 line-clamp-2 pt-1">
+                    {(() => {
+                      // Extract only the job description part (after the separator)
+                      const parts = job.description.split('='.repeat(50));
+                      const descPart = parts.length > 1 ? parts[1] : job.description;
+                      // Clean HTML and extra whitespace
+                      return descPart.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+                    })()}
+                  </p>
+                )}
               </div>
 
               <div className="flex md:flex-col items-end justify-between gap-4 min-w-[200px]">

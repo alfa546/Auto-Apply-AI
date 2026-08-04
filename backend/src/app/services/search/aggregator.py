@@ -78,16 +78,45 @@ class SearchAggregator:
                 description = opp.get("description", "")
                 company = opp.get("company", "Company")
                 
-                # Extract hiring emails
+                # Extract hiring emails from description
                 from src.app.services.email_extractor import extract_emails_from_text, select_best_hiring_email
                 extracted_emails = extract_emails_from_text(description)
                 company_email = select_best_hiring_email(extracted_emails, company)
                 
-                # Fallback email structure if no explicit email found in description
+                # Enhanced email fallback - use more authentic HR email patterns
                 if not company_email:
                     clean_comp = re.sub(r'[^a-zA-Z0-9]', '', company.lower())
-                    company_email = f"careers@{clean_comp}.com"
+                    # Try common HR email patterns in order of preference
+                    hr_email_patterns = [
+                        f"hr@{clean_comp}.com",
+                        f"recruiting@{clean_comp}.com",
+                        f"jobs@{clean_comp}.com",
+                        f"careers@{clean_comp}.com",
+                        f"talent@{clean_comp}.com"
+                    ]
+                    company_email = hr_email_patterns[0]  # Use hr@ as most authentic
 
+                # Enhance description with structured job information
+                enhanced_description = description
+                if enhanced_description:
+                    # Build enhanced description with metadata
+                    parts = []
+                    if company:
+                        parts.append(f"🏢 Company: {company}")
+                    if opp.get("location"):
+                        parts.append(f"📍 Location: {opp['location']}")
+                    if opp.get("country") or country:
+                        parts.append(f"🌍 Country: {(opp.get('country') or country).upper()}")
+                    if opp.get("salary") and opp["salary"] != "N/A":
+                        parts.append(f"💰 Salary: {opp['salary']}")
+                    
+                    # Add separator and original description
+                    if parts:
+                        parts.append("\n" + "="*50)
+                        parts.append("\n📋 Job Description:\n")
+                        parts.append(enhanced_description)
+                        enhanced_description = "\n".join(parts)
+                
                 # Save new job found record
                 job_record = JobFound(
                     title=opp.get("title"),
@@ -96,7 +125,7 @@ class SearchAggregator:
                     extracted_emails=extracted_emails,
                     location=opp.get("location"),
                     country=opp.get("country") or country,
-                    description=description,
+                    description=enhanced_description,
                     url=url,
                     salary=opp.get("salary"),
                     source=opp.get("source", "Aggregator"),
