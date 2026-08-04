@@ -11,6 +11,7 @@ import { ALL_WORLD_COUNTRIES } from "../constants";
 import EmailReviewModal from "../components/EmailReviewModal";
 import AutoApplyModal from "../components/AutoApplyModal";
 import AutoApplyProgress from "../components/AutoApplyProgress";
+import JobDetailsModal from "../components/JobDetailsModal";
 
 // Map country names (with emoji flags) to standardized names without emoji for matching
 const COUNTRY_NAME_MAP: Record<string, string> = {
@@ -84,6 +85,11 @@ export default function OpportunitiesPage() {
   const [emailPreview, setEmailPreview] = useState<any>(null);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [pendingJob, setPendingJob] = useState<Job | null>(null);
+
+  // Job Details Modal State
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [isJobDetailsOpen, setIsJobDetailsOpen] = useState(false);
+  const [isApplyingFromDetails, setIsApplyingFromDetails] = useState(false);
 
   // Auto-Apply Batch State
   const [isAutoApplyModalOpen, setIsAutoApplyModalOpen] = useState(false);
@@ -200,6 +206,8 @@ export default function OpportunitiesPage() {
           setPendingJob(job);
           setEmailPreview(data.preview);
           setIsReviewModalOpen(true);
+          // Close job details modal if open
+          setIsJobDetailsOpen(false);
         } else {
           showToast(data.message || "Failed to generate email preview.", "error");
         }
@@ -211,7 +219,20 @@ export default function OpportunitiesPage() {
       showToast(err instanceof Error ? err.message : "Failed to connect to backend application router.", "error");
     } finally {
       setIsApplyingId(null);
+      setIsApplyingFromDetails(false);
     }
+  };
+
+  // Handle apply from job details modal
+  const handleApplyFromDetails = async (job: Job) => {
+    setIsApplyingFromDetails(true);
+    await handleAutoApply(job);
+  };
+
+  // Open job details modal
+  const handleViewJobDetails = (job: Job) => {
+    setSelectedJob(job);
+    setIsJobDetailsOpen(true);
   };
 
   // Step 2: User confirmed - send the email
@@ -364,6 +385,7 @@ export default function OpportunitiesPage() {
             isAutoApplyRunning={autoApplyStatus?.status === "running"}
             onStopAutoApply={handleStopAutoApply}
             isAutoApplyStopping={isStoppingAutoApply}
+            onViewJobDetails={handleViewJobDetails}
             isLoading={isJobsLoading}
             error={jobsError}
             onRetry={fetchOpportunities}
@@ -397,6 +419,18 @@ export default function OpportunitiesPage() {
         status={autoApplyStatus}
         onStop={handleStopAutoApply}
         isStopping={isStoppingAutoApply}
+      />
+
+      {/* Job Details Modal - shows full description with apply button */}
+      <JobDetailsModal
+        job={selectedJob}
+        isOpen={isJobDetailsOpen}
+        onClose={() => {
+          setIsJobDetailsOpen(false);
+          setSelectedJob(null);
+        }}
+        onApply={handleApplyFromDetails}
+        isApplying={isApplyingFromDetails}
       />
     </div>
   );

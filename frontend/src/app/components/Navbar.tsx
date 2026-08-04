@@ -92,11 +92,10 @@ export default function Navbar() {
 
             <button
               onClick={() => setShowGmailModal(true)}
-              className={`text-xs px-3.5 py-2 rounded-xl font-semibold flex items-center gap-2 transition-all border ${
-                isGmailConnected
+              className={`text-xs px-3.5 py-2 rounded-xl font-semibold flex items-center gap-2 transition-all border ${isGmailConnected
                   ? "bg-rose-950/80 text-rose-300 border-rose-500/30 hover:border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.15)]"
                   : "bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-700"
-              }`}
+                }`}
             >
               <GmailIcon />
               <span>{isGmailConnected ? `Gmail Connected (${gmailEmail})` : "Connect Gmail"}</span>
@@ -120,11 +119,10 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`pb-3.5 px-6 font-semibold text-sm border-b-2 whitespace-nowrap transition-all flex items-center gap-2.5 rounded-t-xl ${
-                  isActive
+                className={`pb-3.5 px-6 font-semibold text-sm border-b-2 whitespace-nowrap transition-all flex items-center gap-2.5 rounded-t-xl ${isActive
                     ? "border-rose-400 text-rose-300 bg-rose-950/20 shadow-[0_4px_20px_-4px_rgba(244,63,94,0.3)]"
                     : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
-                }`}
+                  }`}
               >
                 {link.icon}
                 <span>{link.label}</span>
@@ -148,6 +146,7 @@ export default function Navbar() {
           setSmtpPassword={setSmtpPassword}
           setIsGmailConnected={setIsGmailConnected}
           showToast={showToast}
+          isGmailConnected={isGmailConnected}
         />
       )}
     </>

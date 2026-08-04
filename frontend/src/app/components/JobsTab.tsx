@@ -14,6 +14,7 @@ interface JobsTabProps {
   isAutoApplyRunning: boolean;
   onStopAutoApply: () => void;
   isAutoApplyStopping: boolean;
+  onViewJobDetails: (job: Job) => void;
   isLoading?: boolean;
   error?: string | null;
   onRetry?: () => void;
@@ -30,6 +31,7 @@ export default function JobsTab({
   isAutoApplyRunning,
   onStopAutoApply,
   isAutoApplyStopping,
+  onViewJobDetails,
   isLoading,
   error,
   onRetry
@@ -132,11 +134,12 @@ export default function JobsTab({
           filteredDailyJobs.map((job) => (
             <div
               key={job.id}
-              className="bg-slate-900/80 border border-slate-800 hover:border-rose-500/50 p-6 rounded-xl transition-all shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6"
+              className="bg-slate-900/80 border border-slate-800 hover:border-rose-500/50 p-6 rounded-xl transition-all shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6 cursor-pointer"
+              onClick={() => onViewJobDetails(job)}
             >
               <div className="space-y-2 flex-1">
                 <div className="flex items-center gap-3">
-                  <h3 className="text-lg font-bold text-slate-100">{job.title}</h3>
+                  <h3 className="text-lg font-bold text-slate-100 hover:text-rose-300 transition-colors">{job.title}</h3>
                   <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${job.opportunity_type === "internship"
                     ? "bg-amber-950/80 text-amber-300 border border-amber-500/30"
                     : "bg-rose-950/80 text-rose-300 border border-rose-500/30"
@@ -147,6 +150,7 @@ export default function JobsTab({
 
                 <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-400">
                   <span className="font-semibold text-slate-200">🏢 {job.company}</span>
+                  {job.country && <span>🌍 {job.country.toUpperCase()}</span>}
                   {job.location && <span>📍 {job.location}</span>}
                   {job.salary && <span className="text-amber-300 font-mono">💰 {job.salary}</span>}
                   {job.company_email && <span className="text-rose-400 font-mono">✉️ HR Email: {job.company_email}</span>}
@@ -161,23 +165,38 @@ export default function JobsTab({
                   <div className="text-lg font-extrabold text-rose-400">{job.match_score || 92}% Match</div>
                 </div>
 
-                <button
-                  onClick={() => handleAutoApply(job)}
-                  disabled={isApplyingId === job.id}
-                  className="w-full btn-red-glow text-white font-semibold text-xs py-2.5 px-4 rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-                >
-                  {isApplyingId === job.id ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Preparing Preview...</span>
-                    </>
-                  ) : (
-                    <>
-                      <GmailIcon />
-                      <span>Apply via Gmail (CV Attached)</span>
-                    </>
-                  )}
-                </button>
+                <div className="flex flex-col gap-2 w-full">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onViewJobDetails(job);
+                    }}
+                    className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs py-2 px-4 rounded-lg transition-all border border-slate-700 flex items-center justify-center gap-2"
+                  >
+                    <span>📋</span>
+                    <span>View Details</span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAutoApply(job);
+                    }}
+                    disabled={isApplyingId === job.id}
+                    className="w-full btn-red-glow text-white font-semibold text-xs py-2.5 px-4 rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                  >
+                    {isApplyingId === job.id ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Preparing Preview...</span>
+                      </>
+                    ) : (
+                      <>
+                        <GmailIcon />
+                        <span>Apply via Gmail</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           ))

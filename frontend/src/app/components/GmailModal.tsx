@@ -16,6 +16,7 @@ interface GmailModalProps {
   setGoogleClientId?: (id: string) => void;
   googleClientSecret?: string;
   setGoogleClientSecret?: (secret: string) => void;
+  isGmailConnected?: boolean;
 }
 
 export default function GmailModal({
@@ -32,9 +33,30 @@ export default function GmailModal({
   googleClientId = "",
   setGoogleClientId,
   googleClientSecret = "",
-  setGoogleClientSecret
+  setGoogleClientSecret,
+  isGmailConnected = false
 }: GmailModalProps) {
   if (!showGmailModal) return null;
+
+  const handleDisconnect = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/auth/gmail/disconnect`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setIsGmailConnected(false);
+        setGmailEmail("");
+        setSmtpPassword("");
+        showToast("Gmail disconnected successfully.");
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        showToast(errData.detail || "Failed to disconnect Gmail.", "error");
+      }
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Failed to disconnect Gmail.", "error");
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
@@ -42,10 +64,27 @@ export default function GmailModal({
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
             <GmailIcon />
-            <span>Connect Gmail Account</span>
+            <span>{isGmailConnected ? "Gmail Account Connected" : "Connect Gmail Account"}</span>
           </h3>
           <button onClick={() => setShowGmailModal(false)} className="text-slate-400 hover:text-slate-200">✕</button>
         </div>
+
+        {isGmailConnected && (
+          <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-xl p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-xs font-semibold text-emerald-300">Connected as {gmailEmail || "your Gmail"}</span>
+            </div>
+            <button
+              onClick={handleDisconnect}
+              className="w-full bg-red-950/60 hover:bg-red-900/60 text-red-300 border border-red-500/40 font-semibold py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition-all"
+            >
+              <span>🔌</span>
+              <span>Disconnect Gmail</span>
+            </button>
+            <p className="text-[10px] text-slate-400 text-center">Disconnecting will stop all email sending and auto-apply features.</p>
+          </div>
+        )}
 
         <div className="space-y-4 text-xs">
           <p className="text-slate-300 leading-relaxed">
@@ -54,8 +93,8 @@ export default function GmailModal({
 
           <div>
             <label className="block text-slate-300 font-semibold mb-1">Your Gmail Address</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               value={gmailEmail}
               onChange={e => setGmailEmail(e.target.value)}
               placeholder="name@gmail.com"
@@ -73,8 +112,8 @@ export default function GmailModal({
             <div className="space-y-2">
               <div>
                 <label className="block text-slate-400 text-[11px] mb-1">Google OAuth Client ID</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={googleClientId}
                   onChange={e => setGoogleClientId && setGoogleClientId(e.target.value)}
                   placeholder="xxxxxx.apps.googleusercontent.com"
@@ -84,8 +123,8 @@ export default function GmailModal({
 
               <div>
                 <label className="block text-slate-400 text-[11px] mb-1">Google OAuth Client Secret</label>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   value={googleClientSecret}
                   onChange={e => setGoogleClientSecret && setGoogleClientSecret(e.target.value)}
                   placeholder="GOCSPX-xxxxxxxxxxxx"
@@ -144,7 +183,7 @@ export default function GmailModal({
             <span className="font-bold text-slate-200 block">Option 2: Gmail App Password (SMTP)</span>
             <div>
               <label className="block text-slate-400 mb-1">Google App Password (16 Characters)</label>
-              <input 
+              <input
                 type="password"
                 placeholder="xxxx xxxx xxxx xxxx"
                 value={smtpPassword}
