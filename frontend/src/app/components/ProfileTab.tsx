@@ -660,64 +660,118 @@ export default function ProfileTab({
               <p className="text-[10px] text-slate-400">Education, experience, skills & contact links present.</p>
             </div>
           </div>
-
-          {/* ATS Suggestions Section */}
-          {(atsMetrics.missing_skills?.length > 0 || atsMetrics.formatting_suggestions?.length > 0 || atsMetrics.experience_improvements?.length > 0) && (
-            <div className="mt-6 space-y-4">
-              <h4 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-                <SparklesIcon />
-                <span>ATS Optimization Suggestions</span>
-              </h4>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Missing Skills */}
-                {atsMetrics.missing_skills?.length > 0 && (
-                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider">🔑 Missing Skills</h5>
-                    <ul className="space-y-1.5">
-                      {atsMetrics.missing_skills.map((skill, idx) => (
-                        <li key={idx} className="text-[11px] text-slate-300 flex items-start gap-2">
-                          <span className="text-amber-400 mt-0.5">•</span>
-                          <span>{skill}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Formatting Suggestions */}
-                {atsMetrics.formatting_suggestions?.length > 0 && (
-                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <h5 className="text-xs font-bold text-indigo-400 uppercase tracking-wider">🎨 Formatting Tips</h5>
-                    <ul className="space-y-1.5">
-                      {atsMetrics.formatting_suggestions.map((suggestion, idx) => (
-                        <li key={idx} className="text-[11px] text-slate-300 flex items-start gap-2">
-                          <span className="text-indigo-400 mt-0.5">•</span>
-                          <span>{suggestion}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Experience Improvements */}
-                {atsMetrics.experience_improvements?.length > 0 && (
-                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                    <h5 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">⚡ Experience Enhancements</h5>
-                    <ul className="space-y-1.5">
-                      {atsMetrics.experience_improvements.map((improvement, idx) => (
-                        <li key={idx} className="text-[11px] text-slate-300 flex items-start gap-2">
-                          <span className="text-emerald-400 mt-0.5">•</span>
-                          <span>{improvement}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
+
+        {/* ATS Optimization Roadmap Section */}
+        {(atsMetrics.missing_skills?.length > 0 || atsMetrics.formatting_suggestions?.length > 0 || atsMetrics.experience_improvements?.length > 0) && (
+          <div className="border-t border-slate-800/80 pt-6 mt-2 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                  <SparklesIcon />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-pink-400 to-indigo-400 font-extrabold text-base">
+                    AI-Powered ATS Optimization Roadmap
+                  </span>
+                </h4>
+                <p className="text-xs text-slate-400 mt-1">
+                  Actionable insights generated from real-time resume parsing to elevate keyword density and interview callback ranking.
+                </p>
+              </div>
+              <span className="text-[11px] bg-slate-950 text-slate-300 border border-slate-800 px-3 py-1 rounded-full font-mono self-start sm:self-auto shadow-sm">
+                ✨ Personalized Insights
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Missing Skills Card */}
+              {atsMetrics.missing_skills?.length > 0 && (
+                <div className="bg-gradient-to-b from-slate-950 to-[#12141e] p-5 rounded-2xl border border-amber-500/25 shadow-lg hover:border-amber-500/50 transition-all duration-300 flex flex-col justify-between space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between border-b border-amber-500/15 pb-3 mb-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm shadow-inner">🔑</span>
+                        <h5 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider">Missing Keywords</h5>
+                      </div>
+                      <span className="text-[10px] bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-md font-mono">
+                        {atsMetrics.missing_skills.length} detected
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mb-3 leading-relaxed">
+                      Adding these high-frequency keywords from target job descriptions will significantly boost your technical match score:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {atsMetrics.missing_skills.map((skill, idx) => (
+                        <span
+                          key={idx}
+                          className="bg-amber-950/50 hover:bg-amber-900/60 border border-amber-500/40 text-amber-200 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors shadow-sm flex items-center gap-1.5"
+                        >
+                          <span className="text-amber-400 font-bold">+</span>
+                          <span>{skill}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Formatting Suggestions Card */}
+              {atsMetrics.formatting_suggestions?.length > 0 && (
+                <div className="bg-gradient-to-b from-slate-950 to-[#12141e] p-5 rounded-2xl border border-indigo-500/25 shadow-lg hover:border-indigo-500/50 transition-all duration-300 flex flex-col justify-between space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between border-b border-indigo-500/15 pb-3 mb-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-8 h-8 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold text-sm shadow-inner">🎨</span>
+                        <h5 className="text-xs font-extrabold text-indigo-400 uppercase tracking-wider">Formatting Tips</h5>
+                      </div>
+                      <span className="text-[10px] bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-md font-mono">
+                        Layout & ATS
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mb-3 leading-relaxed">
+                      Optimize structural presentation to ensure accurate automated parsing and human readability:
+                    </p>
+                    <ul className="space-y-2.5">
+                      {atsMetrics.formatting_suggestions.map((suggestion, idx) => (
+                        <li key={idx} className="bg-indigo-950/25 border border-indigo-500/20 rounded-xl p-3 text-xs text-slate-200 flex items-start gap-3 shadow-sm hover:bg-indigo-950/40 transition-colors">
+                          <span className="text-indigo-400 text-sm font-bold shrink-0 mt-0.5">❯</span>
+                          <span className="leading-relaxed">{suggestion}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {/* Experience Improvements Card */}
+              {atsMetrics.experience_improvements?.length > 0 && (
+                <div className="bg-gradient-to-b from-slate-950 to-[#12141e] p-5 rounded-2xl border border-emerald-500/25 shadow-lg hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between border-b border-emerald-500/15 pb-3 mb-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-sm shadow-inner">⚡</span>
+                        <h5 className="text-xs font-extrabold text-emerald-400 uppercase tracking-wider">Experience Enhancements</h5>
+                      </div>
+                      <span className="text-[10px] bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-md font-mono">
+                        Action & Impact
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mb-3 leading-relaxed">
+                      Strengthen achievement descriptions and demonstrate measurable business impact:
+                    </p>
+                    <ul className="space-y-2.5">
+                      {atsMetrics.experience_improvements.map((improvement, idx) => (
+                        <li key={idx} className="bg-emerald-950/25 border border-emerald-500/20 rounded-xl p-3 text-xs text-slate-200 flex items-start gap-3 shadow-sm hover:bg-emerald-950/40 transition-colors">
+                          <span className="text-emerald-400 text-sm font-bold shrink-0 mt-0.5">✓</span>
+                          <span className="leading-relaxed">{improvement}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
