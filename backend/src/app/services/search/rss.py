@@ -60,7 +60,7 @@ class RSSProvider(BaseSearchProvider):
                         "title": title_text,
                         "company": source,
                         "location": "Online",
-                        "description": desc_text[:300] + "..." if desc_text else "",
+                        "description": desc_text.strip() if desc_text else "",
                         "url": link_text,
                         "salary": "N/A",
                         "opportunity_type": opportunity_type,

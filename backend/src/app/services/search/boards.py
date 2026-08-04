@@ -26,20 +26,24 @@ class GreenhouseProvider(BaseSearchProvider):
 
         async with httpx.AsyncClient(timeout=10.0) as client:
             for company in companies:
-                url = f"https://boards-api.greenhouse.io/v1/boards/{company}/jobs"
+                url = f"https://boards-api.greenhouse.io/v1/boards/{company}/jobs?content=true"
                 try:
                     response = await client.get(url)
                     if response.status_code == 200:
                         data = response.json()
                         for job in data.get("jobs", []):
                             title = job.get("title", "")
+                            content_html = job.get("content", "")
                             # Case-insensitive keyword filter
-                            if normalized_query in title.lower() or normalized_query in job.get("content", "").lower():
+                            if normalized_query in title.lower() or normalized_query in content_html.lower():
+                                desc = clean_html(content_html)
+                                if not desc:
+                                    desc = f"Job vacancy for {title} at {company.capitalize()}."
                                 results.append({
                                     "title": title,
                                     "company": company.capitalize(),
                                     "location": job.get("location", {}).get("name", "N/A"),
-                                    "description": f"Greenhouse Job Posting at {company.capitalize()}",
+                                    "description": desc,
                                     "url": job.get("absolute_url", ""),
                                     "salary": "N/A",
                                     "opportunity_type": "job",
@@ -70,13 +74,28 @@ class LeverProvider(BaseSearchProvider):
                         data = response.json() # Lever returns root list of postings
                         for posting in data:
                             title = posting.get("text", "")
-                            desc = clean_html(posting.get("description", ""))
-                            if normalized_query in title.lower() or normalized_query in desc.lower():
+                            desc_parts = []
+                            main_desc = clean_html(posting.get("description", ""))
+                            if main_desc:
+                                desc_parts.append(main_desc)
+                            
+                            # Extract original requirement and responsibility lists from Lever API
+                            for lst in posting.get("lists", []):
+                                list_title = lst.get("text", "")
+                                list_content = clean_html(lst.get("content", ""))
+                                if list_title or list_content:
+                                    desc_parts.append(f"### {list_title}\n{list_content}")
+
+                            full_desc = "\n\n".join(desc_parts).strip()
+                            if not full_desc:
+                                full_desc = f"Job posting for {title} at {company.capitalize()}."
+
+                            if normalized_query in title.lower() or normalized_query in full_desc.lower():
                                 results.append({
                                     "title": title,
                                     "company": company.capitalize(),
                                     "location": posting.get("categories", {}).get("location", "N/A"),
-                                    "description": desc[:300] + "..." if desc else "Lever Job Posting",
+                                    "description": full_desc,
                                     "url": posting.get("hostedUrl", ""),
                                     "salary": "N/A",
                                     "opportunity_type": "job",

@@ -128,7 +128,7 @@ export default function JobDetailsModal({
                         )}
                     </div>
 
-                    {/* Full Description & Structured Job Requirements */}
+                    {/* Authentic Original Job Description */}
                     <div className="space-y-4 max-h-[52vh] overflow-y-auto custom-scrollbar pr-1">
                         {metadata.length > 0 && (
                             <div className="bg-[#090a0f] border border-white/10 rounded-xl p-3.5 flex flex-wrap gap-4">
@@ -138,74 +138,21 @@ export default function JobDetailsModal({
                             </div>
                         )}
 
-                        {/* Section 1: Role Overview */}
-                        <div className="bg-slate-950/90 border border-slate-800/80 rounded-xl p-4 space-y-2 shadow-sm">
-                            <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-2">
-                                <span>📌</span>
-                                <span>Role Overview & Executive Summary</span>
-                            </h4>
-                            <p className="text-xs text-slate-200 leading-relaxed">
-                                Join <strong className="text-rose-300">{job.company}</strong> as a <strong className="text-white">{job.title}</strong> in <strong className="text-slate-300">{job.location || "Hybrid/Remote"}</strong>. This role invites proactive specialists to contribute to active project objectives and organizational growth.
-                            </p>
-                            {description && (
-                                <div className="mt-2.5 pt-2.5 border-t border-slate-800/80 text-xs text-slate-300 whitespace-pre-wrap font-sans leading-relaxed">
-                                    {description}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Section 2: Key Responsibilities & Expected Duties */}
-                        <div className="bg-slate-950/90 border border-indigo-500/20 rounded-xl p-4 space-y-3 shadow-sm">
-                            <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-2">
-                                <span>🎯</span>
-                                <span>Key Responsibilities & Expected Duties</span>
-                            </h4>
-                            <ul className="space-y-2 text-xs text-slate-300">
-                                <li className="flex items-start gap-2.5">
-                                    <span className="text-indigo-400 font-bold mt-0.5">❯</span>
-                                    <span>Spearhead execution, technical problem-solving, and task delivery aligned with <strong>{job.title}</strong> role requirements.</span>
-                                </li>
-                                <li className="flex items-start gap-2.5">
-                                    <span className="text-indigo-400 font-bold mt-0.5">❯</span>
-                                    <span>Collaborate effectively with team peers, engineering counterparts, and organizational leadership to maintain operational momentum.</span>
-                                </li>
-                                <li className="flex items-start gap-2.5">
-                                    <span className="text-indigo-400 font-bold mt-0.5">❯</span>
-                                    <span>Adhere to quality benchmarks and continuous delivery practices within <strong>{job.company}</strong>'s workflow frameworks.</span>
-                                </li>
-                                {(description.toLowerCase().includes("intern") || description.toLowerCase().includes("summer") || job.opportunity_type === "internship") && (
-                                    <li className="flex items-start gap-2.5">
-                                        <span className="text-indigo-400 font-bold mt-0.5">❯</span>
-                                        <span>Participate actively in intensive practical learning and team deliverables, with opportunities for full-time conversion or career promotion upon success.</span>
-                                    </li>
-                                )}
-                            </ul>
-                        </div>
-
-                        {/* Section 3: Candidate Requirements & Qualifications */}
-                        <div className="bg-slate-950/90 border border-emerald-500/20 rounded-xl p-4 space-y-3 shadow-sm">
-                            <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-                                <span>💼</span>
-                                <span>Required Qualifications & Candidate Criteria (What Company Wants)</span>
-                            </h4>
-                            <ul className="space-y-2 text-xs text-slate-300">
-                                <li className="flex items-start gap-2.5">
-                                    <span className="text-emerald-400 font-bold mt-0.5">✓</span>
-                                    <span><strong>Core Proficiency:</strong> Demonstrated capability and practical skill set in methodologies relevant to <strong>{job.title}</strong>.</span>
-                                </li>
-                                <li className="flex items-start gap-2.5">
-                                    <span className="text-emerald-400 font-bold mt-0.5">✓</span>
-                                    <span><strong>Candidate Profile:</strong> Open to driven job applicants, university grads, active students, or dedicated career pivoters ready for immediate collaborative contributions.</span>
-                                </li>
-                                <li className="flex items-start gap-2.5">
-                                    <span className="text-emerald-400 font-bold mt-0.5">✓</span>
-                                    <span><strong>Problem Solving:</strong> Strong analytical reasoning, self-starter mentality, and clear proactive communication skills.</span>
-                                </li>
-                                <li className="flex items-start gap-2.5">
-                                    <span className="text-emerald-400 font-bold mt-0.5">✓</span>
-                                    <span><strong>Environment Adaptability:</strong> Proven capability to thrive in <strong>{job.location || "hybrid / remote"}</strong> operational working environments.</span>
-                                </li>
-                            </ul>
+                        {/* Original Job Description (Purely from API/Source, No Generated Content) */}
+                        <div className="bg-slate-950/90 border border-slate-800/80 rounded-xl p-5 space-y-3 shadow-md">
+                            <div className="flex items-center justify-between border-b border-slate-800/60 pb-3">
+                                <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-2">
+                                    <span>📋</span>
+                                    <span>Original Job Description & Requirements</span>
+                                </h4>
+                                <span className="text-[10px] bg-slate-900 text-slate-400 border border-slate-700/80 px-2.5 py-0.5 rounded-full font-mono">
+                                    Original API Data
+                                </span>
+                            </div>
+                            
+                            <div className="text-xs text-slate-200 whitespace-pre-wrap font-sans leading-relaxed pt-1">
+                                {description || "No detailed job description provided by the original job provider."}
+                            </div>
                         </div>
                     </div>
 
