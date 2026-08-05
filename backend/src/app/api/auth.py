@@ -13,8 +13,8 @@ from src.app.config import settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-# Use a static secret key for local development since this is a local app
-SECRET_KEY = "local_dev_secret_key_auto_apply_ai_2026"
+# Use secret key from settings
+SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
 

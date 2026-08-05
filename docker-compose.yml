@@ -72,36 +72,6 @@ services:
       timeout: 10s
       retries: 3
 
-  # Admin Backend API (port 8001)
-  admin-backend:
-    build:
-      context: ./backend_admin
-      dockerfile: Dockerfile
-    container_name: auto-apply-admin-backend
-    command: uvicorn main:admin_app --host 0.0.0.0 --port 8001 --reload
-    ports:
-      - "8001:8001"
-    environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-auto_apply_db}
-      - REDIS_URL=redis://redis:6379
-      - SECRET_KEY=${SECRET_KEY:-supersecretdevelopmentkeychangeinprod}
-      - VAULT_MASTER_KEY=${VAULT_MASTER_KEY:-}
-    volumes:
-      - ./backend_admin:/app
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      backend:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8001/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
   # Main Frontend (port 3000)
   frontend:
     build:
@@ -118,25 +88,6 @@ services:
       - /app/node_modules
     depends_on:
       backend:
-        condition: service_healthy
-    restart: unless-stopped
-
-  # Admin Frontend (port 3001)
-  admin-frontend:
-    build:
-      context: ./admin-frontend
-      dockerfile: Dockerfile
-    container_name: auto-apply-admin-frontend
-    command: npm run dev
-    ports:
-      - "3001:3001"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8001
-    volumes:
-      - ./admin-frontend:/app
-      - /app/node_modules
-    depends_on:
-      admin-backend:
         condition: service_healthy
     restart: unless-stopped
 

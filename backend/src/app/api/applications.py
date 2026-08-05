@@ -5,7 +5,7 @@ import logging
 
 from src.app.database import get_db
 from src.app.auth import get_current_user
-from src.app.models import Application
+from src.app.models import Application, User
 from src.app.services.application.pipeline import run_apply_pipeline
 
 logger = logging.getLogger(__name__)
@@ -15,13 +15,13 @@ router = APIRouter(prefix="/applications", tags=["applications"])
 @router.get("")
 def list_applications(
     status_filter: Optional[str] = Query(None, alias="status", description="Filter by application status, e.g. Matched, Applied, Failed"),
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     List all applications for the authenticated user, optionally filtering by status.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     query = db.query(Application).filter(Application.user_id == uid)
     
     if status_filter:
@@ -49,13 +49,13 @@ def list_applications(
 @router.get("/{application_id}")
 def get_application_details(
     application_id: int,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Fetch details for a specific application record.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     app_record = db.query(Application).filter(Application.id == application_id, Application.user_id == uid).first()
     
     if not app_record:
@@ -94,14 +94,14 @@ async def run_apply_background(user_id: str, application_id: int):
 async def trigger_apply(
     application_id: int,
     background_tasks: BackgroundTasks,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Triggers the browser automation form filler pipeline for a matched opportunity.
     Runs asynchronously in the background.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     
     # Verify the application exists and belongs to the user
     app_record = db.query(Application).filter(Application.id == application_id, Application.user_id == uid).first()

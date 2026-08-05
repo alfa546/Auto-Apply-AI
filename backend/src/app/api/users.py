@@ -48,12 +48,12 @@ class ProfileUpdateRequest(BaseModel):
     auto_fulfill_enabled: Optional[bool] = None
 
 @router.get("/me")
-def get_me(current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_me(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """
     Fetch the authenticated user's database record or initialize a new record if first time.
     """
-    uid = current_user.get("uid")
-    email = current_user.get("email")
+    uid = current_user.id
+    email = current_user.email
 
     user = db.query(User).filter(User.id == uid).first()
     if not user:
@@ -74,11 +74,11 @@ def get_me(current_user: dict = Depends(get_current_user), db: Session = Depends
     }
 
 @router.get("/settings")
-def get_user_settings(current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_user_settings(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """
     Fetch user API keys and integration credentials.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
     if not settings:
         settings = UserSettings(user_id=uid)
@@ -128,13 +128,13 @@ def get_user_settings(current_user: dict = Depends(get_current_user), db: Sessio
 @router.put("/settings")
 def update_user_settings(
     payload: SettingsUpdateRequest,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Update and save user API keys and integration credentials.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
     if not settings:
         settings = UserSettings(user_id=uid)
@@ -167,18 +167,18 @@ def update_user_settings(
 @router.put("/profile")
 def update_user_profile(
     payload: ProfileUpdateRequest,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Update and save user profile and career preferences.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     
     # Ensure User record exists
     user = db.query(User).filter(User.id == uid).first()
     if not user:
-        user = User(id=uid, email=current_user.get("email", f"{uid}@local.com"))
+        user = User(id=uid, email=current_user.email or f"{uid}@local.com")
         db.add(user)
         db.commit()
     
@@ -243,7 +243,7 @@ def update_user_profile(
 @router.post("/resume")
 async def upload_resume(
     file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -258,10 +258,10 @@ async def upload_resume(
     content = await file.read()
     file_url = storage_service.upload(content, file.filename)
     
-    uid = current_user.get("uid")
+    uid = current_user.id
     user = db.query(User).filter(User.id == uid).first()
     if not user:
-        user = User(id=uid, email=current_user.get("email"))
+        user = User(id=uid, email=current_user.email)
         db.add(user)
         db.commit()
         db.refresh(user)

@@ -108,13 +108,13 @@ async def run_email_check_pipeline(db: Session, user_id: str):
 
 @router.get("/drafts")
 def list_drafts(
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     List all email interactions and their auto-generated response drafts.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     interactions = db.query(EmailInteraction).filter(
         EmailInteraction.user_id == uid
     ).order_by(EmailInteraction.received_at.desc()).all()
@@ -138,13 +138,13 @@ def list_drafts(
 @router.post("/check")
 async def trigger_check(
     background_tasks: BackgroundTasks,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Manually triggers email checking in the background.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     
     # We run database operations on background worker threads
     # To prevent thread race, we pass task parameters
@@ -162,13 +162,13 @@ async def trigger_check(
 @router.post("/drafts/{draft_id}/approve")
 def approve_draft(
     draft_id: int,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Approve an auto-generated draft, updating its status to 'Approved' (ready to send).
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     interaction = db.query(EmailInteraction).filter(
         EmailInteraction.id == draft_id,
         EmailInteraction.user_id == uid
@@ -188,13 +188,13 @@ def approve_draft(
 @router.delete("/drafts/{draft_id}")
 def discard_draft(
     draft_id: int,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Dismiss or discard a draft reply.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     interaction = db.query(EmailInteraction).filter(
         EmailInteraction.id == draft_id,
         EmailInteraction.user_id == uid

@@ -4,6 +4,7 @@ import logging
 
 from src.app.database import get_db
 from src.app.auth import get_current_user
+from src.app.models import User
 from src.app.services.matching.pipeline import run_matching_pipeline
 from src.app.services.matching.matcher import MatchingEngine
 
@@ -13,14 +14,14 @@ router = APIRouter(prefix="/matching", tags=["matching"])
 
 @router.post("/run")
 async def execute_matching(
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Executes the matching pipeline on all discovered opportunities,
     populating the user's application pipeline with Matched results.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     try:
         new_matches = await run_matching_pipeline(db=db, user_id=uid)
         return {
@@ -38,13 +39,13 @@ async def execute_matching(
 @router.get("/evaluate/{job_id}")
 async def evaluate_single_job(
     job_id: int,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Evaluate and return detailed matching scores and reasons for a specific job opportunity.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     engine = MatchingEngine()
     try:
         result = await engine.evaluate_job_match(db=db, user_id=uid, job_id=job_id)

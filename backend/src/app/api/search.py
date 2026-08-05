@@ -6,7 +6,7 @@ import logging
 
 from src.app.database import get_db
 from src.app.auth import get_current_user
-from src.app.models import JobFound
+from src.app.models import JobFound, User
 from src.app.services.search.aggregator import SearchAggregator
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ class TriggerSearchRequest(BaseModel):
 @router.post("/trigger")
 async def trigger_search(
     payload: TriggerSearchRequest,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -28,7 +28,7 @@ async def trigger_search(
     """
     aggregator = SearchAggregator()
     try:
-        user_id = current_user.get("uid")
+        user_id = current_user.id
         
         if payload.query:
             new_jobs = await aggregator.run_aggregation(
@@ -64,7 +64,7 @@ def get_opportunities(
     title: Optional[str] = Query(None, description="Filter by job title (partial match)"),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """

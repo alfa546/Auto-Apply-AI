@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 security_scheme = HTTPBearer(auto_error=False)
 
-SECRET_KEY = settings.SECRET_KEY if hasattr(settings, 'SECRET_KEY') and settings.SECRET_KEY else "local_dev_secret_key_auto_apply_ai_2026"
+SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = "HS256"
 
 async def get_current_user(

@@ -22,14 +22,14 @@ class ATSCheckRequest(BaseModel):
 @router.post("/upload")
 async def upload_resume(
     file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Upload and parse PDF resume file.
     Extracts skills, experience, education, executive summary, and calculates real-time ATS score.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     if not file.filename.lower().endswith((".pdf", ".doc", ".docx")):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -95,13 +95,13 @@ async def upload_resume(
 
 @router.get("/profile")
 def get_resume_profile(
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Retrieve the current authenticated user's structured resume profile, ATS score, and recommendations.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     profile = db.query(Profile).filter(Profile.user_id == uid).first()
     
     if not profile:
@@ -129,13 +129,13 @@ def get_resume_profile(
 @router.post("/ats-check")
 def run_ats_check(
     payload: ATSCheckRequest,
-    current_user: dict = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Run an ad-hoc ATS grading checklist against a target job role or job description.
     """
-    uid = current_user.get("uid")
+    uid = current_user.id
     profile = db.query(Profile).filter(Profile.user_id == uid).first()
     
     if not profile:
