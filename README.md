@@ -207,8 +207,14 @@ Auto-Apply-AI/
 │   │       ├── main.py                # FastAPI lifecycle root, CORS policies & router mounting
 │   │       ├── models.py              # Declarative SQL tables (Users, Jobs, Applications, Resumes)
 │   │       └── storage.py             # Local filesystem & Firebase file persistent storage
+│   ├── tests/                         # Dedicated unit & schema verification test package
+│   │   ├── test_auth_storage.py       # Authentication & PDF upload validation suite
+│   │   └── test_db.py                 # In-memory SQLite relational schema tests
 │   ├── requirements.txt               # Backend Python library dependencies
 │   └── pyproject.toml                 # Backend formatting and linter configs
+├── deploy/                            # Enterprise DevOps & server hosting infrastructure
+│   ├── nginx/                         # High-performance Nginx reverse proxy routing configs
+│   └── systemd/                       # Linux service daemon unit scripts for continuous running
 ├── frontend/                          # Next.js 16 Workspace Dashboard & UI
 │   ├── src/
 │   │   ├── app/
@@ -333,14 +339,14 @@ docker-compose up -d --build
 
 ### 2. Linux Systemd & Reverse Proxy Setup
 For continuous bare-metal or cloud VPS deployments (Ubuntu / Debian / AlmaLinux):
-- **Systemd Unit Files**: Copy `auto-apply-backend.service` and `auto-apply-frontend.service` to `/etc/systemd/system/`.
+- **Systemd Unit Files**: Copy `deploy/systemd/auto-apply-backend.service` and `deploy/systemd/auto-apply-frontend.service` to `/etc/systemd/system/`.
 - **Enable & Start**:
   ```bash
   sudo systemctl daemon-reload
   sudo systemctl enable auto-apply-backend auto-apply-frontend
   sudo systemctl start auto-apply-backend auto-apply-frontend
   ```
-- **Nginx Proxying**: Use the provided `nginx.conf` template to route incoming web domain HTTP/HTTPS traffic directly to your local backend and frontend processes.
+- **Nginx Proxying**: Use the provided `deploy/nginx/nginx.conf` template to route incoming web domain HTTP/HTTPS traffic directly to your local backend and frontend processes.
 
 ### 3. Platform-as-a-Service (PaaS)
 The repository natively includes a `Procfile`, `runtime.txt` (specifying Python runtime), and `app.json` for rapid zero-config deployments onto platforms such as Heroku, Render, Railway, or Fly.io.

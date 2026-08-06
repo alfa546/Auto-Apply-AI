@@ -141,9 +141,9 @@ Before submitting your changes, ensure both frontend and backend verify without 
 ```bash
 cd backend
 # Verify SQLAlchemy database model schemas
-python src/app/test_db.py
+python tests/test_db.py
 # Run authentication and storage unit tests
-python -m unittest src/app/test_auth_storage.py
+python -m unittest tests/test_auth_storage.py
 ```
 
 **Frontend Verification:**
