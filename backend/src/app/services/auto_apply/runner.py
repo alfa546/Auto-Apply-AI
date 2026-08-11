@@ -230,6 +230,9 @@ class AutoApplyBatchRunner:
                             "status": "failed",
                             "error": result.get("error", "Unknown error")
                         })
+                    if not result.get("retryable", True):
+                        self._update_state(uid, status="error", last_error=result.get("error"))
+                        return
 
                 # Small delay between sends to avoid rate limiting
                 time.sleep(2)
@@ -280,6 +283,9 @@ class AutoApplyBatchRunner:
                             "status": "failed",
                             "error": result.get("error", "Unknown error")
                         })
+                    if not result.get("retryable", True):
+                        self._update_state(uid, status="error", last_error=result.get("error"))
+                        return
 
                 time.sleep(2)
 
@@ -295,6 +301,11 @@ class AutoApplyBatchRunner:
         except Exception as e:
             logger.error(f"Auto-apply batch worker error for user {uid}: {e}", exc_info=True)
             self._update_state(uid, status="error", last_error=str(e))
+        finally:
+            try:
+                db.close()
+            except Exception:
+                pass
 
     def _auto_apply_one(
         self,
@@ -318,7 +329,7 @@ class AutoApplyBatchRunner:
                 _saved_openai = config_module.settings.OPENAI_API_KEY
                 _saved_gemini = config_module.settings.GEMINI_API_KEY
                 if user_settings.openai_api_key:
-                    if user_settings.llm_provider == "gemini" or user_settings.openai_api_key.startswith("AIzaSy"):
+                    if user_settings.llm_provider == "gemini" or user_settings.openai_api_key.startswith(("AIzaSy", "AQ.")):
                         config_module.settings.GEMINI_API_KEY = user_settings.openai_api_key
                     else:
                         config_module.settings.OPENAI_API_KEY = user_settings.openai_api_key
