@@ -12,6 +12,7 @@ from src.app.config import settings
 
 logger = logging.getLogger(__name__)
 
+
 class StorageProvider(ABC):
     @abstractmethod
     def upload(self, file_content: bytes, filename: str) -> str:
@@ -22,20 +23,23 @@ class StorageProvider(ABC):
 
 
 class LocalStorageProvider(StorageProvider):
-    def __init__(self, upload_dir: str = "uploads"):
-        self.upload_dir = upload_dir
+    def __init__(self, upload_dir: str = None):
+        # Resolve to an absolute path so uploads/mounts are consistent
+        # regardless of the process working directory.
+        configured = upload_dir or settings.UPLOAD_DIR or "uploads"
+        self.upload_dir = os.path.abspath(configured)
         os.makedirs(self.upload_dir, exist_ok=True)
 
     def upload(self, file_content: bytes, filename: str) -> str:
         # Generate a unique name to prevent collisions
-        file_ext = os.path.splitext(filename)[1]
+        file_ext = os.path.splitext(filename)[1].lower()
         unique_filename = f"{uuid.uuid4()}{file_ext}"
         filepath = os.path.join(self.upload_dir, unique_filename)
-        
+
         with open(filepath, "wb") as f:
             f.write(file_content)
-        
-        # Return path relative to server root or an absolute system path
+
+        # Return path relative to server root so /uploads/<file> resolves
         logger.info(f"File uploaded locally to {filepath}")
         return f"/uploads/{unique_filename}"
 
@@ -44,11 +48,11 @@ class FirebaseStorageProvider(StorageProvider):
     def upload(self, file_content: bytes, filename: str) -> str:
         try:
             bucket = storage.bucket()
-            file_ext = os.path.splitext(filename)[1]
+            file_ext = os.path.splitext(filename)[1].lower()
             unique_filename = f"resumes/{uuid.uuid4()}{file_ext}"
             blob = bucket.blob(unique_filename)
-            blob.upload_from_string(file_content, content_type="application/pdf")
-            
+            blob.upload_from_string(file_content, content_type="application/octet-stream")
+
             # Make the blob publicly viewable or generate signed URL
             blob.make_public()
             return blob.public_url
@@ -62,5 +66,6 @@ def get_storage_provider() -> StorageProvider:
     if HAS_FIREBASE_STORAGE and settings.FIREBASE_STORAGE_BUCKET and settings.FIREBASE_PROJECT_ID != "your-firebase-project-id":
         return FirebaseStorageProvider()
     return LocalStorageProvider()
+
 
 storage_service = get_storage_provider()
