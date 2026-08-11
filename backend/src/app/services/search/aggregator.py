@@ -1,6 +1,7 @@
 import re
 import asyncio
 import logging
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from src.app.models import JobFound
 from src.app.services.search.adzuna import AdzunaProvider
@@ -84,17 +85,18 @@ class SearchAggregator:
                 company_email = select_best_hiring_email(extracted_emails, company)
                 
                 # Enhanced email fallback - use more authentic HR email patterns
-                if not company_email:
+                if not company_email and company and len(company) > 1:
                     clean_comp = re.sub(r'[^a-zA-Z0-9]', '', company.lower())
-                    # Try common HR email patterns in order of preference
-                    hr_email_patterns = [
-                        f"hr@{clean_comp}.com",
-                        f"recruiting@{clean_comp}.com",
-                        f"jobs@{clean_comp}.com",
-                        f"careers@{clean_comp}.com",
-                        f"talent@{clean_comp}.com"
-                    ]
-                    company_email = hr_email_patterns[0]  # Use hr@ as most authentic
+                    if clean_comp:
+                        # Try common HR email patterns in order of preference
+                        hr_email_patterns = [
+                            f"hr@{clean_comp}.com",
+                            f"recruiting@{clean_comp}.com",
+                            f"jobs@{clean_comp}.com",
+                            f"careers@{clean_comp}.com",
+                            f"talent@{clean_comp}.com"
+                        ]
+                        company_email = hr_email_patterns[1]  # Use recruiting@ as most authentic
 
                 # Enhance description with structured job information
                 enhanced_description = description

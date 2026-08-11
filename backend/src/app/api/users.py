@@ -8,6 +8,7 @@ from src.app.database import get_db
 from src.app.auth import get_current_user
 from src.app.storage import storage_service
 from src.app.models import User, Profile, UserSettings
+from src.app.config import settings
 
 from src.app.services.pdf_parser import extract_text_from_pdf
 from src.app.services.resume_parser import parse_resume_text
@@ -16,6 +17,8 @@ from src.app.services.ats_checker import evaluate_resume_ats
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/users", tags=["users"])
+
+MAX_UPLOAD_SIZE_BYTES = settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024
 
 class SettingsUpdateRequest(BaseModel):
     llm_provider: Optional[str] = None
@@ -256,6 +259,18 @@ async def upload_resume(
         )
 
     content = await file.read()
+
+    if not content or not content.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Uploaded file is empty.",
+        )
+    if len(content) > MAX_UPLOAD_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File exceeds the maximum size of {settings.MAX_UPLOAD_SIZE_MB} MB.",
+        )
+
     file_url = storage_service.upload(content, file.filename)
     
     uid = current_user.id
