@@ -26,18 +26,21 @@ class GmailClient:
             # Fallback mock OAuth URL for testing / dev mode
             return f"http://localhost:3000/?gmail_connected=true&mock=true&state={user_id}"
             
-        scopes = "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email"
-        url = (
-            f"https://accounts.google.com/o/oauth2/v2/auth?"
-            f"client_id={cid}&"
-            f"redirect_uri={self.redirect_uri}&"
-            f"response_type=code&"
-            f"scope={scopes}&"
-            f"access_type=offline&"
-            f"prompt=consent&"
-            f"state={user_id}"
-        )
-        return url
+        scopes = [
+            "https://www.googleapis.com/auth/gmail.send",
+            "https://www.googleapis.com/auth/userinfo.email",
+        ]
+        from urllib.parse import urlencode
+        params = {
+            "client_id": cid,
+            "redirect_uri": self.redirect_uri,
+            "response_type": "code",
+            "scope": " ".join(scopes),
+            "access_type": "offline",
+            "prompt": "consent",
+            "state": user_id,
+        }
+        return f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
 
     def exchange_code_for_tokens(self, code: str, client_id: Optional[str] = None, client_secret: Optional[str] = None) -> Dict[str, Any]:
         """
