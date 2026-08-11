@@ -8,12 +8,37 @@ from src.app.database import get_db
 from src.app.auth import get_current_user
 from src.app.models import User, Profile, UserSettings
 from src.app.storage import get_storage_provider
+from src.app.config import settings
 from src.app.services.pdf_parser import extract_text_from_pdf
 from src.app.services.ats_checker import evaluate_resume_ats, extract_skills_and_summary_from_text
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/resumes", tags=["resumes"])
+
+MAX_UPLOAD_SIZE_BYTES = settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024
+
+ALLOWED_RESUME_EXTENSIONS = (".pdf", ".doc", ".docx", ".txt")
+
+
+def validate_resume_upload(file: UploadFile, content: bytes):
+    """Shared validation for resume uploads: extension, type and size."""
+    filename = (file.filename or "").lower()
+    if not filename.endswith(ALLOWED_RESUME_EXTENSIONS):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only PDF, DOC, DOCX, or TXT files are supported.",
+        )
+    if not content or not content.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Uploaded file is empty.",
+        )
+    if len(content) > MAX_UPLOAD_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File exceeds the maximum size of {settings.MAX_UPLOAD_SIZE_MB} MB.",
+        )
 
 class ATSCheckRequest(BaseModel):
     target_role: Optional[str] = Field(None, description="The job title or role to evaluate against")
@@ -30,14 +55,11 @@ async def upload_resume(
     Extracts skills, experience, education, executive summary, and calculates real-time ATS score.
     """
     uid = current_user.id
-    if not file.filename.lower().endswith((".pdf", ".doc", ".docx")):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Only PDF, DOC, or DOCX files are supported."
-        )
-
     content = await file.read()
-    
+
+    # Validate extension, non-empty, and file size
+    validate_resume_upload(file, content)
+
     # 1. Save file locally or to storage
     storage = get_storage_provider()
     file_url = storage.upload(content, file.filename)

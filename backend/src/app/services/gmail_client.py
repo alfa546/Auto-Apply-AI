@@ -24,7 +24,7 @@ class GmailClient:
         cid = client_id or self.client_id
         if not cid:
             # Fallback mock OAuth URL for testing / dev mode
-            return f"http://localhost:3000/?gmail_connected=true&mock=true&state={user_id}"
+            return f"{settings.FRONTEND_BASE_URL}?gmail_connected=true&mock=true&state={user_id}"
             
         scopes = [
             "https://www.googleapis.com/auth/gmail.send",

@@ -1,5 +1,6 @@
 import imaplib
 import email
+import re
 from email.header import decode_header
 import logging
 from typing import List
@@ -41,10 +42,13 @@ class EmailInboxWatcher:
     def _decode_string(self, value) -> str:
         if not value:
             return ""
-        decoded_bytes, encoding = decode_header(value)[0]
-        if isinstance(decoded_bytes, bytes):
-            return decoded_bytes.decode(encoding or "utf-8", errors="ignore")
-        return str(decoded_bytes)
+        decoded_parts = []
+        for part_bytes, encoding in decode_header(value):
+            if isinstance(part_bytes, bytes):
+                decoded_parts.append(part_bytes.decode(encoding or "utf-8", errors="ignore"))
+            else:
+                decoded_parts.append(str(part_bytes))
+        return "".join(decoded_parts)
 
     def _extract_email_body(self, msg) -> str:
         body = ""
@@ -106,21 +110,41 @@ class EmailInboxWatcher:
                         recipient = self._decode_string(msg["To"])
                         body = self._extract_email_body(msg)
 
-                        # Match sender or body with candidate companies
-                        sender_lower = sender.lower()
+                        # Extract the actual email address from "Name <addr>" headers
+                        sender_addr = sender.lower()
+                        addr_match = re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", sender_addr)
+                        if addr_match:
+                            sender_addr = addr_match.group(0)
+                        recipient_addr = recipient.lower()
+                        addr_match = re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", recipient_addr)
+                        if addr_match:
+                            recipient_addr = addr_match.group(0)
+
                         body_lower = body.lower()
                         subject_lower = subject.lower()
 
                         matched_app = None
+                        matched_reason = None
                         for app in applications:
                             comp = app.company.lower()
-                            # Match company name in sender header, subject, or email body
-                            if comp in sender_lower or comp in subject_lower:
+                            company_domain_key = re.sub(r"[^a-zA-Z0-9]", "", comp)
+                            if not company_domain_key:
+                                continue
+                            # Match company name in sender header, subject, body,
+                            # or the company's domain inside the sender address.
+                            if (
+                                company_domain_key in sender_addr
+                                or company_domain_key in recipient_addr
+                                or comp in sender
+                                or comp in subject_lower
+                                or comp in body_lower
+                            ):
                                 matched_app = app
+                                matched_reason = "company name/domain match"
                                 break
-                            
+
                         if matched_app:
-                            logger.info(f"Matched email from '{sender}' relating to application: {matched_app.company}")
+                            logger.info(f"Matched email from '{sender}' relating to application: {matched_app.company} ({matched_reason})")
                             matched_emails.append({
                                 "sender": sender,
                                 "recipient": recipient,
