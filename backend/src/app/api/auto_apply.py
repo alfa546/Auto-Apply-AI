@@ -35,6 +35,9 @@ def get_uid_and_email(user_context):
     return uid, email
 
 def build_cover_letter_with_links(cover_letter: str, profile: Profile) -> str:
+    """
+    Appends GitHub, LinkedIn, and Portfolio links to the cover letter signature block.
+    """
     links = []
     if profile:
         if profile.github_url:
@@ -57,6 +60,31 @@ def build_cover_letter_with_links(cover_letter: str, profile: Profile) -> str:
         return cover_letter[:insert_pos] + links_block + cover_letter[insert_pos:]
     else:
         return cover_letter + links_block
+
+def sanitize_company_domain(company: str) -> str:
+    """
+    Converts a company name into a plausible email domain, e.g.
+    'Acme Corporation' -> 'acmecorporation' (never 'acme corporation').
+    Strips common TLDs / noise tokens so the fabricated address stays valid.
+    """
+    if not company:
+        return ""
+    clean = re.sub(r"[^a-zA-Z0-9]", "", company.lower())
+    # Drop known TLD-like suffixes that may appear inside the company name
+    for tld in (".com", ".co", ".io", ".ai", "ltd", "llc", "inc", "gmbh", "corp", "technology"):
+        if clean.endswith(tld) and len(clean) > len(tld) + 2:
+            clean = clean[: -len(tld)]
+            break
+    return clean
+
+
+def build_fallback_recipient_email(company: str) -> str:
+    """Best-effort fallback contact email for a company; '' if not sane."""
+    domain = sanitize_company_domain(company)
+    if len(domain) < 3:
+        return ""
+    return f"careers@{domain}.com"
+
 
 def prepare_application_data(
     db: Session,
