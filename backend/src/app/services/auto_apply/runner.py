@@ -49,7 +49,6 @@ class AutoApplyBatchRunner:
 
     def start_batch(
         self,
-        db: Session,
         uid: str,
         user_email: str,
         job_count: int = 10,
@@ -92,7 +91,7 @@ class AutoApplyBatchRunner:
         # Launch background thread
         thread = threading.Thread(
             target=self._run_batch_worker,
-            args=(db, uid, user_email, job_count, internship_count, run_id),
+            args=(uid, user_email, job_count, internship_count, run_id),
             daemon=True,
             name=f"auto-apply-{uid}-{run_id}"
         )
@@ -143,8 +142,16 @@ class AutoApplyBatchRunner:
             }
         return _active_runs[uid]
 
-    def _run_batch_worker(self, db: Session, uid: str, user_email: str, job_count: int, internship_count: int, run_id: str):
-        """Background worker that processes jobs until targets are met or stopped."""
+    def _run_batch_worker(self, uid: str, user_email: str, job_count: int, internship_count: int, run_id: str):
+        """Background worker that processes jobs until targets are met or stopped.
+
+        IMPORTANT: Opens its own DB session because the worker runs in a
+        background thread and must never share a request-scoped session
+        (FastAPI closes those once the HTTP response is sent).
+        """
+        from src.app.database import SessionLocal
+
+        db = SessionLocal()
         lock = _run_locks.get(uid)
         try:
             # Fetch user profile & settings
@@ -161,6 +168,9 @@ class AutoApplyBatchRunner:
 
             # Resolve resume path once for all sends
             cv_path = resolve_resume_local_path(profile.resume_url)
+            if not cv_path or not os.path.exists(cv_path):
+                self._update_state(uid, status="error", last_error="Resume file could not be located or downloaded.")
+                return
 
             # Get all available job opportunities, not yet applied to
             applied_urls = set()
