@@ -8,6 +8,7 @@ import logging
 from src.app.database import get_db
 from src.app.models import User, UserSettings
 from src.app.auth import get_current_user
+from src.app.config import settings
 from src.app.services.gmail_client import gmail_client
 
 logger = logging.getLogger(__name__)
@@ -53,21 +54,29 @@ def gmail_oauth_callback(
     if not state:
         raise HTTPException(status_code=400, detail="Missing OAuth state parameter (user ID).")
     user_id = state
-    
-    settings = db.query(UserSettings).filter(UserSettings.user_id == user_id).first()
-    if not settings:
-        settings = UserSettings(user_id=user_id)
-        db.add(settings)
 
-    cid = settings.google_client_id if (settings and settings.google_client_id) else None
-    csecret = settings.google_client_secret if (settings and settings.google_client_secret) else None
+    # Validate that the user actually exists - prevents an attacker from
+    # binding their Gmail to an arbitrary user_id via the callback.
+    user_exists = db.query(User).filter(User.id == user_id).first()
+    if not user_exists:
+        logger.warning(f"Gmail OAuth callback received for unknown user_id: {user_id}")
+        raise HTTPException(status_code=400, detail="Invalid OAuth state (unknown user).")
+    user_id = user_exists.id
+
+    settings_row = db.query(UserSettings).filter(UserSettings.user_id == user_id).first()
+    if not settings_row:
+        settings_row = UserSettings(user_id=user_id)
+        db.add(settings_row)
+
+    cid = settings_row.google_client_id if (settings_row and settings_row.google_client_id) else None
+    csecret = settings_row.google_client_secret if (settings_row and settings_row.google_client_secret) else None
     tokens = gmail_client.exchange_code_for_tokens(code, client_id=cid, client_secret=csecret)
         
     if tokens.get("success"):
-        settings.is_gmail_connected = True
-        settings.gmail_access_token = tokens.get("access_token")
+        settings_row.is_gmail_connected = True
+        settings_row.gmail_access_token = tokens.get("access_token")
         if tokens.get("refresh_token"):
-            settings.gmail_refresh_token = tokens.get("refresh_token")
+            settings_row.gmail_refresh_token = tokens.get("refresh_token")
         
         # Fetch the user's Gmail email address using the access token
         try:
@@ -80,7 +89,7 @@ def gmail_oauth_callback(
                     userinfo = userinfo_res.json()
                     gmail_addr = userinfo.get("email")
                     if gmail_addr:
-                        settings.gmail_email_address = gmail_addr
+                        settings_row.gmail_email_address = gmail_addr
                         logger.info(f"Retrieved Gmail address: {gmail_addr}")
                 else:
                     logger.warning(f"Failed to fetch Gmail userinfo: {userinfo_res.status_code} - {userinfo_res.text}")
@@ -88,10 +97,10 @@ def gmail_oauth_callback(
             logger.warning(f"Error fetching Gmail userinfo: {e}")
         
         db.commit()
-        return RedirectResponse(url="http://localhost:3000/?gmail_connected=true")
+        return RedirectResponse(url=f"{settings.FRONTEND_BASE_URL}?gmail_connected=true")
     else:
         error_msg = tokens.get("error", "OAuth failed")
-        return RedirectResponse(url=f"http://localhost:3000/?gmail_error={error_msg}")
+        return RedirectResponse(url=f"{settings.FRONTEND_BASE_URL}?gmail_error={error_msg}")
 
 @router.post("/setup-smtp")
 def setup_gmail_smtp(
