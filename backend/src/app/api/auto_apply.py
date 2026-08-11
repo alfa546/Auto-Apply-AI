@@ -35,9 +35,6 @@ def get_uid_and_email(user_context):
     return uid, email
 
 def build_cover_letter_with_links(cover_letter: str, profile: Profile) -> str:
-    """
-    Appends GitHub, LinkedIn, and Portfolio links to the cover letter signature block.
-    """
     links = []
     if profile:
         if profile.github_url:

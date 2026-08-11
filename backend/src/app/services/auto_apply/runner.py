@@ -115,9 +115,12 @@ class AutoApplyBatchRunner:
         return {"success": False, "message": "No active auto-apply run found."}
 
     def dismiss_batch(self, uid: str) -> dict:
-        """Dismisses and clears the stored batch status for a user."""
+        """Dismisses and clears the stored batch status for a user (only when not running)."""
+        if uid in _active_runs and _active_runs[uid].get("status") == "running":
+            return {"success": False, "message": "Cannot dismiss an active auto-apply run. Stop it first."}
         if uid in _active_runs:
             _active_runs.pop(uid, None)
+            _run_locks.pop(uid, None)
             logger.info(f"Dismissed auto-apply status for user {uid}")
             return {"success": True, "message": "Auto-apply status dismissed."}
         return {"success": True, "message": "No active auto-apply run found."}
@@ -140,7 +143,10 @@ class AutoApplyBatchRunner:
                 "current_job_company": None,
                 "applied_jobs": [],
             }
-        return _active_runs[uid]
+        # Return a shallow copy so callers cannot mutate internal state
+        state = dict(_active_runs[uid])
+        state["applied_jobs"] = list(state.get("applied_jobs") or [])
+        return state
 
     def _run_batch_worker(self, uid: str, user_email: str, job_count: int, internship_count: int, run_id: str):
         """Background worker that processes jobs until targets are met or stopped.
@@ -391,10 +397,10 @@ class AutoApplyBatchRunner:
                 if send_result.get("new_access_token"):
                     user_settings.gmail_access_token = send_result.get("new_access_token")
             else:
-                return {"success": False, "error": "No sending method configured."}
+                return {"success": False, "error": "No sending method configured.", "retryable": False}
 
             if not send_result.get("success"):
-                return {"success": False, "error": send_result.get("error", "Unknown send error")}
+                return {"success": False, "error": send_result.get("error", "Unknown send error"), "retryable": True}
 
             # Record application
             app_record = Application(
@@ -416,8 +422,12 @@ class AutoApplyBatchRunner:
             return {"success": True, "recipient_email": recipient_email}
 
         except Exception as e:
+            try:
+                db.rollback()
+            except Exception:
+                pass
             logger.error(f"Auto-apply single job failed for {job.company}: {e}", exc_info=True)
-            return {"success": False, "error": str(e)}
+            return {"success": False, "error": str(e), "retryable": True}
 
     def _update_state(self, uid: str, **kwargs):
         """Thread-safe state update."""
