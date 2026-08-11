@@ -9,30 +9,28 @@ def detect_llm_provider(api_key: str) -> str:
     Automatically detects AI Model Provider based on API key prefix pattern.
     - 'gsk_' -> Groq (Free High-Speed Open Source Tier)
     - 'sk-or-' -> OpenRouter (Free Open Source Models)
-    - 'AIzaSy' -> Google Gemini
+    - 'AIzaSy' -> Google Gemini (legacy key format)
+    - 'AQ.'  -> Google Gemini (newer 2025+ key format)
     - 'sk-ant-' -> Anthropic Claude
     - 'sk-proj-' or 'sk-' -> OpenAI / DeepSeek
-    - 'AQ.' -> Could be an invalid/mistyped key, default to a clear error hint
     """
     if not api_key:
         return "openai"
-    
+
     k = api_key.strip()
     if k.startswith("gsk_"):
         return "groq"
     elif k.startswith("sk-or-"):
         return "openrouter"
-    elif k.startswith("AIzaSy"):
+    elif k.startswith("AIzaSy") or k.startswith("AQ."):
+        # 'AQ.' is the newer Google API key format (Gemini), NOT a typo
         return "gemini"
     elif k.startswith("sk-ant-"):
         return "anthropic"
     elif k.startswith("sk-") or k.startswith("sk-proj-"):
         return "openai"
-    elif k.startswith("AQ."):
-        # This doesn't match any known provider - likely a mistyped/incorrect key
-        # Return a special value that triggers clearer error handling
-        return "invalid"
-    
+
+    # Unknown prefix - fall back to OpenAI so that explicit configs keep working
     return "openai"
 
 def get_llm_headers_and_url(
