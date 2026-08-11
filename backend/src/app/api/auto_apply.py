@@ -1,4 +1,5 @@
 import os
+import re
 import logging
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -101,7 +102,13 @@ def prepare_application_data(
     """
     recipient_email = job.company_email
     if not recipient_email:
-        recipient_email = f"careers@{job.company.lower().replace(' ', '')}.com"
+        recipient_email = build_fallback_recipient_email(job.company)
+        if not recipient_email:
+            raise HTTPException(
+                status_code=400,
+                detail=f"No contact email found for {job.company} ({job.title}). "
+                       "Add HR contact info to the job before applying.",
+            )
 
     sender_email = user_settings.gmail_email_address or user_email
     if not sender_email:
@@ -134,7 +141,7 @@ def prepare_application_data(
             _saved_openai = config_module.settings.OPENAI_API_KEY
             _saved_gemini = config_module.settings.GEMINI_API_KEY
             if user_api_key:
-                if user_provider == "gemini" or user_api_key.startswith("AIzaSy"):
+                if user_provider == "gemini" or user_api_key.startswith(("AIzaSy", "AQ.")):
                     config_module.settings.GEMINI_API_KEY = user_api_key
                 else:
                     config_module.settings.OPENAI_API_KEY = user_api_key
@@ -371,11 +378,10 @@ def start_auto_apply_batch(
     # Validate and start batch
     try:
         result = auto_apply_runner.start_batch(
-            db=db,
             uid=uid,
             user_email=user_email,
             job_count=payload.job_count or 10,
-            internship_count=payload.internship_count or 3
+            internship_count=payload.internship_count or 3,
         )
         return result
     except ValueError as e:
