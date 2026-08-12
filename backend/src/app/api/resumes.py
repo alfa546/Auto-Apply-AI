@@ -45,7 +45,7 @@ class ATSCheckRequest(BaseModel):
     job_description: Optional[str] = Field(None, description="Full job description text to run semantic keywords matching")
 
 @router.post("/upload")
-async def upload_resume(
+def upload_resume(
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -55,7 +55,7 @@ async def upload_resume(
     Extracts skills, experience, education, executive summary, and calculates real-time ATS score.
     """
     uid = current_user.id
-    content = await file.read()
+    content = file.file.read()
 
     # Validate extension, non-empty, and file size
     validate_resume_upload(file, content)
