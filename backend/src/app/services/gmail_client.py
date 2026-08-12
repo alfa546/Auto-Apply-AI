@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from typing import Optional, Dict, Any
 
-from src.app.config import settings
+from src.app.core.config import settings
 
 logger = logging.getLogger(__name__)
 

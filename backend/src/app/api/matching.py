@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 import logging
 
-from src.app.database import get_db
-from src.app.auth import get_current_user
-from src.app.models import User
+from src.app.db.database import get_db
+from src.app.core.security import get_current_user
+from src.app.db.models import User
 from src.app.services.matching.pipeline import run_matching_pipeline
 from src.app.services.matching.matcher import MatchingEngine
 

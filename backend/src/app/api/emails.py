@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 import logging
 
-from src.app.database import get_db
-from src.app.auth import get_current_user
-from src.app.models import EmailInteraction, User, Profile
+from src.app.db.database import get_db
+from src.app.core.security import get_current_user
+from src.app.db.models import EmailInteraction, User, Profile
 from src.app.services.email.watcher import EmailInboxWatcher
 from src.app.services.email.classifier import classify_email
 from src.app.services.email.draft_writer import generate_draft_reply
@@ -22,7 +22,7 @@ async def run_email_check_pipeline(db: Session, user_id: str):
     classifies received emails, and drafts professional responses.
     """
     logger.info(f"Triggering email check pipeline for user: {user_id}")
-    from src.app.models import UserSettings
+    from src.app.db.models import UserSettings
     user_settings = db.query(UserSettings).filter(UserSettings.user_id == user_id).first()
     
     if user_settings and user_settings.is_gmail_connected and user_settings.gmail_email_address:
@@ -149,7 +149,7 @@ async def trigger_check(
     # We run database operations on background worker threads
     # To prevent thread race, we pass task parameters
     async def task_wrapper():
-        from src.app.database import SessionLocal
+        from src.app.db.database import SessionLocal
         bg_db = SessionLocal()
         try:
             await run_email_check_pipeline(bg_db, uid)

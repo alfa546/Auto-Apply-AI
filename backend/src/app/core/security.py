@@ -3,9 +3,9 @@ import jwt
 from fastapi import HTTPException, Security, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from src.app.config import settings
-from src.app.database import get_db
-from src.app.models import User, UserRole
+from src.app.core.config import settings
+from src.app.db.database import get_db
+from src.app.db.models import User, UserRole
 
 logger = logging.getLogger(__name__)
 

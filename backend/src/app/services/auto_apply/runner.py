@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from typing import Dict, Optional
 from sqlalchemy.orm import Session
 
-from src.app.models import JobFound, Profile, UserSettings, Application
+from src.app.db.models import JobFound, Profile, UserSettings, Application
 from src.app.services.gmail_client import gmail_client
 from src.app.services.llm_client import generate_custom_cover_letter
 from src.app.services.application.pipeline import resolve_resume_local_path
@@ -157,7 +157,7 @@ class AutoApplyBatchRunner:
         background thread and must never share a request-scoped session
         (FastAPI closes those once the HTTP response is sent).
         """
-        from src.app.database import SessionLocal
+        from src.app.db.database import SessionLocal
 
         db = SessionLocal()
         lock = _run_locks.get(uid)
@@ -354,7 +354,7 @@ class AutoApplyBatchRunner:
 
             # Generate cover letter
             try:
-                import src.app.config as config_module
+                import src.app.core.config as config_module
                 _saved_openai = config_module.settings.OPENAI_API_KEY
                 _saved_gemini = config_module.settings.GEMINI_API_KEY
                 if user_settings.openai_api_key:

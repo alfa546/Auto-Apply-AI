@@ -4,9 +4,9 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 import logging
 
-from src.app.database import get_db
-from src.app.auth import get_current_user
-from src.app.models import JobFound, User
+from src.app.db.database import get_db
+from src.app.core.security import get_current_user
+from src.app.db.models import JobFound, User
 from src.app.services.search.aggregator import SearchAggregator
 
 logger = logging.getLogger(__name__)

@@ -3,7 +3,7 @@ import asyncio
 import logging
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from src.app.models import JobFound
+from src.app.db.models import JobFound
 from src.app.services.search.adzuna import AdzunaProvider
 from src.app.services.search.jooble import JoobleProvider
 from src.app.services.search.boards import GreenhouseProvider, LeverProvider
@@ -33,7 +33,7 @@ class SearchAggregator:
         adzuna_id = None
         adzuna_key = None
         if user_id and db:
-            from src.app.models import UserSettings
+            from src.app.db.models import UserSettings
             u_set = db.query(UserSettings).filter(UserSettings.user_id == user_id).first()
             if u_set:
                 jooble_key = u_set.jooble_api_key
@@ -158,7 +158,7 @@ class SearchAggregator:
         3. Formulates optimized search queries blending resume skills + user target preferences.
         4. Runs search aggregator across preferred countries and evaluates match scores.
         """
-        from src.app.models import Profile, UserSettings
+        from src.app.db.models import Profile, UserSettings
         from src.app.services.matching.matcher import MatchingEngine
         
         profile = db.query(Profile).filter(Profile.user_id == user_id).first()

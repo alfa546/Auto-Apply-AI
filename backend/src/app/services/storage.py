@@ -8,7 +8,7 @@ try:
 except ImportError:
     storage = None
     HAS_FIREBASE_STORAGE = False
-from src.app.config import settings
+from src.app.core.config import settings
 
 logger = logging.getLogger(__name__)
 

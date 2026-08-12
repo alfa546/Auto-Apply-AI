@@ -2,7 +2,7 @@ import logging
 import httpx
 import re
 from typing import List, Dict
-from src.app.config import settings
+from src.app.core.config import settings
 from src.app.services.search.base import BaseSearchProvider
 
 logger = logging.getLogger(__name__)

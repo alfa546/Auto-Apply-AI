@@ -2,7 +2,7 @@ import json
 import logging
 import httpx
 from fastapi import HTTPException, status
-from src.app.config import settings
+from src.app.core.config import settings
 from src.app.services.llm_client import get_llm_headers_and_url, is_llm_configured, detect_llm_provider
 
 logger = logging.getLogger(__name__)

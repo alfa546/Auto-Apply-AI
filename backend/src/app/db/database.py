@@ -3,7 +3,7 @@ import os
 import logging
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker
-from src.app.config import settings
+from src.app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,7 @@ def sync_sqlite_schema(db_engine):
     to existing SQLite tables so OperationalError 'no such column' can NEVER happen.
     """
     try:
-        from src.app.models import User, Profile, UserSettings, JobFound, Application, EmailInteraction, CustomCoverLetter
+        from src.app.db.models import User, Profile, UserSettings, JobFound, Application, EmailInteraction, CustomCoverLetter
         with db_engine.connect() as conn:
             for table_name, table in Base.metadata.tables.items():
                 cursor = conn.execute(text(f"PRAGMA table_info({table_name})"))
@@ -84,7 +84,7 @@ def sync_sqlite_schema(db_engine):
     except Exception as e:
         logger.warning(f"SQLite dynamic schema sync warning: {e}")
 
-import src.app.models
+from src.app.db import models
 Base.metadata.create_all(bind=engine)
 
 # If using SQLite fallback, ensure tables are created & synced automatically on startup

@@ -5,7 +5,7 @@ import logging
 import httpx
 import tempfile
 from sqlalchemy.orm import Session
-from src.app.models import Application, User, Profile, JobFound
+from src.app.db.models import Application, User, Profile, JobFound
 from src.app.services.application.cover_letter import generate_cover_letter
 from src.app.services.application.form_filler import FormFillerService
 from src.app.services.pdf_parser import extract_text_from_pdf

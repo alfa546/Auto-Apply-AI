@@ -1,6 +1,6 @@
 import logging
 from sqlalchemy.orm import Session
-from src.app.models import JobFound, Application
+from src.app.db.models import JobFound, Application
 from src.app.services.matching.matcher import MatchingEngine
 
 logger = logging.getLogger(__name__)

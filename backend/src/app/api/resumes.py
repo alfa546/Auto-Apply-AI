@@ -4,11 +4,11 @@ from pydantic import BaseModel, Field
 from typing import Optional
 import logging
 
-from src.app.database import get_db
-from src.app.auth import get_current_user
-from src.app.models import User, Profile, UserSettings
-from src.app.storage import get_storage_provider
-from src.app.config import settings
+from src.app.db.database import get_db
+from src.app.core.security import get_current_user
+from src.app.db.models import User, Profile, UserSettings
+from src.app.services.storage import get_storage_provider
+from src.app.core.config import settings
 from src.app.services.pdf_parser import extract_text_from_pdf
 from src.app.services.ats_checker import evaluate_resume_ats, extract_skills_and_summary_from_text
 
@@ -70,7 +70,7 @@ def upload_resume(
     # Apply user's saved LLM API key for parsing (if available)
     user_settings = db.query(UserSettings).filter(UserSettings.user_id == uid).first()
     if user_settings and user_settings.openai_api_key:
-        import src.app.config as config_module
+        import src.app.core.config as config_module
         if user_settings.llm_provider == "gemini" or user_settings.openai_api_key.startswith("AIzaSy"):
             config_module.settings.GEMINI_API_KEY = user_settings.openai_api_key
         else:

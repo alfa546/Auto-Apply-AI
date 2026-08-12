@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from typing import Optional, List
 import logging
 
-from src.app.database import get_db
-from src.app.auth import get_current_user
-from src.app.models import Application, User
+from src.app.db.database import get_db
+from src.app.core.security import get_current_user
+from src.app.db.models import Application, User
 from src.app.services.application.pipeline import run_apply_pipeline
 
 logger = logging.getLogger(__name__)
@@ -81,7 +81,7 @@ def get_application_details(
 # Background worker wrapper
 async def run_apply_background(user_id: str, application_id: int):
     # Setup local DB session for background task thread
-    from src.app.database import SessionLocal
+    from src.app.db.database import SessionLocal
     db = SessionLocal()
     try:
         await run_apply_pipeline(db, user_id, application_id)

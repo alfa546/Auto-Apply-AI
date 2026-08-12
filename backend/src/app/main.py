@@ -9,7 +9,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 
-from src.app.config import settings
+from src.app.core.config import settings
 from src.app.api.auth import router as auth_router
 from src.app.api.users import router as users_router
 from src.app.api.resumes import router as resumes_router

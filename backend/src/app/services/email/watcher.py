@@ -5,8 +5,8 @@ from email.header import decode_header
 import logging
 from typing import List
 from sqlalchemy.orm import Session
-from src.app.config import settings
-from src.app.models import Application
+from src.app.core.config import settings
+from src.app.db.models import Application
 
 logger = logging.getLogger(__name__)
 

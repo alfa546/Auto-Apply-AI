@@ -5,10 +5,10 @@ from typing import Optional
 from sqlalchemy.orm import Session
 import logging
 
-from src.app.database import get_db
-from src.app.models import User, UserSettings
-from src.app.auth import get_current_user
-from src.app.config import settings
+from src.app.db.database import get_db
+from src.app.db.models import User, UserSettings
+from src.app.core.security import get_current_user
+from src.app.core.config import settings
 from src.app.services.gmail_client import gmail_client
 
 logger = logging.getLogger(__name__)

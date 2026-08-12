@@ -1,7 +1,7 @@
 import asyncio
 import logging
-from src.app.database import SessionLocal
-from src.app.config import settings
+from src.app.db.database import SessionLocal
+from src.app.core.config import settings
 from src.app.services.search.aggregator import SearchAggregator
 
 logger = logging.getLogger(__name__)

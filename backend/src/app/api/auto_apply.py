@@ -6,9 +6,9 @@ from pydantic import BaseModel
 from typing import Optional, List
 from sqlalchemy.orm import Session
 
-from src.app.database import get_db
-from src.app.models import User, Profile, UserSettings, Application, JobFound
-from src.app.auth import get_current_user
+from src.app.db.database import get_db
+from src.app.db.models import User, Profile, UserSettings, Application, JobFound
+from src.app.core.security import get_current_user
 from src.app.services.gmail_client import gmail_client
 from src.app.services.llm_client import generate_custom_cover_letter
 from src.app.services.application.pipeline import resolve_resume_local_path
@@ -139,7 +139,7 @@ def prepare_application_data(
             user_custom_base = user_settings.custom_api_base
 
             # Temporarily override global settings for this request
-            import src.app.config as config_module
+            import src.app.core.config as config_module
             _saved_openai = config_module.settings.OPENAI_API_KEY
             _saved_gemini = config_module.settings.GEMINI_API_KEY
             if user_api_key:

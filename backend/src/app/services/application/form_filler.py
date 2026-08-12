@@ -7,7 +7,7 @@ try:
 except ImportError:
     async_playwright = None
     HAS_PLAYWRIGHT = False
-from src.app.config import settings
+from src.app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
