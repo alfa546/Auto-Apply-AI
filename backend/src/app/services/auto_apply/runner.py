@@ -3,6 +3,8 @@ import time
 import logging
 import threading
 import uuid
+import random
+from datetime import datetime, timezone
 from typing import Dict, Optional
 from sqlalchemy.orm import Session
 
@@ -172,6 +174,22 @@ class AutoApplyBatchRunner:
                 self._update_state(uid, status="error", last_error="Gmail is not connected.")
                 return
 
+            # --- Check Daily Limit ---
+            now = datetime.now(timezone.utc)
+            start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            today_count = db.query(Application).filter(
+                Application.user_id == uid,
+                Application.applied_at >= start_of_day
+            ).count()
+
+            limit = user_settings.daily_apply_limit or 20
+            if today_count >= limit:
+                msg = f"Daily apply limit reached ({today_count}/{limit}). Try again tomorrow to protect your Gmail account."
+                logger.warning(f"User {uid}: {msg}")
+                self._update_state(uid, status="error", last_error=msg)
+                return
+            # --------------------------
+
             # Resolve resume path once for all sends
             cv_path = resolve_resume_local_path(profile.resume_url)
             if not cv_path or not os.path.exists(cv_path):
@@ -240,8 +258,10 @@ class AutoApplyBatchRunner:
                         self._update_state(uid, status="error", last_error=result.get("error"))
                         return
 
-                # Small delay between sends to avoid rate limiting
-                time.sleep(2)
+                # Human-like delay between sends to avoid rate limiting
+                delay = random.randint(480, 600)
+                logger.info(f"Sleeping for {delay} seconds before next job application to prevent rate limits.")
+                time.sleep(delay)
 
             # Process internships (up to internship_target)
             internships_applied = 0
@@ -293,7 +313,10 @@ class AutoApplyBatchRunner:
                         self._update_state(uid, status="error", last_error=result.get("error"))
                         return
 
-                time.sleep(2)
+                # Human-like delay between sends to avoid rate limiting
+                delay = random.randint(480, 600)
+                logger.info(f"Sleeping for {delay} seconds before next internship application to prevent rate limits.")
+                time.sleep(delay)
 
             # Mark completed (if not stopped)
             if not self._is_stopped(uid):
