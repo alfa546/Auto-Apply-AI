@@ -58,7 +58,17 @@ def parse_resume_with_openai(text: str) -> dict:
         "messages": [
             {
                 "role": "system",
-                "content": "You are a professional ATS resume parser. Your job is to extract structured details from the raw resume text. Conform exactly to the JSON schema."
+                "content": (
+                    "You are a professional ATS resume parser. Your job is to extract structured details from the raw resume text.\n"
+                    "Conform exactly to this JSON structure and return ONLY valid JSON:\n"
+                    "{\n"
+                    "  \"skills\": [\"List of technical or professional skills\"],\n"
+                    "  \"experience\": [{\"title\": \"...\", \"company\": \"...\", \"duration\": \"...\", \"description\": \"...\"}],\n"
+                    "  \"education\": [{\"degree\": \"...\", \"institution\": \"...\", \"year\": \"...\"}],\n"
+                    "  \"projects\": [{\"title\": \"...\", \"description\": \"...\"}],\n"
+                    "  \"languages\": [\"Languages spoken\"]\n"
+                    "}"
+                )
             },
             {
                 "role": "user",
@@ -66,70 +76,7 @@ def parse_resume_with_openai(text: str) -> dict:
             }
         ],
         "response_format": {
-            "type": "json_schema",
-            "json_schema": {
-                "name": "resume_parser_schema",
-                "strict": True,
-                "schema": {
-                    "type": "object",
-                    "properties": {
-                        "skills": {
-                            "type": "array",
-                            "items": {"type": "string"},
-                            "description": "List of technical or professional skills"
-                        },
-                        "experience": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "title": {"type": "string"},
-                                    "company": {"type": "string"},
-                                    "duration": {"type": "string"},
-                                    "description": {"type": "string"}
-                                },
-                                "required": ["title", "company", "duration", "description"],
-                                "additionalProperties": False
-                            },
-                            "description": "Professional experience history"
-                        },
-                        "education": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "degree": {"type": "string"},
-                                    "institution": {"type": "string"},
-                                    "year": {"type": "string"}
-                                },
-                                "required": ["degree", "institution", "year"],
-                                "additionalProperties": False
-                            },
-                            "description": "Education background"
-                        },
-                        "projects": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "title": {"type": "string"},
-                                    "description": {"type": "string"}
-                                },
-                                "required": ["title", "description"],
-                                "additionalProperties": False
-                            },
-                            "description": "Personal or academic projects"
-                        },
-                        "languages": {
-                            "type": "array",
-                            "items": {"type": "string"},
-                            "description": "Languages spoken"
-                        }
-                    },
-                    "required": ["skills", "experience", "education", "projects", "languages"],
-                    "additionalProperties": False
-                }
-            }
+            "type": "json_object"
         }
     }
     
