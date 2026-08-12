@@ -66,13 +66,15 @@ def sanitize_company_domain(company: str) -> str:
     """
     Converts a company name into a plausible email domain, e.g.
     'Acme Corporation' -> 'acmecorporation' (never 'acme corporation').
-    Strips common TLDs / noise tokens so the fabricated address stays valid.
+    Only literal TLDs (e.g. '.com', '.io') are stripped; business-word
+    tokens like 'corp'/'inc' are kept since real companies commonly use
+    them inside their email domains (e.g. acmecorp.com).
     """
     if not company:
         return ""
     clean = re.sub(r"[^a-zA-Z0-9]", "", company.lower())
-    # Drop known TLD-like suffixes that may appear inside the company name
-    for tld in (".com", ".co", ".io", ".ai", "ltd", "llc", "inc", "gmbh", "corp", "technology"):
+    # Strip literal-TLD noise that may appear inside the company name
+    for tld in (".com", ".co", ".io", ".ai"):
         if clean.endswith(tld) and len(clean) > len(tld) + 2:
             clean = clean[: -len(tld)]
             break

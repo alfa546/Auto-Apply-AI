@@ -121,8 +121,8 @@ class SearchAggregator:
                 
                 # Save new job found record
                 job_record = JobFound(
-                    title=opp.get("title"),
-                    company=company,
+                    title=opp.get("title") or "Untitled Opportunity",
+                    company=company or "Unknown Company",
                     company_email=company_email,
                     extracted_emails=extracted_emails,
                     location=opp.get("location"),
@@ -135,11 +135,18 @@ class SearchAggregator:
                     raw_data=opp.get("raw_data", {})
                 )
                 db.add(job_record)
-                new_records_count += 1
+                # Commit per-record so a single duplicate/constraint failure
+                # never aborts the whole aggregation batch.
+                try:
+                    db.commit()
+                    new_records_count += 1
+                except IntegrityError:
+                    db.rollback()
+                    logger.warning(f"Skipped duplicate job insertion for URL: {url}")
+                except Exception as exc:
+                    db.rollback()
+                    logger.error(f"Failed to insert job {url}: {exc}")
 
-        if new_records_count > 0:
-            db.commit()
-            
         logger.info(f"Aggregator pipeline complete. Saved {new_records_count} new opportunities to the database.")
         return new_records_count
 

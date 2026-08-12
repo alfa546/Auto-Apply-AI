@@ -78,7 +78,7 @@ def sync_sqlite_schema(db_engine):
                         try:
                             conn.execute(text(alter_query))
                             conn.commit()
-                            print(f"Auto-migrated SQLite column: {table_name}.{col.name}")
+                            logger.info(f"Auto-migrated SQLite column: {table_name}.{col.name}")
                         except Exception as ex:
                             logger.warning(f"Could not alter {table_name}.{col.name}: {ex}")
     except Exception as e:
