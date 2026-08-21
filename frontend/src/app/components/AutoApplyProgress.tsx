@@ -50,7 +50,7 @@ export default function AutoApplyProgress({
     }[status.status] || "text-slate-300";
 
     return (
-        <div className={`fixed bottom-6 right-6 z-50 w-[380px] shadow-2xl border rounded-2xl backdrop-blur-xl ${isRunning ? "border-red-500/60 bg-[#12141d]/95 shadow-[0_10px_30px_rgba(239,68,68,0.25)]" : "border-white/10 bg-[#12141d]/95"
+        <div className={`fixed bottom-6 right-4 left-4 sm:left-auto sm:right-6 z-50 w-auto sm:w-[380px] max-w-full shadow-2xl border rounded-2xl backdrop-blur-xl ${isRunning ? "border-red-500/60 bg-[#12141d]/95 shadow-[0_10px_30px_rgba(239,68,68,0.25)]" : "border-white/10 bg-[#12141d]/95"
             }`}>
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">

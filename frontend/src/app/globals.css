@@ -18,11 +18,11 @@ body {
   color: var(--foreground);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
   min-height: 100vh;
+  overflow-x: clip;
   background-size: 32px 32px !important;
   background-image: 
     linear-gradient(to right, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px) !important;
-  background-attachment: fixed !important;
 }
 
 /* Bright Visible Grid Pattern Class */
@@ -31,7 +31,6 @@ body {
   background-image: 
     linear-gradient(to right, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px) !important;
-  background-attachment: fixed !important;
 }
 
 /* Red Glow Top Backdrop (OmniRoute screenshot) */

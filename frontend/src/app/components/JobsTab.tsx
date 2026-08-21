@@ -172,7 +172,11 @@ export default function JobsTab({
               <div className="flex md:flex-col items-end justify-between gap-4 min-w-[200px]">
                 <div className="text-right">
                   <div className="text-xs text-slate-400">AI Match Score</div>
-                  <div className="text-lg font-extrabold text-rose-400">{job.match_score || 92}% Match</div>
+                  {job.match_score ? (
+                    <div className="text-lg font-extrabold text-rose-400">{job.match_score}% Match</div>
+                  ) : (
+                    <div className="text-lg font-extrabold text-slate-500 text-sm mt-1">Not computed</div>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-2 w-full">

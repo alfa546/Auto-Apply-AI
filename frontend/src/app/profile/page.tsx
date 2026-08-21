@@ -15,9 +15,9 @@ export default function ProfilePage() {
 
   // User details & links
   const [userEmail, setUserEmail] = useState("");
-  const [portfolioUrl, setPortfolioUrl] = useState("https://your-portfolio.dev");
-  const [githubUrl, setGithubUrl] = useState("https://github.com/your-username");
-  const [otherUrl, setOtherUrl] = useState("https://linkedin.com/in/your-username");
+  const [portfolioUrl, setPortfolioUrl] = useState("");
+  const [githubUrl, setGithubUrl] = useState("");
+  const [otherUrl, setOtherUrl] = useState("");
 
   // Career Preferences
   const [targetRoles, setTargetRoles] = useState<string[]>(["Frontend Engineer", "Full Stack Developer", "AI Specialist"]);
@@ -263,30 +263,13 @@ export default function ProfilePage() {
 
     setIsUploading(true);
     setAgentPhase("reading");
-    setAgentLogs(["[Agent] Initializing local environment...", "[Agent] Reading PDF binary..."]);
+    setAgentLogs([
+      "[Agent] Uploading resume to parsing engine...",
+      "[Agent] Parsing and extracting structured profile..."
+    ]);
 
     const formData = new FormData();
     formData.append("file", file);
-
-    const fakeLogs = [
-      "[Agent] Initializing AI analysis engine...",
-      "[Agent] Chunking resume text...",
-      "[Agent] Extracting skills and core competencies...",
-      "[Agent] Analyzing work experience achievements...",
-      "[Agent] Formatting structured JSON profile...",
-      "[Agent] Calculating real-time ATS match score..."
-    ];
-    let logIndex = 0;
-
-    const logInterval = setInterval(() => {
-      if (logIndex < fakeLogs.length) {
-        setAgentLogs(prev => [...prev, fakeLogs[logIndex]]);
-        if (logIndex === 1) setAgentPhase("planning");
-        else if (logIndex === 3) setAgentPhase("extracting");
-        else if (logIndex === 5) setAgentPhase("scoring");
-        logIndex++;
-      }
-    }, 1200);
 
     try {
       const res = await fetch(`${API_BASE}/api/v1/resumes/upload`, {
@@ -295,9 +278,10 @@ export default function ProfilePage() {
         body: formData
       });
 
-      clearInterval(logInterval);
       setAgentPhase("complete");
-      setAgentLogs(prev => [...prev, "[Agent] Process finished successfully!"]);
+      setAgentLogs(prev => [...prev, res.ok
+        ? "[Agent] Resume processed and profile updated successfully!"
+        : "[Agent] Resume processing failed."]);
 
       if (res.ok) {
         const data = await res.json();
@@ -332,7 +316,6 @@ export default function ProfilePage() {
         }
       }
     } catch (err) {
-      clearInterval(logInterval);
       showToast(err instanceof Error ? err.message : "Failed to upload and analyze resume.", "error");
     } finally {
       setTimeout(() => {
