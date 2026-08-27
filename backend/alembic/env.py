@@ -14,7 +14,7 @@ from alembic import context
 config = context.config
 
 # Dynamically set the sqlalchemy URL from settings
-from src.app.config import settings
+from src.app.core.config import settings
 database_url = f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_SERVER}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
 config.set_main_option("sqlalchemy.url", database_url)
 
@@ -25,8 +25,8 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from src.app.database import Base
-from src.app import models  # Ensure models are imported so metadata is populated
+from src.app.db.database import Base
+from src.app.db import models  # Ensure models are imported so metadata is populated
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

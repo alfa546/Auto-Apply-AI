@@ -23,6 +23,8 @@ export default function SettingsPage() {
   const [adzunaAppId, setAdzunaAppId] = useState("");
   const [adzunaAppKey, setAdzunaAppKey] = useState("");
   const [joobleApiKey, setJoobleApiKey] = useState("");
+  const [linkedinEmail, setLinkedinEmail] = useState("");
+  const [linkedinPassword, setLinkedinPassword] = useState("");
   const [isSavingApiSettings, setIsSavingApiSettings] = useState(false);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([
     "United States", "United Kingdom", "Canada", "Australia",
@@ -79,6 +81,8 @@ export default function SettingsPage() {
         if (data.adzuna_app_id) setAdzunaAppId(data.adzuna_app_id);
         if (data.adzuna_app_key) setAdzunaAppKey(data.adzuna_app_key);
         if (data.jooble_api_key) setJoobleApiKey(data.jooble_api_key);
+        if (data.linkedin_email) setLinkedinEmail(data.linkedin_email);
+        if (data.linkedin_password) setLinkedinPassword(data.linkedin_password);
         if (data.target_countries?.length) {
           setSelectedCountries(data.target_countries);
         }
@@ -114,6 +118,8 @@ export default function SettingsPage() {
           adzuna_app_id: adzunaAppId,
           adzuna_app_key: adzunaAppKey,
           jooble_api_key: joobleApiKey,
+          linkedin_email: linkedinEmail,
+          linkedin_password: linkedinPassword,
           target_countries: selectedCountries
         })
       });
@@ -148,6 +154,8 @@ export default function SettingsPage() {
             adzunaAppId={adzunaAppId} setAdzunaAppId={setAdzunaAppId}
             adzunaAppKey={adzunaAppKey} setAdzunaAppKey={setAdzunaAppKey}
             joobleApiKey={joobleApiKey} setJoobleApiKey={setJoobleApiKey}
+            linkedinEmail={linkedinEmail} setLinkedinEmail={setLinkedinEmail}
+            linkedinPassword={linkedinPassword} setLinkedinPassword={setLinkedinPassword}
             isSavingApiSettings={isSavingApiSettings} handleSaveApiSettings={handleSaveApiSettings}
           />
         </ErrorBoundary>

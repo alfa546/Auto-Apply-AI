@@ -1,5 +1,8 @@
 import logging
 import jwt
+import base64
+import hashlib
+from cryptography.fernet import Fernet
 from fastapi import HTTPException, Security, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
@@ -13,6 +16,32 @@ security_scheme = HTTPBearer(auto_error=False)
 
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = "HS256"
+
+def get_fernet() -> Fernet:
+    """Generate a stable Fernet key derived from the application SECRET_KEY."""
+    if not SECRET_KEY:
+        raise ValueError("SECRET_KEY environment variable is not set")
+    # Derive a 32-byte url-safe base64 key from the secret key
+    key = hashlib.sha256(SECRET_KEY.encode()).digest()
+    return Fernet(base64.urlsafe_b64encode(key))
+
+def encrypt_credential(credential: str) -> str:
+    """Encrypt a sensitive string."""
+    if not credential:
+        return credential
+    f = get_fernet()
+    return f.encrypt(credential.encode()).decode()
+
+def decrypt_credential(encrypted_credential: str) -> str:
+    """Decrypt a sensitive string."""
+    if not encrypted_credential:
+        return encrypted_credential
+    f = get_fernet()
+    try:
+        return f.decrypt(encrypted_credential.encode()).decode()
+    except Exception as e:
+        logger.error(f"Failed to decrypt credential: {e}")
+        return None
 
 async def get_current_user(
     token_creds: HTTPAuthorizationCredentials = Security(security_scheme),
