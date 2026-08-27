@@ -91,10 +91,6 @@ class UserSettings(Base):
     adzuna_app_id = Column(String, nullable=True)
     adzuna_app_key = Column(String, nullable=True)
     jooble_api_key = Column(String, nullable=True)
-    
-    # LinkedIn Integration (Encrypted)
-    linkedin_email = Column(String, nullable=True)
-    linkedin_password_encrypted = Column(String, nullable=True)
 
     # Gmail OAuth & Email Connection Settings
     is_gmail_connected = Column(Boolean, default=False)

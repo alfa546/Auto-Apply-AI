@@ -8,7 +8,6 @@ from src.app.services.search.adzuna import AdzunaProvider
 from src.app.services.search.jooble import JoobleProvider
 from src.app.services.search.boards import GreenhouseProvider, LeverProvider
 from src.app.services.search.rss import RSSProvider
-from src.app.plugins.linkedin.scraper import LinkedInScraperProvider
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +32,6 @@ class SearchAggregator:
         jooble_key = None
         adzuna_id = None
         adzuna_key = None
-        linkedin_email = None
-        linkedin_pwd = None
         if user_id and db:
             from src.app.db.models import UserSettings
             u_set = db.query(UserSettings).filter(UserSettings.user_id == user_id).first()
@@ -42,8 +39,6 @@ class SearchAggregator:
                 jooble_key = u_set.jooble_api_key
                 adzuna_id = u_set.adzuna_app_id
                 adzuna_key = u_set.adzuna_app_key
-                linkedin_email = u_set.linkedin_email
-                linkedin_pwd = u_set.linkedin_password_encrypted
 
         # Run all providers concurrently
         tasks = [
@@ -54,11 +49,6 @@ class SearchAggregator:
             RSSProvider().search(query, country)
         ]
         
-        # Add LinkedIn if credentials are provided
-        if linkedin_email and linkedin_pwd:
-            logger.info("LinkedIn credentials found. Including LinkedIn Scraper in aggregation.")
-            tasks.append(LinkedInScraperProvider(email=linkedin_email, encrypted_password=linkedin_pwd).search(query, country))
-            
         gathered_results = await asyncio.gather(*tasks, return_exceptions=True)
         
         all_opportunities = []

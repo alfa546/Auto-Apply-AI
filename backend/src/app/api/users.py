@@ -31,8 +31,6 @@ class SettingsUpdateRequest(BaseModel):
     adzuna_app_key: Optional[str] = None
     jooble_api_key: Optional[str] = None
     target_countries: Optional[List[str]] = None
-    linkedin_email: Optional[str] = None
-    linkedin_password: Optional[str] = None
 
 class ProfileUpdateRequest(BaseModel):
     email: Optional[str] = None
@@ -111,8 +109,6 @@ def get_user_settings(current_user: User = Depends(get_current_user), db: Sessio
         "adzuna_app_id": settings.adzuna_app_id or "",
         "adzuna_app_key": mask_key(settings.adzuna_app_key),
         "jooble_api_key": mask_key(settings.jooble_api_key),
-        "linkedin_email": settings.linkedin_email or "",
-        "linkedin_password": mask_key(settings.linkedin_password_encrypted) if settings.linkedin_password_encrypted else "",
         "is_gmail_connected": settings.is_gmail_connected,
         "gmail_email_address": settings.gmail_email_address or "",
         "target_roles": settings.target_roles or [],
@@ -138,7 +134,6 @@ def update_user_settings(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    from src.app.core.security import encrypt_credential
     """
     Update and save user API keys and integration credentials.
     """
@@ -168,10 +163,6 @@ def update_user_settings(
         settings.jooble_api_key = payload.jooble_api_key
     if payload.target_countries is not None:
         settings.preferred_countries = payload.target_countries
-    if payload.linkedin_email is not None:
-        settings.linkedin_email = payload.linkedin_email
-    if payload.linkedin_password is not None and "••••••••" not in payload.linkedin_password:
-        settings.linkedin_password_encrypted = encrypt_credential(payload.linkedin_password)
 
     db.commit()
     return {"status": "success", "message": "API keys and integration settings saved successfully!"}

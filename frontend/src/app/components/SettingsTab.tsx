@@ -25,10 +25,6 @@ interface SettingsTabProps {
   setAdzunaAppKey: (v: string) => void;
   joobleApiKey: string;
   setJoobleApiKey: (v: string) => void;
-  linkedinEmail: string;
-  setLinkedinEmail: (v: string) => void;
-  linkedinPassword: string;
-  setLinkedinPassword: (v: string) => void;
   isSavingApiSettings: boolean;
   handleSaveApiSettings: (e: React.FormEvent) => void;
 }
@@ -45,8 +41,6 @@ export default function SettingsTab({
   adzunaAppId, setAdzunaAppId,
   adzunaAppKey, setAdzunaAppKey,
   joobleApiKey, setJoobleApiKey,
-  linkedinEmail, setLinkedinEmail,
-  linkedinPassword, setLinkedinPassword,
   isSavingApiSettings, handleSaveApiSettings
 }: SettingsTabProps) {
   return (
@@ -252,31 +246,6 @@ export default function SettingsTab({
                   placeholder="Jooble API Key"
                   className="w-full omni-input rounded-xl px-3.5 py-2.5 font-mono text-xs"
                 />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-white/10 mt-4">
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">LinkedIn Email (For Scraper Plugin)</label>
-                <input 
-                  type="email"
-                  value={linkedinEmail}
-                  onChange={e => setLinkedinEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  className="w-full omni-input rounded-xl px-3.5 py-2.5 font-mono text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">LinkedIn Password</label>
-                <input 
-                  type={showApiKeys ? "text" : "password"}
-                  value={linkedinPassword}
-                  onChange={e => setLinkedinPassword(e.target.value)}
-                  placeholder="Your LinkedIn Password"
-                  className="w-full omni-input rounded-xl px-3.5 py-2.5 font-mono text-xs"
-                />
-                <p className="text-[10px] text-rose-400 mt-1">Credentials are securely encrypted in the database.</p>
               </div>
             </div>
           </div>
